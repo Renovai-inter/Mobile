@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#519059"
+    tools:context=".view.Splash_screen">
+
+    <!-- Logo / símbolo -->
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="100dp"
+        android:layout_height="107dp"
+        android:layout_marginTop="180dp"
+        android:contentDescription="Logo Renovai"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo"
+        app:layout_constraintBottom_toTopOf="@id/renovai_estilizado"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- Renovai estilizado -->
+    <ImageView
+        android:id="@+id/renovai_estilizado"
+        android:layout_width="273dp"
+        android:layout_height="69dp"
+        android:layout_marginTop="10dp"
+        android:contentDescription="Renovai"
+        android:scaleType="fitCenter"
+        android:src="@drawable/renovai_estilizado"
+        app:layout_constraintBottom_toTopOf="@id/transforme_texto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/logo" />
+
+    <!-- Slogan -->
+    <ImageView
+        android:id="@+id/transforme_texto"
+        android:layout_width="220dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="250dp"
+        android:contentDescription="Transforme hoje, sustente o amanhã"
+        android:scaleType="fitCenter"
+        android:src="@drawable/transforme_texto"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/renovai_estilizado" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
