@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#292929"
+    tools:context=".view.LoginActivity">
+
+    <!-- ===================================================== -->
+    <!-- CARTÃO BRANCO PRINCIPAL -->
+    <!-- ===================================================== -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/containerLogin"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#FAFAF8"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+
+        <!-- ================================================= -->
+        <!-- CABEÇALHO VERDE -->
+        <!-- ================================================= -->
+
+        <!-- CABEÇALHO VERDE -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/header"
+            android:layout_width="0dp"
+            android:layout_height="190dp"
+            android:layout_marginStart="-1dp"
+            android:layout_marginEnd="-1dp"
+            app:cardBackgroundColor="#519059"
+            app:cardCornerRadius="30dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/logo"
+                    android:layout_width="80dp"
+                    android:layout_height="85dp"
+                    android:layout_marginTop="20dp"
+                    android:contentDescription="Logo Renovai"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/logo"
+                    app:layout_constraintBottom_toTopOf="@id/renovaiEstilizado"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_chainStyle="packed" />
+
+                <ImageView
+                    android:id="@+id/renovaiEstilizado"
+                    android:layout_width="230dp"
+                    android:layout_height="60dp"
+                    android:layout_marginTop="1dp"
+                    android:layout_marginBottom="5dp"
+                    android:contentDescription="Renovai"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/renovai_estilizado"
+                    app:layout_constraintBottom_toTopOf="@id/transformeTexto"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/logo" />
+
+                <ImageView
+                    android:id="@+id/transformeTexto"
+                    android:layout_width="190dp"
+                    android:layout_height="22dp"
+                    android:layout_marginBottom="10dp"
+                    android:contentDescription="Transforme hoje, sustente o amanhã"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/transforme_texto"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/renovaiEstilizado" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- TAMPA O CANTO SUPERIOR ESQUERDO -->
+        <View
+            android:id="@+id/tampaSuperiorEsquerda"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="#519059"
+            android:elevation="1dp"
+            app:layout_constraintStart_toStartOf="@id/header"
+            app:layout_constraintTop_toTopOf="@id/header" />
+
+
+        <!-- TAMPA O CANTO SUPERIOR DIREITO -->
+        <View
+            android:id="@+id/tampaSuperiorDireita"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:background="#519059"
+            android:elevation="1dp"
+            app:layout_constraintEnd_toEndOf="@id/header"
+            app:layout_constraintTop_toTopOf="@id/header" />
+
+
+        <!-- ================================================= -->
+        <!-- BEM-VINDO -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtBemVindo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Bem-vindo"
+            android:textColor="#000000"
+            android:textSize="26sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header" />
+
+
+        <!-- ================================================= -->
+        <!-- E-MAIL -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="36dp"
+            android:layout_marginTop="25dp"
+            android:text="E-mail"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtBemVindo" />
+
+
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="25dp"
+            android:backgroundTint="#F7EEEE"
+            android:hint="Seu@email.com"
+            android:inputType="textEmailAddress"
+            android:paddingStart="18dp"
+            android:paddingEnd="15dp"
+            android:textColor="#000000"
+            android:textColorHint="#999999"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtEmail" />
+
+
+        <!-- ================================================= -->
+        <!-- SENHA -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtSenha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="35dp"
+            android:layout_marginTop="15dp"
+            android:text="Senha"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edtEmail" />
+
+
+        <EditText
+            android:id="@+id/edtSenha"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="25dp"
+            android:backgroundTint="#F7EEEE"
+            android:hint="Sua senha"
+            android:inputType="textPassword"
+            android:paddingStart="18dp"
+            android:paddingEnd="15dp"
+            android:textColor="#000000"
+            android:textColorHint="#999999"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtSenha" />
+
+
+        <!-- ================================================= -->
+        <!-- ESQUECEU A SENHA -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtEsqueceuSenha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="24dp"
+            android:text="Esqueceu a senha?"
+            android:textColor="#519059"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/edtSenha" />
+
+
+        <!-- ================================================= -->
+        <!-- BOTÃO ENTRAR -->
+        <!-- ================================================= -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEntrar"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="45dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="45dp"
+            android:text="Entrar"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="#882A50"
+            app:cornerRadius="15dp"
+            app:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtEsqueceuSenha" />
+
+
+        <!-- ================================================= -->
+        <!-- LINHA / OU / LINHA -->
+        <!-- ================================================= -->
+
+        <View
+            android:id="@+id/linhaEsquerda"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="27dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginBottom="7dp"
+            android:background="#80000000"
+            app:layout_constraintBottom_toBottomOf="@id/txtOu"
+            app:layout_constraintEnd_toStartOf="@id/txtOu"
+            app:layout_constraintStart_toStartOf="parent" />
+
+
+        <TextView
+            android:id="@+id/txtOu"
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:gravity="center"
+            android:text="ou"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btnEntrar" />
+
+
+        <View
+            android:id="@+id/linhaDireita"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginStart="19dp"
+            android:layout_marginEnd="27dp"
+            android:layout_marginBottom="7dp"
+            android:background="#80000000"
+            app:layout_constraintBottom_toBottomOf="@+id/txtOu"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/txtOu" />
+
+
+        <!-- ================================================= -->
+        <!-- CADASTRO -->
+        <!-- ================================================= -->
+
+        <TextView
+            android:id="@+id/txtNaoTemCadastro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:text="Não tem cadastro?"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@id/txtCadastre"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtOu" />
+
+
+        <TextView
+            android:id="@+id/txtCadastre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:text="Cadastre-se"
+            android:textColor="#519059"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/txtNaoTemCadastro"
+            app:layout_constraintTop_toTopOf="@id/txtNaoTemCadastro" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
