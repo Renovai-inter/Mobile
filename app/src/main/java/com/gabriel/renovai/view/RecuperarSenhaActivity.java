@@ -1,7 +1,9 @@
 package com.gabriel.renovai.view;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,5 +30,15 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
         setContentView(R.layout.activity_recuperar_senha);
+
+        // Implementando os elementos
+        ImageView btnVoltar = findViewById(R.id.btnVoltar);
+
+
+        btnVoltar.setOnClickListener(v -> {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        });
+
     }
 }

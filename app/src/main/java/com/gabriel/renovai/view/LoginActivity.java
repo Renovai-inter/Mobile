@@ -36,6 +36,11 @@ public class LoginActivity extends AppCompatActivity {
         TextView txtCadastre = findViewById(R.id.txtCadastre);
         TextView txtEsqueceuSenha = findViewById(R.id.txtEsqueceuSenha);
 
+        // Ir para a tela de recuperar senha
+        txtEsqueceuSenha.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RecuperarSenhaActivity.class);
+            startActivity(intent);
+        });
 
         // Ir para a tela de EscolhaCadastro
         txtCadastre.setOnClickListener(v -> {
