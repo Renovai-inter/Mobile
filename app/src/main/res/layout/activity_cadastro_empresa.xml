@@ -463,7 +463,7 @@
                     android:layout_height="58dp"
                     android:layout_marginBottom="25dp"
                     android:gravity="center_vertical"
-                    android:background="F8F8F8"
+                    android:background="#F8F8F8"
                     android:orientation="horizontal">
 
                     <ImageView

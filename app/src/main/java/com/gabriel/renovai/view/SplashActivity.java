@@ -1,5 +1,6 @@
 package com.gabriel.renovai.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -22,5 +23,22 @@ public class SplashActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                //Abrir a tela principal
+                Intent rota = new Intent(SplashActivity.this, LoginActivity.class);
+                startActivity(rota);
+                finish();
+            }
+        }).start();
+
     }
 }
