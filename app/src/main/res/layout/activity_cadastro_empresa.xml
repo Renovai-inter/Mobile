@@ -10,133 +10,146 @@
     android:background="#FAFAF8"
     tools:context=".view.CadastroEmpresaActivity">
 
+
+    <!-- ===================================================== -->
+    <!-- CABEÇALHO -->
+    <!-- ===================================================== -->
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/headerCadastro"
+        android:layout_width="0dp"
+        android:layout_height="210dp"
+        android:layout_marginStart="-1dp"
+        android:layout_marginEnd="-1dp"
+        app:cardBackgroundColor="#882B4E"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeWidth="0dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+
+            <!-- LOGO -->
+
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_marginTop="30dp"
+                android:contentDescription="Logo Renovai"
+                android:scaleType="fitCenter"
+                android:src="@drawable/logo"
+                app:layout_constraintBottom_toTopOf="@id/renovaiEstilizado"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_chainStyle="packed" />
+
+
+            <!-- NOME RENOVAI -->
+
+            <ImageView
+                android:id="@+id/renovaiEstilizado"
+                android:layout_width="235dp"
+                android:layout_height="55dp"
+                android:contentDescription="Renovai"
+                android:scaleType="fitCenter"
+                android:src="@drawable/renovai_estilizado"
+                app:layout_constraintBottom_toTopOf="@id/transformeTexto"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/logo" />
+
+
+            <!-- FRASE -->
+
+            <ImageView
+                android:id="@+id/transformeTexto"
+                android:layout_width="190dp"
+                android:layout_height="20dp"
+                android:contentDescription="Transforme hoje, sustente o amanhã"
+                android:scaleType="fitCenter"
+                android:src="@drawable/transforme_texto"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/renovaiEstilizado" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    </com.google.android.material.card.MaterialCardView>
+    <!-- ===================================================== -->
+    <!-- QUADRADOS PARA TAMPAR OS CANTOS SUPERIORES -->
+    <!-- ===================================================== -->
+
+    <View
+        android:id="@+id/tampaSuperiorEsquerda"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="#882B4E"
+        android:elevation="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/tampaSuperiorDireita"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="#882B4E"
+        android:elevation="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <!-- ===================================================== -->
+    <!-- CONTEÚDO DO CADASTRO -->
+    <!-- ===================================================== -->
+
     <ScrollView
         android:id="@+id/scrollCadastro"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:fillViewport="true"
-        android:background="#FAFAF8"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerCadastro">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:paddingTop="25dp"
             android:paddingBottom="35dp">
 
 
-            <!-- ========================================== -->
-            <!-- CABEÇALHO -->
-            <!-- ========================================== -->
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="205dp">
-
-                <!-- Fundo verde -->
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="205dp"
-                    app:cardBackgroundColor="#882B4E"
-                    app:cardCornerRadius="30dp"
-                    app:cardElevation="0dp"
-                    app:strokeWidth="0dp">
-
-                    <androidx.constraintlayout.widget.ConstraintLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-
-                        <!-- LOGO -->
-
-                        <ImageView
-                            android:id="@+id/logo"
-                            android:layout_width="85dp"
-                            android:layout_height="90dp"
-                            android:contentDescription="Logo Renovai"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/logo"
-                            app:layout_constraintBottom_toTopOf="@id/renovaiEstilizado"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:layout_constraintVertical_chainStyle="packed" />
-
-
-                        <!-- NOME RENOVAI -->
-
-                        <ImageView
-                            android:id="@+id/renovaiEstilizado"
-                            android:layout_width="235dp"
-                            android:layout_height="58dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/renovai_estilizado"
-                            app:layout_constraintBottom_toTopOf="@id/transformeTexto"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/logo" />
-
-
-                        <!-- FRASE -->
-
-                        <ImageView
-                            android:id="@+id/transformeTexto"
-                            android:layout_width="190dp"
-                            android:layout_height="20dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/transforme_texto"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toBottomOf="@id/renovaiEstilizado" />
-
-                    </androidx.constraintlayout.widget.ConstraintLayout>
-
-                </com.google.android.material.card.MaterialCardView>
-
-
-                <!--
-                    QUADRADOS VERDES.
-                    Eles ficam DENTRO do FrameLayout,
-                    portanto não empurram o restante da tela.
-                -->
-
-                <View
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="top|start"
-                    android:background="#882B4E" />
-
-                <View
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:layout_gravity="top|end"
-                    android:background="#882B4E" />
-
-            </FrameLayout>
-
-
-            <!-- ========================================== -->
+            <!-- ================================================= -->
             <!-- TÍTULO -->
-            <!-- ========================================== -->
+            <!-- ================================================= -->
 
             <TextView
                 android:id="@+id/tituloCadastro"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="28dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginBottom="25dp"
                 android:text="Crie sua conta"
                 android:textColor="#000000"
                 android:textSize="26sp"
                 android:textStyle="bold" />
 
 
-            <!-- ========================================== -->
+            <!-- ================================================= -->
             <!-- FORMULÁRIO -->
-            <!-- ========================================== -->
+            <!-- ================================================= -->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -146,23 +159,23 @@
                 android:orientation="vertical">
 
 
-                <!-- NOME -->
+                <!-- ==================== NOME ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Nome"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -171,8 +184,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Nome"
-                        android:src="@drawable/nome_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/nome_icon" />
 
                     <EditText
                         android:id="@+id/edtNome"
@@ -184,28 +197,29 @@
                         android:inputType="textPersonName"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- E-MAIL -->
+                <!-- ==================== E-MAIL ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="E-mail"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -214,8 +228,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="E-mail"
-                        android:src="@drawable/email_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/email_icon" />
 
                     <EditText
                         android:id="@+id/edtEmail"
@@ -227,28 +241,29 @@
                         android:inputType="textEmailAddress"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- TELEFONE -->
+                <!-- ==================== TELEFONE ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Nº de Telefone"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -257,8 +272,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Telefone"
-                        android:src="@drawable/telefone_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/telefone_icon" />
 
                     <EditText
                         android:id="@+id/edtTelefone"
@@ -270,28 +285,29 @@
                         android:inputType="phone"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- EMPRESA -->
+                <!-- ==================== EMPRESA ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Empresa"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -300,8 +316,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Empresa"
-                        android:src="@drawable/empresa_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/empresa_icon" />
 
                     <EditText
                         android:id="@+id/edtEmpresa"
@@ -313,28 +329,29 @@
                         android:inputType="text"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- CNPJ -->
+                <!-- ==================== CNPJ ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="CNPJ"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -343,8 +360,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="CNPJ"
-                        android:src="@drawable/empresa_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/empresa_icon" />
 
                     <EditText
                         android:id="@+id/edtCnpj"
@@ -356,28 +373,29 @@
                         android:inputType="number"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- ENDEREÇO -->
+                <!-- ==================== ENDEREÇO ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Endereço"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -386,8 +404,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Endereço"
-                        android:src="@drawable/endereco_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/endereco_icon" />
 
                     <EditText
                         android:id="@+id/edtEndereco"
@@ -399,28 +417,29 @@
                         android:inputType="textPostalAddress"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- SENHA -->
+                <!-- ==================== SENHA ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Senha"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
-                    android:layout_marginBottom="20dp"
-                    android:gravity="center_vertical"
+                    android:layout_height="55dp"
+                    android:layout_marginBottom="18dp"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -429,8 +448,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Senha"
-                        android:src="@drawable/senha_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/senha_icon" />
 
                     <EditText
                         android:id="@+id/edtSenha"
@@ -442,28 +461,29 @@
                         android:inputType="textPassword"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
 
 
-                <!-- CONFIRMAR SENHA -->
+                <!-- ==================== CONFIRMAR SENHA ==================== -->
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="7dp"
                     android:text="Confirmar senha"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="58dp"
+                    android:layout_height="55dp"
                     android:layout_marginBottom="25dp"
-                    android:gravity="center_vertical"
                     android:background="#F8F8F8"
+                    android:gravity="center_vertical"
                     android:orientation="horizontal">
 
                     <ImageView
@@ -472,8 +492,8 @@
                         android:layout_marginStart="16dp"
                         android:layout_marginEnd="15dp"
                         android:contentDescription="Confirmar senha"
-                        android:src="@drawable/senha_icon"
-                        android:scaleType="fitCenter" />
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/senha_icon" />
 
                     <EditText
                         android:id="@+id/edtConfirmarSenha"
@@ -485,6 +505,7 @@
                         android:inputType="textPassword"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
+                        android:textColorHint="#999999"
                         android:textSize="15sp" />
 
                 </LinearLayout>
@@ -492,9 +513,9 @@
             </LinearLayout>
 
 
-            <!-- ========================================== -->
-            <!-- TERMOS -->
-            <!-- ========================================== -->
+            <!-- ================================================= -->
+            <!-- TERMOS DE USO -->
+            <!-- ================================================= -->
 
             <LinearLayout
                 android:id="@+id/termosContainer"
@@ -523,14 +544,15 @@
             </LinearLayout>
 
 
-            <!-- ========================================== -->
-            <!-- BOTÃO -->
-            <!-- ========================================== -->
+            <!-- ================================================= -->
+            <!-- BOTÃO CADASTRAR -->
+            <!-- ================================================= -->
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/btnCadastrar"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
+                android:layout_marginBottom="30dp"
                 android:layout_marginStart="45dp"
                 android:layout_marginEnd="45dp"
                 android:clickable="true"
@@ -544,13 +566,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Entrar"
+                    android:text="Cadastrar"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp"
                     android:textStyle="bold" />
 
             </com.google.android.material.card.MaterialCardView>
-
 
         </LinearLayout>
 
