@@ -1,7 +1,9 @@
 package com.gabriel.renovai.view;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,5 +30,19 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
         setContentView(R.layout.activity_login);
+
+
+        // Instanciando os elementos
+        TextView txtCadastre = findViewById(R.id.txtCadastre);
+        TextView txtEsqueceuSenha = findViewById(R.id.txtEsqueceuSenha);
+
+
+        // Ir para a tela de EscolhaCadastro
+        txtCadastre.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, EscolheActivity.class);
+            startActivity(intent);
+        });
+
+
     }
 }
