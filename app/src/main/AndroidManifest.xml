@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Renovai">
         <activity
+            android:name=".view.SplashActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.LoginActivity"
             android:exported="false" />
         <activity
@@ -24,7 +27,7 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".view.SplashActivity"
+            android:name=".view.RecuperarSenhaActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
