@@ -1,4 +1,4 @@
-package com.gabriel.renovai.view;
+package com.example.renovai.view;
 
 import android.content.Intent;
 import android.graphics.Color;
@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.gabriel.renovai.R;
+import com.example.renovai.R;
 
 public class LoginActivity extends AppCompatActivity {
 
