@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.gabriel.renovai"
+    namespace = "com.example.renovai"
     compileSdk {
         version = release(36)
     }
 
     defaultConfig {
-        applicationId = "com.gabriel.renovai"
+        applicationId = "com.example.renovai"
         minSdk = 33
         targetSdk = 36
         versionCode = 1

@@ -1,20 +1,18 @@
-package com.gabriel.renovai.view;
+package com.example.renovai.view;
 
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.gabriel.renovai.R;
+import com.example.renovai.R;
 
-public class RecuperarSenhaActivity extends AppCompatActivity {
+public class EscolheActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,16 +27,23 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
 
         getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
-        setContentView(R.layout.activity_recuperar_senha);
+        setContentView(R.layout.activity_escolhe);
 
         // Implementando os elementos
         ImageView btnVoltar = findViewById(R.id.btnVoltar);
+        View empresaButton = findViewById(R.id.empresaButton);
+        View cooperativaButton = findViewById(R.id.cooperativaButton);
 
+        // Ir para o cadastro de empresa
+        empresaButton.setOnClickListener(v -> {
+            Intent intent = new Intent(this, CadastroEmpresaActivity.class);
+            startActivity(intent);
+        });
 
+        // Voltar para tela de login
         btnVoltar.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         });
-
     }
 }
