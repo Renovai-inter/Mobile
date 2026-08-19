@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FAFAF8"
+    tools:context=".view.RecuperarSenhaActivity">
+
+    <ScrollView
+        android:id="@+id/scrollRedefinicao"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:background="#FAFAF8"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="30dp">
+
+            <!-- ================================================= -->
+            <!-- CABEÇALHO -->
+            <!-- ================================================= -->
+
+            <FrameLayout
+                android:id="@+id/headerContainer"
+                android:layout_width="match_parent"
+                android:layout_height="250dp">
+
+                <!-- CARD VERDE -->
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/header"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    app:cardBackgroundColor="#519059"
+                    app:cardCornerRadius="30dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <!-- LOGO -->
+
+                        <ImageView
+                            android:id="@+id/logo"
+                            android:layout_width="78dp"
+                            android:layout_height="82dp"
+                            android:layout_marginTop="40dp"
+                            android:contentDescription="Logo Renovai"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/logo"
+                            app:layout_constraintBottom_toTopOf="@id/renovaiEstilizado"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintVertical_chainStyle="packed" />
+
+                        <!-- RENOVAI -->
+
+                        <ImageView
+                            android:id="@+id/renovaiEstilizado"
+                            android:layout_width="225dp"
+                            android:layout_height="55dp"
+                            android:contentDescription="Renovai"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/renovai_estilizado"
+                            app:layout_constraintTop_toBottomOf="@id/logo"
+                            app:layout_constraintBottom_toTopOf="@id/transformeTexto"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent" />
+
+                        <!-- FRASE -->
+
+                        <ImageView
+                            android:id="@+id/transformeTexto"
+                            android:layout_width="190dp"
+                            android:layout_height="18dp"
+                            android:layout_marginTop="3dp"
+                            android:contentDescription="Transforme hoje, sustente o amanhã"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/transforme_texto"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toBottomOf="@id/renovaiEstilizado" />
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </com.google.android.material.card.MaterialCardView>
+
+
+                <!-- ================================================= -->
+                <!-- QUADRADOS PARA COBRIR OS CANTOS -->
+                <!-- ================================================= -->
+
+                <View
+                    android:id="@+id/cantoSuperiorEsquerdo"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="top|start"
+                    android:background="#519059" />
+
+                <View
+                    android:id="@+id/cantoSuperiorDireito"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="top|end"
+                    android:background="#519059" />
+
+
+                <!-- ================================================= -->
+                <!-- BOTÃO VOLTAR -->
+                <!-- ================================================= -->
+
+                <ImageView
+                    android:id="@+id/btnVoltar"
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top|start"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="45dp"
+                    android:contentDescription="Voltar"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/voltar" />
+
+            </FrameLayout>
+
+
+            <!-- ================================================= -->
+            <!-- TÍTULO -->
+            <!-- ================================================= -->
+
+            <TextView
+                android:id="@+id/tituloRedefinir"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="22dp"
+                android:text="Redefinir senha"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="normal" />
+
+
+            <!-- ================================================= -->
+            <!-- CAMPOS -->
+            <!-- ================================================= -->
+
+            <LinearLayout
+                android:id="@+id/containerCampos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:orientation="vertical">
+
+
+                <!-- ============================= -->
+                <!-- SENHA -->
+                <!-- ============================= -->
+
+                <TextView
+                    android:id="@+id/labelSenha"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="7dp"
+                    android:text="Senha"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/campoSenha"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:background="#F8F8F8"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="15dp"
+                        android:contentDescription="Ícone de senha"
+                        android:src="@drawable/senha_icon"
+                        android:scaleType="fitCenter" />
+
+                    <EditText
+                        android:id="@+id/edtNovaSenha"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Digite a nova senha"
+                        android:inputType="textPassword"
+                        android:paddingEnd="10dp"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+
+                <!-- ============================= -->
+                <!-- CONFIRMAÇÃO -->
+                <!-- ============================= -->
+
+                <TextView
+                    android:id="@+id/labelConfirmacao"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="7dp"
+                    android:text="Confirmação de senha"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/campoConfirmacao"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:gravity="center_vertical"
+                    android:background="#F8F8F8"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="15dp"
+                        android:contentDescription="Ícone de confirmação de senha"
+                        android:src="@drawable/senha_icon"
+                        android:scaleType="fitCenter" />
+
+                    <EditText
+                        android:id="@+id/edtConfirmarSenha"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Confirme a senha"
+                        android:inputType="textPassword"
+                        android:paddingEnd="10dp"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <!-- ================================================= -->
+            <!-- BOTÃO ALTERAR -->
+            <!-- ================================================= -->
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnAlterar"
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="42dp"
+                android:layout_marginTop="74dp"
+                android:layout_marginEnd="42dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="#882B4E"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Alterar"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
