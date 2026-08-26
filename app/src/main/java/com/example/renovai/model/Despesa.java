@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.TipoDespesa;
+import com.example.renovai.model.enums.TipoDespesa;
 
 public class Despesa {
 

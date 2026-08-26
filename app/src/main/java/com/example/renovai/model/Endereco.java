@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.TipoEndereco;
+import com.example.renovai.model.enums.TipoEndereco;
 
 public class Endereco {
 

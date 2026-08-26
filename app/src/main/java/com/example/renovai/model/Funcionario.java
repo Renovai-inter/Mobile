@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.StatusFuncionario;
+import com.example.renovai.model.enums.StatusFuncionario;
 import java.util.Date;
 
 public class Funcionario {

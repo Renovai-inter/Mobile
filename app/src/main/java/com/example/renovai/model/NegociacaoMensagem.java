@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.TipoMensagem;
+import com.example.renovai.model.enums.TipoMensagem;
 import java.util.Date;
 
 public class NegociacaoMensagem {

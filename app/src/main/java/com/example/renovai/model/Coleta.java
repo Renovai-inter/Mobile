@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.TipoColeta;
+import com.example.renovai.model.enums.TipoColeta;
 import java.math.BigDecimal;
 import java.util.Date;
 

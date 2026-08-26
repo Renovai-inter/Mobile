@@ -1,6 +1,6 @@
 package com.example.renovai.model;
 
-import com.renovai.model.enums.ContatoPreferencial;
+import com.example.renovai.model.enums.ContatoPreferencial;
 import java.util.Date;
 
 public class Cooperativa {
