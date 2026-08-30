@@ -39,7 +39,7 @@ public final class ApiClient {
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(new AuthInterceptor())
-                    .addInterceptor(logging) // remova em release/produção
+                    .addInterceptor(logging)
                     .connectTimeout(30, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
                     .build();

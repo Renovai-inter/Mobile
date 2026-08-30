@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         AuthApiService authService = ApiClient.createService(AuthApiService.class);
 
-        LoginRequest request = new LoginRequest("gestor@cooperativa.com", "senha123");
+        LoginRequest request = new LoginRequest("laviniadas-neves@example.org", "senha123");
 
         // Corrigido: usando retrofit2.Callback e o DTO correto
         authService.login(request).enqueue(new Callback<LoginResponse>() {
