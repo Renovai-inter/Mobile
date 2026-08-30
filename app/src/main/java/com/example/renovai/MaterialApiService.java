@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-/** Espelha MaterialController do backend (rota base: /materiais). */
 public interface MaterialApiService {
 
     @GET("materiais")
