@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
 
-/** Espelha AuthController do backend (rota base: /auth). */
 public interface AuthApiService {
 
     @POST("auth/login")

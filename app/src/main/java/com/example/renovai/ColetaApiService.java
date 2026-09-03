@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-/** Espelha ColetaController do backend (rota base: /coletas). */
 public interface ColetaApiService {
 
     @GET("coletas")

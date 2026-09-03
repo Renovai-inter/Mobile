@@ -13,7 +13,6 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-/** Espelha CooperativaController do backend (rota base: /cooperativas). */
 public interface CooperativaApiService {
 
     @GET("cooperativas")
