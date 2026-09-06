@@ -6,7 +6,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-/** Espelha EstoqueController do backend (rota base: /estoques). */
 public interface EstoqueApiService {
 
     @GET("estoques")

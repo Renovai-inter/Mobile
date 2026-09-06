@@ -8,11 +8,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * NÃO é uma classe de produção — é um exemplo comentado de como usar as
- * peças acima dentro de uma Activity/Fragment/Controller. Apague ou adapte
- * conforme a estrutura MVC de vocês.
- */
 public class ExemploDeUso {
 
     // 1) LOGIN — precisa ser feito antes de qualquer outra chamada,
