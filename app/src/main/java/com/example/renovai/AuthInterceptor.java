@@ -10,8 +10,15 @@ public class AuthInterceptor implements Interceptor {
 
     @NonNull
     @Override
-    public Response intercept(@NonNull Interceptor.Chain chain) throws IOException {
+    public Response intercept(@NonNull Interceptor.Chain chain)
+            throws IOException {
+
         Request originalRequest = chain.request();
+
+        if (originalRequest.url().encodedPath().endsWith("/auth/login")) {
+            return chain.proceed(originalRequest);
+        }
+
         String token = SessionManager.getToken();
 
         if (token == null) {
