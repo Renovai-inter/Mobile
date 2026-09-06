@@ -110,7 +110,7 @@ public class AuthController {
         CadastroEmpresaRequest request = new CadastroEmpresaRequest(
                 nome.trim(), email.trim(), telefone.trim(), senha, nomeEmpresa.trim(), cnpj.trim(), endereco.trim());
 
-        authApiService.cadastro(request).enqueue(new Callback<CadastroEmpresaResponse>() {
+        authApiService.cadastroEmpresa(request).enqueue(new Callback<CadastroEmpresaResponse>() {
             @Override
             public void onResponse(Call<CadastroEmpresaResponse> call, Response<CadastroEmpresaResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
