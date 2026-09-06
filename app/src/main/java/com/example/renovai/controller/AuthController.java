@@ -3,7 +3,9 @@ package com.example.renovai.controller;
 import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
 import com.example.renovai.SessionManager;
+import com.example.renovai.dto.request.CadastroEmpresaRequest;
 import com.example.renovai.dto.request.LoginRequest;
+import com.example.renovai.dto.response.CadastroEmpresaResponse;
 import com.example.renovai.dto.response.LoginResponse;
 
 import retrofit2.Call;
@@ -15,6 +17,11 @@ public class AuthController {
 
     public interface LoginCallback {
         void onSuccess(LoginResponse usuario);
+        void onErro(String mensagem);
+    }
+
+    public interface CadastroEmpresaCallback {
+        void onSuccess(CadastroEmpresaResponse resposta);
         void onErro(String mensagem);
     }
 
@@ -54,7 +61,7 @@ public class AuthController {
         });
     }
 
-    public void cadastrarEmpresa(String nome, String email, String telefone, String nomeEmpresa, String cnpj, String endereco, String senha, String confirmacaoSenha, LoginCallback callback) {
+    public void cadastrarEmpresa(String nome, String email, String telefone, String nomeEmpresa, String cnpj, String endereco, String senha, String confirmacaoSenha, CadastroEmpresaCallback callback) {
         if (nome == null || nome.trim().isEmpty()){
             callback.onErro("Preencha o nome.");
             return;
@@ -100,24 +107,27 @@ public class AuthController {
             return;
         }
 
-        LoginRequest request = new LoginRequest(email.trim(), senha);
+        CadastroEmpresaRequest request = new CadastroEmpresaRequest(
+                nome.trim(), email.trim(), telefone.trim(), senha, nomeEmpresa.trim(), cnpj.trim(), endereco.trim());
 
-        authApiService.login(request).enqueue(new Callback<LoginResponse>() {
+        authApiService.cadastro(request).enqueue(new Callback<CadastroEmpresaResponse>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<CadastroEmpresaResponse> call, Response<CadastroEmpresaResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse body = response.body();
+                    CadastroEmpresaResponse body = response.body();
                     SessionManager.salvarSessao(body.getToken(), body.getEmail(), body.getRole());
                     callback.onSuccess(body);
-                } else if (response.code() == 401) {
-                    callback.onErro("Email ou senha incorretos.");
+                } else if (response.code() == 422) {
+                    callback.onErro("Este e-mail ou CNPJ já está cadastrado.");
+                } else if (response.code() == 400) {
+                    callback.onErro("Verifique os dados informados (email ou CNPJ podem estar num formato inválido).");
                 } else {
-                    callback.onErro("Erro ao entrar (código " + response.code() + "). Tente novamente.");
+                    callback.onErro("Erro ao cadastrar (código " + response.code() + "). Tente novamente.");
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(Call<CadastroEmpresaResponse> call, Throwable t) {
                 callback.onErro("Não foi possível conectar ao servidor. Verifique sua internet.");
             }
         });
