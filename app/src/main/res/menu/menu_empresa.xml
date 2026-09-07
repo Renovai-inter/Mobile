@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+        <item
+            android:id="@+id/nav_favoritas"
+            android:icon="@drawable/ic_star_outline"
+            android:title="Favoritas" />
+
+        <item
+            android:id="@+id/nav_cooperativas"
+            android:icon="@drawable/ic_tree"
+            android:title="Cooperativas" />
+
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_home"
+            android:title="Home" />
+
+        <item
+            android:id="@+id/nav_pedidos"
+            android:icon="@drawable/ic_assignment"
+            android:title="Pedidos" />
+
+        <item
+            android:id="@+id/nav_perfil"
+            android:icon="@drawable/ic_person"
+            android:title="Perfil" />
+
+
+</menu>
