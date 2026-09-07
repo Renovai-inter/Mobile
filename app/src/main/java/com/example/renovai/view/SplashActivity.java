@@ -9,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.renovai.EmpresaActivity;
 import com.example.renovai.R;
 
 public class SplashActivity extends AppCompatActivity {
@@ -34,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
                 }
 
                 //Abrir a tela principal
-                Intent rota = new Intent(SplashActivity.this, LoginActivity.class);
+                Intent rota = new Intent(SplashActivity.this, EmpresaActivity.class);
                 startActivity(rota);
                 finish();
             }
