@@ -1,110 +1,134 @@
 package com.example.renovai;
 
-import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.TypedValue;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.ViewGroup;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-public class EmpresaActivity extends AppCompatActivity {
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-    private View menuFavoritas, menuCooperativas, menuHome, menuPedidos, menuPerfil;
-    private View abaSelecionadaAtual = null;
+public class EmpresaActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
+
         setContentView(R.layout.activity_empresa);
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            int folgaExtraPx = (int) TypedValue.applyDimension(
-                    TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
+        // =========================================================
+        // BARRA DO SISTEMA
+        // =========================================================
 
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+        ViewCompat.setOnApplyWindowInsetsListener(
+                findViewById(R.id.main),
+                (v, insets) -> {
 
-            View customMenu = findViewById(R.id.layout_custom_bottom_menu);
-            if (customMenu != null) {
-                customMenu.setPadding(
-                        customMenu.getPaddingLeft(),
-                        customMenu.getPaddingTop(),
-                        customMenu.getPaddingRight(),
-                        systemBars.bottom + folgaExtraPx
-                );
+                    Insets systemBars = insets.getInsets(
+                            WindowInsetsCompat.Type.systemBars()
+                    );
+
+                    v.setPadding(
+                            systemBars.left,
+                            systemBars.top,
+                            systemBars.right,
+                            0
+                    );
+
+                    return insets;
+                }
+        );
+
+
+        // =========================================================
+        // MENU INFERIOR
+        // =========================================================
+
+        BottomNavigationView menu = findViewById(R.id.bottom_navigation_empresa);
+        android.view.View conteudo = findViewById(R.id.conteudo_empresa);
+
+        // Altura "visível" do menu (ícone + texto), igual em qualquer aparelho.
+        // (72dp = mesmo valor definido em activity_empresa.xml, aqui só serve de base
+        // pro cálculo da altura total abaixo)
+        int alturaBaseMenuPx = (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, 72, getResources().getDisplayMetrics());
+
+        // Aparelhos com navegação por 3 botões reservam bem mais espaço do que
+        // aparelhos com gesto. Em vez de espremer esse espaço DENTRO de uma altura
+        // fixa (o que sumia com o menu em celulares com 3 botões), a altura do menu
+        // cresce: 72dp de conteúdo + o que o sistema precisar embaixo.
+        ViewCompat.setOnApplyWindowInsetsListener(
+                menu,
+                (v, insets) -> {
+                    Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+                    ViewGroup.LayoutParams params = v.getLayoutParams();
+                    params.height = alturaBaseMenuPx + systemBars.bottom;
+                    v.setLayoutParams(params);
+
+                    v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+
+                    // O conteúdo da tela (Home, cards, etc.) precisa reservar a mesma
+                    // altura total do menu, senão fica escondido atrás dele.
+                    ViewGroup.MarginLayoutParams conteudoParams =
+                            (ViewGroup.MarginLayoutParams) conteudo.getLayoutParams();
+                    conteudoParams.bottomMargin = alturaBaseMenuPx + systemBars.bottom;
+                    conteudo.setLayoutParams(conteudoParams);
+
+                    return insets;
+                }
+        );
+
+
+        // =========================================================
+        // CLIQUE NOS ITENS
+        // =========================================================
+
+        menu.setOnItemSelectedListener(item -> {
+
+            int id = item.getItemId();
+
+            if (id == R.id.nav_favoritas) {
+
+                // Tela Favoritas
+                return true;
+
+            } else if (id == R.id.nav_cooperativas) {
+
+                // Tela Cooperativas
+                return true;
+
+            } else if (id == R.id.nav_home) {
+
+                // Tela Home
+                return true;
+
+            } else if (id == R.id.nav_pedidos) {
+
+                // Tela Pedidos
+                return true;
+
+            } else if (id == R.id.nav_perfil) {
+
+                // Tela Perfil
+                return true;
             }
-            return insets;
+
+            return false;
         });
 
-        menuFavoritas = findViewById(R.id.menu_favoritas);
-        menuCooperativas = findViewById(R.id.menu_cooperativas);
-        menuHome = findViewById(R.id.menu_home);
-        menuPedidos = findViewById(R.id.menu_pedidos);
-        menuPerfil = findViewById(R.id.menu_perfil);
 
-        menuFavoritas.setOnClickListener(v -> selecionarAba(menuFavoritas, R.id.container_favoritas, R.drawable.favoritos_empresa_icon));
-        menuCooperativas.setOnClickListener(v -> selecionarAba(menuCooperativas, R.id.container_cooperativas, R.drawable.cooperativa_empresa_icon));
-        menuHome.setOnClickListener(v -> selecionarAba(menuHome, R.id.container_home, R.drawable.home_empresa_icon));
-        menuPedidos.setOnClickListener(v -> selecionarAba(menuPedidos, R.id.container_pedidos, R.drawable.pedidos_empresa_icon));
-        menuPerfil.setOnClickListener(v -> selecionarAba(menuPerfil, R.id.container_perfil, R.drawable.perfil_empresa_icon));
+        // =========================================================
+        // HOME SELECIONADA INICIALMENTE
+        // =========================================================
 
-        // Inicia na aba Home por padrão
-        selecionarAba(menuHome, R.id.container_home, R.drawable.home_empresa_icon);
-    }
-
-    private void selecionarAba(View abaClicada, int containerId, int iconeResId) {
-        if (abaSelecionadaAtual == abaClicada) return;
-
-        // Reseta todas as abas
-        resetarAba(menuFavoritas, R.id.container_favoritas, R.drawable.favoritos_empresa_icon);
-        resetarAba(menuCooperativas, R.id.container_cooperativas, R.drawable.cooperativa_empresa_icon);
-        resetarAba(menuHome, R.id.container_home, R.drawable.home_empresa_icon);
-        resetarAba(menuPedidos, R.id.container_pedidos, R.drawable.pedidos_empresa_icon);
-        resetarAba(menuPerfil, R.id.container_perfil, R.drawable.perfil_empresa_icon);
-
-        // Destaca a aba clicada
-        View container = abaClicada.findViewById(containerId);
-        if (container != null) {
-            container.setBackgroundResource(R.drawable.seletor_menu_background_empresa);
-            ImageView img = (ImageView) ((android.view.ViewGroup) container).getChildAt(0);
-            if (img != null) {
-                img.setImageResource(iconeResId);
-                img.setColorFilter(ContextCompat.getColor(this, R.color.seletor_menu_icon_empresa));
-            }
-        }
-
-        TextView txt = (TextView) ((android.view.ViewGroup) abaClicada).getChildAt(1);
-        if (txt != null) {
-            txt.setTextColor(ColorStateList.valueOf(0xFFD4E699)); // Amarelo claro
-        }
-
-        abaSelecionadaAtual = abaClicada;
-    }
-
-    private void resetarAba(View aba, int containerId, int iconeResId) {
-        if (aba == null) return;
-
-        View container = aba.findViewById(containerId);
-        if (container != null) {
-            container.setBackground(null);
-            ImageView img = (ImageView) ((android.view.ViewGroup) container).getChildAt(0);
-            if (img != null) {
-                img.setImageResource(iconeResId);
-                img.setColorFilter(ContextCompat.getColor(this, android.R.color.white));
-            }
-        }
-
-        TextView txt = (TextView) ((android.view.ViewGroup) aba).getChildAt(1);
-        if (txt != null) {
-            txt.setTextColor(ContextCompat.getColor(this, android.R.color.white));
-        }
+        menu.setSelectedItemId(R.id.nav_home);
     }
 }

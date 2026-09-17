@@ -35,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
                 }
 
                 //Abrir a tela principal
-                Intent rota = new Intent(SplashActivity.this, LoginActivity.class);
+                Intent rota = new Intent(SplashActivity.this, EmpresaActivity.class);
                 startActivity(rota);
                 finish();
             }
