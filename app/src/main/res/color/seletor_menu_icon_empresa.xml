@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--  Quando selecionado: Amarelo claro  -->
+    <item android:state_checked="true" android:color="#D4E699"/>
+    <!--  Quando em repouso: Branco total  -->
+    <item android:state_checked="false" android:color="#FFFFFF"/>
+</selector>

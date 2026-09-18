@@ -74,11 +74,6 @@ public class Usuario {
         this.cpf = cpf;
     }
 
-    /**
-     * Senha em texto puro. Uso restrito a fluxos temporários (ex.: formulário
-     * de cadastro antes do hash ser gerado) — nunca deve ser persistida ou
-     * trafegada como está; prefira sempre senhaHash.
-     */
     public String getSenha() {
         return senha;
     }
