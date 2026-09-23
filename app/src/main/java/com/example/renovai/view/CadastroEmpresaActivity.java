@@ -12,7 +12,6 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
-import com.example.renovai.MainActivity;
 import com.example.renovai.R;
 import com.example.renovai.controller.AuthController;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
@@ -35,7 +34,7 @@ public class CadastroEmpresaActivity extends AppCompatActivity {
 
         getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
-        setContentView(R.layout.activity_cadastro_empresa);
+        setContentView(R.layout.activity_cadastro);
 
         //Implementando os elementos
         ImageView btnVoltar = findViewById(R.id.btnVoltar);
