@@ -36,7 +36,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    
+
     // Retrofit & OkHttp
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
@@ -55,4 +55,13 @@ dependencies {
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // RecyclerView (listas da Home: pedidos e cooperativas recentes)
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // Fragment (aba Home dentro da EmpresaActivity)
+    implementation("androidx.fragment:fragment:1.6.2")
+
+    // Glide (carregar foto da empresa e das cooperativas a partir de uma URL)
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 }

@@ -2,6 +2,7 @@ package com.example.renovai.controller;
 
 import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
+import com.example.renovai.PerfilResolver;
 import com.example.renovai.SessionManager;
 import com.example.renovai.dto.request.CadastroEmpresaRequest;
 import com.example.renovai.dto.request.LoginRequest;
@@ -46,7 +47,15 @@ public class AuthController {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse body = response.body();
                     SessionManager.salvarSessao(body.getToken(), body.getEmail(), body.getRole());
-                    callback.onSuccess(body);
+
+                    // A API não devolve empresaId no /auth/login, então resolvemos à
+                    // parte via GET /perfis (ver PerfilResolver). Não bloqueia o
+                    // sucesso do login: se não achar (ex: conta não é de empresa),
+                    // simplesmente fica null.
+                    PerfilResolver.resolverEmpresaId(body.getEmail(), empresaId -> {
+                        SessionManager.salvarEmpresaId(empresaId);
+                        callback.onSuccess(body);
+                    });
                 } else if (response.code() == 401 || response.code() == 422) {
                     callback.onErro("Email ou senha incorretos.");
                 } else {

@@ -1,0 +1,21 @@
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#FAF6F2" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Visão Geral:" android:textColor="#444444" android:textSize="14sp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:background="@drawable/kpi_card_background" android:orientation="horizontal" android:padding="16dp">
+            <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pedidos do mês" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtTotalPedidos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="0" android:textColor="#882B4E" android:textSize="34sp" android:textStyle="bold"/>
+            </LinearLayout>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical|end" android:orientation="vertical">
+                <TextView android:id="@+id/txtEmNegociacao" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 Em negociação" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold"/>
+                <TextView android:id="@+id/txtFinalizados" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="0 Finalizados" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold"/>
+            </LinearLayout>
+        </LinearLayout>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:layout_marginBottom="10dp" android:text="Pedidos Recentes" android:textColor="#222222" android:textSize="17sp" android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerPedidos" android:layout_width="match_parent" android:layout_height="wrap_content" android:nestedScrollingEnabled="false" tools:listitem="@layout/item_pedido_card"/>
+        <TextView android:id="@+id/txtSemPedidos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhum pedido ainda." android:textColor="#8A8A8A" android:textSize="13sp" android:visibility="gone"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:layout_marginBottom="10dp" android:text="Cooperativas Recentes" android:textColor="#222222" android:textSize="17sp" android:textStyle="bold"/>
+        <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerCooperativas" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" tools:listitem="@layout/item_cooperativa_card"/>
+        <TextView android:id="@+id/txtSemCooperativas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhuma cooperativa favoritada ainda." android:textColor="#8A8A8A" android:textSize="13sp" android:visibility="gone"/>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
