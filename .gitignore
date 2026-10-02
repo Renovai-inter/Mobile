@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Arquivos locais do Android Studio/Gradle
+.gradle-local/
+exportToHTML/
+.idea/
