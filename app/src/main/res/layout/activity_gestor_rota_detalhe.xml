@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <FrameLayout android:layout_width="match_parent" android:layout_height="240dp">
+                <com.example.renovai.view.RotaMapView android:id="@+id/mapaRota" android:layout_width="match_parent" android:layout_height="match_parent" />
+                <TextView android:id="@+id/txtMapaResumo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="bottom|end" android:layout_margin="10dp"
+                    android:background="@drawable/card_unselected_background" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="6dp" android:paddingBottom="6dp"
+                    android:text="—" android:textColor="#4A5568" android:textSize="12sp" />
+            </FrameLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:background="@drawable/card_selected_background" android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:id="@+id/txtRotaTitulo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Rota" android:textColor="#111111" android:textSize="19sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtRotaStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="3dp" android:paddingBottom="3dp" android:text="Aberto" android:textSize="11sp" android:textStyle="bold" />
+                </LinearLayout>
+                <TextView android:id="@+id/txtRotaCriada" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Criada em --" android:textSize="11sp" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Motorista" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtRotaMotorista" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="6dp" android:layout_marginBottom="6dp" android:background="#C8C8C8" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Veículo" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtRotaVeiculo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Não informado" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="Trajeto da Rota" />
+            <LinearLayout android:id="@+id/listaParadas" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="vertical" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:background="@drawable/summary_green_background" android:orientation="vertical" android:padding="14dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Total de paradas" android:textStyle="normal" android:textSize="15sp" />
+                    <TextView android:id="@+id/txtResParadas" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#111111" android:textSize="15sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Distância total" android:textStyle="normal" android:textSize="15sp" />
+                    <TextView android:id="@+id/txtResDistancia" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="15sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tempo estimado" android:textStyle="normal" android:textSize="15sp" />
+                    <TextView android:id="@+id/txtResTempo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="15sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
