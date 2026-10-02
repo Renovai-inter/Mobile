@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="menu_selecionado_empresa">#D4E699</color>
+
+    <!-- Área Cooperado (telas 2.1 a 2.7) -->
+    <color name="background_light_cooperado">#F5F5F5</color>
+</resources>

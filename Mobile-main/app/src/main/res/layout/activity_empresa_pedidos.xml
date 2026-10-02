@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_empresa_header" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <TextView style="@style/G.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pedidos" android:textSize="22sp" />
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Gerencie os pedidos feitos pela empresa" />
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total aprovado" android:layout_marginTop="16dp" />
+            <TextView android:id="@+id/txtTotalAprovadoE" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" />
+            <HorizontalScrollView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:scrollbars="none">
+                <LinearLayout android:id="@+id/trilhaPedidos" style="@style/G.Track" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+            </HorizontalScrollView>
+            <TextView android:id="@+id/txtVazioPedidos" style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp"
+                android:text="Nenhum pedido encontrado." android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaPedidos" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <include layout="@layout/include_empresa_nav" />
+</LinearLayout>
