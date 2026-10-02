@@ -8,9 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class ApiClient {
 
-
-    private static final String BASE_URL = "http://10.165.50.79:3000/api/";
-
+    private static final String BASE_URL =
+            "https://spring-api-2t71.onrender.com/api/";
 
     private static Retrofit retrofit;
 
@@ -25,8 +24,10 @@ public final class ApiClient {
             OkHttpClient client = new OkHttpClient.Builder()
                     .addInterceptor(new AuthInterceptor())
                     .addInterceptor(logging)
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(100, TimeUnit.SECONDS)
+                    .readTimeout(100, TimeUnit.SECONDS)
+                    .writeTimeout(100, TimeUnit.SECONDS)
+                    .callTimeout(180, TimeUnit.SECONDS)
                     .build();
 
             retrofit = new Retrofit.Builder()
@@ -35,6 +36,7 @@ public final class ApiClient {
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
+
         return retrofit;
     }
 
