@@ -1,0 +1,25 @@
+rules_version = '2';
+// Regras do Firestore do Renovaí — cole em: Console Firebase > Firestore Database > Regras
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cache offline das listagens (FirebaseCache): cada instalação do app
+    // (usuário anônimo do Firebase) só lê e grava o próprio cache.
+    match /usuarios/{uid}/{documento=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Lista de relatórios PDF da cooperativa (GestorRelatorios).
+    match /cooperativas/{cooperativaId}/relatorios/{relatorioId} {
+      allow read, delete: if request.auth != null;
+      allow create, update: if request.auth != null
+        && request.resource.data.url is string
+        && request.resource.data.nome is string;
+    }
+
+    // Todo o resto fica fechado.
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}

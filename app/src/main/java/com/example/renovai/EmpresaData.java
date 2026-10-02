@@ -17,6 +17,27 @@ public final class EmpresaData {
 
     private EmpresaData() {}
 
+    // Tipos das listagens da Empresa — permitem que o GestorCache salve e restaure do Firestore
+    // (cache offline). Ver GestorCache.registrarTipo.
+    static {
+        GestorCache.registrarTipo("empresa:meuPerfil", EmpresaResponses.MeuPerfil.class);
+        GestorCache.registrarTipo("empresa:dashboard", EmpresaResponses.Dashboard.class);
+        GestorCache.registrarTipo("empresa:pedidos",
+                new com.google.gson.reflect.TypeToken<List<PedidoResponse>>() {}.getType());
+        GestorCache.registrarTipo("empresa:negociacoes",
+                new com.google.gson.reflect.TypeToken<List<GestorResponses.Negociacao>>() {}.getType());
+        GestorCache.registrarTipo("empresa:favoritos",
+                new com.google.gson.reflect.TypeToken<List<EmpresaResponses.Favorito>>() {}.getType());
+        GestorCache.registrarTipo("empresa:categorias",
+                new com.google.gson.reflect.TypeToken<
+                        List<com.example.renovai.dto.response.CategoriaMaterialResponse>>() {}.getType());
+        GestorCache.registrarTipo("empresa:interesses",
+                new com.google.gson.reflect.TypeToken<List<EmpresaResponses.MaterialInteresse>>() {}.getType());
+        GestorCache.registrarTipo("empresa:perfilId", String.class);
+        GestorCache.registrarTipo(GestorCache.STATUS,
+                new com.google.gson.reflect.TypeToken<List<GestorResponses.Status>>() {}.getType());
+    }
+
     public static String erro(retrofit2.Response<?> r) {
         try {
             if (r.errorBody() != null) {
@@ -40,6 +61,15 @@ public final class EmpresaData {
     }
 
     private static <T> void buscar(
+            String chave,
+            boolean forcar,
+            java.util.function.Supplier<Call<T>> fabrica,
+            GestorData.Ouvinte<T> o) {
+        // Primeiro traz para a memória a cópia salva no Firestore (cache offline), depois segue.
+        GestorCache.aposRestaurar(() -> buscarAgora(chave, forcar, fabrica, o));
+    }
+
+    private static <T> void buscarAgora(
             String chave,
             boolean forcar,
             java.util.function.Supplier<Call<T>> fabrica,
@@ -136,6 +166,10 @@ public final class EmpresaData {
      * remetente/avaliador.
      */
     public static void meuPerfilId(GestorData.Ouvinte<String> o) {
+        GestorCache.aposRestaurar(() -> meuPerfilIdAgora(o));
+    }
+
+    private static void meuPerfilIdAgora(GestorData.Ouvinte<String> o) {
         String cache = GestorCache.obter("empresa:perfilId");
         if (cache != null) {
             o.aoReceber(cache, true);

@@ -20,7 +20,10 @@ import com.example.renovai.adapter.ListaAdapter;
 
 import java.util.List;
 
-/** Tela 4.4 — Seus relatórios: lista com miniatura do PDF, período e acesso para abrir/baixar. */
+/**
+ * Tela 4.4 — Seus relatórios: lista com miniatura do PDF, período e acesso para abrir/baixar. Os
+ * PDFs ficam no aparelho e também no Firebase Storage (ver GestorRelatorios).
+ */
 public class GestorRelatoriosActivity extends GestorBaseActivity {
 
     private ListaAdapter<GestorRelatorios.Meta> adapter;
@@ -53,7 +56,7 @@ public class GestorRelatoriosActivity extends GestorBaseActivity {
                         .setItems(new String[]{"Abrir", "Compartilhar / baixar", "Excluir"}, (d, w) -> {
                             if (w == 0) GestorRelatorios.abrir(this, m);
                             else if (w == 1) GestorRelatorios.compartilhar(this, m);
-                            else GestorUi.confirmar(this, "Excluir relatório", "Excluir \"" + m.nome + "\"?", "Excluir", () -> { GestorRelatorios.excluir(this, m); carregar(); });
+                            else GestorUi.confirmar(this, "Excluir relatório", "Excluir \"" + m.nome + "\"?", "Excluir", () -> { GestorRelatorios.excluir(this, m); mostrar(); });
                         }).show();
                 return true;
             });
@@ -69,7 +72,18 @@ public class GestorRelatoriosActivity extends GestorBaseActivity {
         if (vivo() && funcId() != null) carregar();
     }
 
+    /**
+     * Mostra na hora os relatórios do aparelho e, em seguida, sincroniza com a nuvem (Firestore +
+     * Storage): traz os criados em outro aparelho e envia os que ainda não subiram.
+     */
     private void carregar() {
+        mostrar();
+        GestorRelatorios.sincronizar(this, () -> {
+            if (vivo()) mostrar();
+        });
+    }
+
+    private void mostrar() {
         List<GestorRelatorios.Meta> l = GestorRelatorios.listar(this);
         TextView vazio = findViewById(R.id.txtVazio);
         vazio.setText("Nenhum relatório criado ainda. Toque em \"Registrar\".");

@@ -27,6 +27,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
+import com.google.gson.reflect.TypeToken;
+
 /**
  * Camada de dados da área do Gestor: cada método entrega PRIMEIRO o que já está no GestorCache
  * (doCache = true), se houver, e DEPOIS o resultado novo da API (doCache = false). A tela só
@@ -42,6 +44,22 @@ public final class GestorData {
 
     private GestorData() {}
 
+    // Tipos das listagens do Gestor — permitem que o GestorCache salve e restaure do Firestore
+    // (cache offline). Chave sem tipo registrado continua só em memória.
+    static {
+        GestorCache.registrarTipo(GestorCache.COLETAS, new TypeToken<List<ColetaResponse>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.TRIAGENS, new TypeToken<List<TriagemResponse>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.ESTOQUE, new TypeToken<List<GestorResponses.Estoque>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.NEGOCIACOES, new TypeToken<List<Negociacao>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.PEDIDOS_COOP, new TypeToken<List<GestorResponses.PedidoCoop>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.RATEIOS, new TypeToken<List<RateioListaResponse>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.ROTAS, new TypeToken<List<GestorResponses.Rota>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.STATUS, new TypeToken<List<GestorResponses.Status>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.CARGOS, new TypeToken<List<GestorResponses.Cargo>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.FUNCIONARIOS, new TypeToken<List<FuncionarioDetalhe>>() {}.getType());
+        GestorCache.registrarTipo(GestorCache.PERFIL_COOP, String.class);
+    }
+
     public static GestorApiService api() {
         return ApiClient.createService(GestorApiService.class);
     }
@@ -55,6 +73,12 @@ public final class GestorData {
     }
 
     private static <T> void buscar(
+            String chave, boolean forcar, Supplier<Call<T>> fabrica, Ouvinte<T> o) {
+        // Primeiro traz para a memória a cópia salva no Firestore (cache offline), depois segue.
+        GestorCache.aposRestaurar(() -> buscarAgora(chave, forcar, fabrica, o));
+    }
+
+    private static <T> void buscarAgora(
             String chave, boolean forcar, Supplier<Call<T>> fabrica, Ouvinte<T> o) {
         if (coop() == null) {
             o.aoErro("Não foi possível identificar a cooperativa do gestor. Faça login novamente.");
@@ -129,6 +153,10 @@ public final class GestorData {
      * completou o cadastro).
      */
     public static void funcionarios(boolean forcar, Ouvinte<List<FuncionarioDetalhe>> o) {
+        GestorCache.aposRestaurar(() -> funcionariosAgora(forcar, o));
+    }
+
+    private static void funcionariosAgora(boolean forcar, Ouvinte<List<FuncionarioDetalhe>> o) {
         if (coop() == null) {
             o.aoErro("Não foi possível identificar a cooperativa do gestor. Faça login novamente.");
             return;
@@ -238,6 +266,10 @@ public final class GestorData {
      * exige um Perfil).
      */
     public static void perfilDaCooperativa(Ouvinte<String> o) {
+        GestorCache.aposRestaurar(() -> perfilDaCooperativaAgora(o));
+    }
+
+    private static void perfilDaCooperativaAgora(Ouvinte<String> o) {
         String cache = GestorCache.obter(GestorCache.PERFIL_COOP);
         if (cache != null) {
             o.aoReceber(cache, true);
