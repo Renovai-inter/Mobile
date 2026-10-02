@@ -8,5 +8,8 @@ public class RenovaiApplication extends Application {
     public void onCreate() {
         super.onCreate();
         SessionManager.init(this);
+        // Necessário para a área de Cooperado (ver CooperadoSession.java) — não
+        // mexe em SessionManager, só inicializa o SharedPreferences próprio.
+        CooperadoSession.init(this);
     }
 }
