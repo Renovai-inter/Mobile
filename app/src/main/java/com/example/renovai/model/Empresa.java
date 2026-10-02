@@ -7,8 +7,7 @@ public class Empresa {
     private String imagemUrl;
     private String descricao;
 
-    public Empresa() {
-    }
+    public Empresa() {}
 
     public Empresa(String empresaId, String nome, String imagemUrl, String descricao) {
         this.empresaId = empresaId;
@@ -51,9 +50,6 @@ public class Empresa {
 
     @Override
     public String toString() {
-        return "Empresa{" +
-                "empresaId='" + empresaId + '\'' +
-                ", nome='" + nome + '\'' +
-                '}';
+        return "Empresa{" + "empresaId='" + empresaId + '\'' + ", nome='" + nome + '\'' + '}';
     }
 }
