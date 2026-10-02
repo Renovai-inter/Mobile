@@ -1,6 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--  Quando selecionado: Amarelo claro (mesma cor usada no menu da Empresa)  -->
-    <item android:state_checked="true" android:color="#D4E699"/>
-    <!--  Quando em repouso: Branco total  -->
-    <item android:state_checked="false" android:color="#FFFFFF"/>
-</selector>
