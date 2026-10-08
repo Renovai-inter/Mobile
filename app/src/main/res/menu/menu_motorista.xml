@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_m_rotas" android:icon="@drawable/ic_rota_white" android:title="Rotas" />
+    <item android:id="@+id/nav_m_home" android:icon="@drawable/ic_home_cooperado" android:title="Home" />
+    <item android:id="@+id/nav_m_perfil" android:icon="@drawable/ic_perfil_cooperado" android:title="Perfil" />
+</menu>
