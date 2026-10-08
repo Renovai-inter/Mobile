@@ -35,8 +35,17 @@ import java.util.UUID;
 
 /**
  * Relatórios do Gestor. A API não tem endpoint de relatórios, então eles são gerados AQUI (PDF
- * nativo, android.graphics.pdf) a partir de dados reais (negociações, triagens, coletas) e
- * guardados no armazenamento do app; a lista fica em SharedPreferences.
+ * nativo, android.graphics.pdf) a partir de dados reais (negociações, triagens, coletas).
+ *
+ * <p>PERSISTÊNCIA:
+ *
+ * <ul>
+ *   <li>Aparelho: o PDF fica em filesDir/relatorios e a lista em SharedPreferences (abre offline).
+ *   <li>Firebase Storage: o PDF é enviado para relatorios/{cooperativaId}/{id}.pdf.
+ *   <li>Firestore: a lista fica em cooperativas/{cooperativaId}/relatorios/{id} (com a URL), para
+ *       os relatórios aparecerem em outro aparelho / depois de reinstalar. Quando o PDF não existe
+ *       no aparelho, ele é baixado do Storage ao abrir.
+ * </ul>
  */
 public final class GestorRelatorios {
 
@@ -46,6 +55,12 @@ public final class GestorRelatorios {
 
     public static class Meta {
         public String id, nome, tipo, inicio, fim, arquivo, criadoEm;
+        /** URL de download no Firebase Storage (null enquanto não subiu). */
+        public String url;
+    }
+
+    public interface AoConcluir {
+        void aoConcluir(boolean ok, String mensagem);
     }
 
     private static final Gson GSON = new Gson();
@@ -61,31 +76,197 @@ public final class GestorRelatorios {
                         Context.MODE_PRIVATE);
     }
 
+    /**
+     * Relatórios conhecidos: os que têm o PDF no aparelho OU uma URL no Firebase Storage (esses são
+     * baixados ao abrir).
+     */
     public static List<Meta> listar(Context c) {
         String json = prefs(c).getString("lista", "[]");
         List<Meta> l = GSON.fromJson(json, new TypeToken<List<Meta>>() {}.getType());
         List<Meta> ok = new ArrayList<>();
         if (l != null)
-            for (Meta m : l) if (m.arquivo != null && new File(m.arquivo).exists()) ok.add(m);
+            for (Meta m : l)
+                if ((m.arquivo != null && new File(m.arquivo).exists()) || m.url != null) ok.add(m);
         ok.sort((a, b) -> String.valueOf(b.criadoEm).compareTo(String.valueOf(a.criadoEm)));
         return ok;
     }
 
+    private static void gravarLista(Context c, List<Meta> l) {
+        prefs(c).edit().putString("lista", GSON.toJson(l)).apply();
+    }
+
     private static void guardar(Context c, Meta m) {
         List<Meta> l = listar(c);
+        l.removeIf(x -> x.id.equals(m.id));
         l.add(m);
-        prefs(c).edit().putString("lista", GSON.toJson(l)).apply();
+        gravarLista(c, l);
+    }
+
+    public static boolean temArquivoLocal(Meta m) {
+        return m.arquivo != null && new File(m.arquivo).exists();
     }
 
     public static void excluir(Context c, Meta m) {
         List<Meta> l = listar(c);
         l.removeIf(x -> x.id.equals(m.id));
-        prefs(c).edit().putString("lista", GSON.toJson(l)).apply();
-        new File(m.arquivo).delete();
-        MINIATURAS.remove(m.arquivo);
+        gravarLista(c, l);
+        if (m.arquivo != null) {
+            new File(m.arquivo).delete();
+            MINIATURAS.remove(m.arquivo);
+        }
+        // também remove da nuvem (Storage + lista no Firestore)
+        String coop = CooperadoSession.getCooperativaId();
+        if (coop == null) return;
+        FirebaseCache.garantirLogin(
+                () -> {
+                    refPdf(coop, m.id).delete();
+                    colecaoNuvem(coop).document(m.id).delete();
+                });
+    }
+
+    // ── nuvem (Firebase Storage + Firestore) ──
+    private static com.google.firebase.storage.StorageReference refPdf(String coop, String id) {
+        return com.google.firebase.storage.FirebaseStorage.getInstance()
+                .getReference()
+                .child("relatorios/" + coop + "/" + id + ".pdf");
+    }
+
+    private static com.google.firebase.firestore.CollectionReference colecaoNuvem(String coop) {
+        return com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("cooperativas")
+                .document(coop)
+                .collection("relatorios");
+    }
+
+    private static File arquivoLocal(Context c, String id) {
+        File dir = new File(c.getFilesDir(), "relatorios");
+        if (!dir.exists()) dir.mkdirs();
+        return new File(dir, id + ".pdf");
+    }
+
+    /** Envia o PDF para o Storage e registra (com a URL) na lista do Firestore. */
+    private static void enviarParaNuvem(Context c, Meta m) {
+        final String coop = CooperadoSession.getCooperativaId();
+        if (coop == null || m.arquivo == null) return;
+        final Context app = c.getApplicationContext();
+        FirebaseCache.garantirLogin(
+                () -> {
+                    com.google.firebase.storage.StorageReference ref = refPdf(coop, m.id);
+                    com.google.firebase.storage.StorageMetadata meta =
+                            new com.google.firebase.storage.StorageMetadata.Builder()
+                                    .setContentType("application/pdf")
+                                    .build();
+                    ref.putFile(Uri.fromFile(new File(m.arquivo)), meta)
+                            .continueWithTask(
+                                    t -> {
+                                        if (!t.isSuccessful()) throw t.getException();
+                                        return ref.getDownloadUrl();
+                                    })
+                            .addOnSuccessListener(
+                                    url -> {
+                                        m.url = url.toString();
+                                        guardar(app, m);
+                                        Map<String, Object> doc = new HashMap<>();
+                                        doc.put("id", m.id);
+                                        doc.put("nome", m.nome);
+                                        doc.put("tipo", m.tipo);
+                                        doc.put("inicio", m.inicio);
+                                        doc.put("fim", m.fim);
+                                        doc.put("criadoEm", m.criadoEm);
+                                        doc.put("url", m.url);
+                                        colecaoNuvem(coop).document(m.id).set(doc);
+                                    })
+                            .addOnFailureListener(
+                                    e ->
+                                            android.util.Log.w(
+                                                    "GestorRelatorios",
+                                                    "Falha ao enviar relatório para o Storage",
+                                                    e));
+                });
+    }
+
+    /**
+     * Traz da nuvem os relatórios da cooperativa que ainda não estão na lista do aparelho, e
+     * reenvia os locais que ainda não subiram (ex.: criados sem internet). Chama {@code depois} na
+     * thread principal quando terminar (com ou sem sucesso).
+     */
+    public static void sincronizar(Context c, Runnable depois) {
+        final String coop = CooperadoSession.getCooperativaId();
+        if (coop == null) {
+            depois.run();
+            return;
+        }
+        final Context app = c.getApplicationContext();
+        FirebaseCache.garantirLogin(
+                () ->
+                        colecaoNuvem(coop)
+                                .get()
+                                .addOnCompleteListener(
+                                        t -> {
+                                            List<Meta> locais = listar(app);
+                                            if (t.isSuccessful() && t.getResult() != null) {
+                                                java.util.Set<String> ids = new java.util.HashSet<>();
+                                                for (Meta m : locais) ids.add(m.id);
+                                                for (com.google.firebase.firestore.DocumentSnapshot d :
+                                                        t.getResult().getDocuments()) {
+                                                    if (ids.contains(d.getId())) continue;
+                                                    Meta m = new Meta();
+                                                    m.id = d.getId();
+                                                    m.nome = d.getString("nome");
+                                                    m.tipo = d.getString("tipo");
+                                                    m.inicio = d.getString("inicio");
+                                                    m.fim = d.getString("fim");
+                                                    m.criadoEm = d.getString("criadoEm");
+                                                    m.url = d.getString("url");
+                                                    m.arquivo = arquivoLocal(app, m.id).getAbsolutePath();
+                                                    if (m.url != null) locais.add(m);
+                                                }
+                                                gravarLista(app, locais);
+                                            }
+                                            for (Meta m : locais)
+                                                if (m.url == null && temArquivoLocal(m))
+                                                    enviarParaNuvem(app, m);
+                                            depois.run();
+                                        }));
+    }
+
+    /** Garante o PDF no aparelho (baixando do Storage se preciso) e então executa a ação. */
+    private static void comArquivoLocal(Activity a, Meta m, Runnable acao) {
+        if (temArquivoLocal(m)) {
+            acao.run();
+            return;
+        }
+        String coop = CooperadoSession.getCooperativaId();
+        if (coop == null || m.url == null) {
+            android.widget.Toast.makeText(a, "Arquivo do relatório não encontrado.", android.widget.Toast.LENGTH_LONG).show();
+            return;
+        }
+        File destino = arquivoLocal(a, m.id);
+        m.arquivo = destino.getAbsolutePath();
+        android.widget.Toast.makeText(a, "Baixando relatório…", android.widget.Toast.LENGTH_SHORT).show();
+        FirebaseCache.garantirLogin(
+                () ->
+                        refPdf(coop, m.id)
+                                .getFile(destino)
+                                .addOnSuccessListener(
+                                        s -> {
+                                            guardar(a, m);
+                                            if (!a.isFinishing()) acao.run();
+                                        })
+                                .addOnFailureListener(
+                                        e ->
+                                                android.widget.Toast.makeText(
+                                                                a,
+                                                                "Não foi possível baixar o relatório. Verifique a internet.",
+                                                                android.widget.Toast.LENGTH_LONG)
+                                                        .show()));
     }
 
     public static void abrir(Activity a, Meta m) {
+        comArquivoLocal(a, m, () -> abrirLocal(a, m));
+    }
+
+    private static void abrirLocal(Activity a, Meta m) {
         Uri uri =
                 FileProvider.getUriForFile(
                         a, a.getPackageName() + ".fileprovider", new File(m.arquivo));
@@ -101,6 +282,10 @@ public final class GestorRelatorios {
     }
 
     public static void compartilhar(Activity a, Meta m) {
+        comArquivoLocal(a, m, () -> compartilharLocal(a, m));
+    }
+
+    private static void compartilharLocal(Activity a, Meta m) {
         Uri uri =
                 FileProvider.getUriForFile(
                         a, a.getPackageName() + ".fileprovider", new File(m.arquivo));
@@ -113,6 +298,7 @@ public final class GestorRelatorios {
     }
 
     public static Bitmap miniatura(Meta m) {
+        if (!temArquivoLocal(m)) return null; // ainda só na nuvem: sem miniatura até baixar
         Bitmap b = MINIATURAS.get(m.arquivo);
         if (b != null) return b;
         try (ParcelFileDescriptor fd =
@@ -244,6 +430,7 @@ public final class GestorRelatorios {
         m.fim = fim.toString();
         m.criadoEm = LocalDateTime.now().toString();
         guardar(c, m);
+        enviarParaNuvem(c, m); // Firebase Storage + lista no Firestore (sem bloquear a tela)
         return m;
     }
 
