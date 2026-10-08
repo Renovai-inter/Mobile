@@ -6,10 +6,10 @@ public class EmpresaMaterialInteresse {
     private String empresaId;
     private String categoriaId;
 
-    public EmpresaMaterialInteresse() {
-    }
+    public EmpresaMaterialInteresse() {}
 
-    public EmpresaMaterialInteresse(String empresaMaterialId, String empresaId, String categoriaId) {
+    public EmpresaMaterialInteresse(
+            String empresaMaterialId, String empresaId, String categoriaId) {
         this.empresaMaterialId = empresaMaterialId;
         this.empresaId = empresaId;
         this.categoriaId = categoriaId;
@@ -41,10 +41,16 @@ public class EmpresaMaterialInteresse {
 
     @Override
     public String toString() {
-        return "EmpresaMaterialInteresse{" +
-                "empresaMaterialId='" + empresaMaterialId + '\'' +
-                ", empresaId='" + empresaId + '\'' +
-                ", categoriaId='" + categoriaId + '\'' +
-                '}';
+        return "EmpresaMaterialInteresse{"
+                + "empresaMaterialId='"
+                + empresaMaterialId
+                + '\''
+                + ", empresaId='"
+                + empresaId
+                + '\''
+                + ", categoriaId='"
+                + categoriaId
+                + '\''
+                + '}';
     }
 }

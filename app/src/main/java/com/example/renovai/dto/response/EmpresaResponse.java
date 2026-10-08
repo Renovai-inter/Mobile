@@ -6,8 +6,19 @@ public class EmpresaResponse {
     private String descricao;
     private String imagemUrl;
 
-    public String getEmpresaId() { return empresaId; }
-    public String getNome() { return nome; }
-    public String getDescricao() { return descricao; }
-    public String getImagemUrl() { return imagemUrl; }
+    public String getEmpresaId() {
+        return empresaId;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
 }

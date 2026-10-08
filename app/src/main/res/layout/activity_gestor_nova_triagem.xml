@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Selecionar Coleta" android:textSize="15sp" />
+            <LinearLayout android:id="@+id/coletaSelecionada" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+
+            <TextView android:id="@+id/txtOutrasColetas" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp"
+                android:text="Outras Coletas Disponíveis:" android:textColor="#8A8A8A" android:textSize="14sp" android:textStyle="bold" />
+            <LinearLayout android:id="@+id/listaOutrasColetas" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+            <TextView android:id="@+id/txtSemColetas" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp"
+                android:text="Nenhuma coleta aguardando triagem." android:visibility="gone" />
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Selecionar Funcionários" android:textSize="15sp" />
+            <LinearLayout android:id="@+id/listaFuncionarios" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:layout_marginStart="12dp" android:layout_marginEnd="12dp"
+                android:background="@drawable/summary_green_background" android:orientation="vertical" android:padding="14dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Funcionários selecionados" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtResFunc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Coleta" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtResColeta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Peso a Triar" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtResPeso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView android:id="@+id/btnIniciarTriagem" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="Iniciar Triagem" />
+            <ProgressBar android:id="@+id/progresso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:layout_marginTop="10dp" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
