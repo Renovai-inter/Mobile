@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="18dp" android:gravity="center_vertical" android:orientation="horizontal">
+    <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+        <ImageView android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/avatar_placeholder_background" android:contentDescription="Cooperativa" />
+        <TextView android:id="@+id/txtIniciaisPerfil" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="--" android:textColor="#FFFFFF" android:textSize="18sp" />
+    </FrameLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/txtPerfilCooperativa" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nome da cooperativa" android:textColor="#111111" android:textSize="17sp" />
+        <TextView android:id="@+id/txtPerfilTipo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Perfil: Gestor" android:textColor="#333333" android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

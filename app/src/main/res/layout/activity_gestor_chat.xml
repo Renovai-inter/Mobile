@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+
+    <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="12dp">
+        <TextView android:id="@+id/btnContraproposta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="end"
+            android:background="@drawable/outline_button_cooperado_background" android:clickable="true" android:focusable="true" android:paddingStart="18dp" android:paddingEnd="18dp"
+            android:paddingTop="10dp" android:paddingBottom="10dp" android:text="Nova contraproposta" android:textColor="#519059" android:textSize="14sp" />
+    </FrameLayout>
+
+    <ScrollView android:id="@+id/scrollChat" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:fillViewport="true">
+        <LinearLayout android:id="@+id/listaMensagens" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp" />
+    </ScrollView>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="14dp">
+        <EditText android:id="@+id/edtMensagem" style="@style/G.Input" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:hint="Faça sua pergunta" android:inputType="textCapSentences|textMultiLine" android:maxLines="4" />
+        <ImageView android:id="@+id/btnEnviar" android:layout_width="48dp" android:layout_height="48dp" android:layout_marginStart="10dp"
+            android:contentDescription="Enviar" android:padding="10dp" android:src="@drawable/ic_send_dark" />
+    </LinearLayout>
+</LinearLayout>

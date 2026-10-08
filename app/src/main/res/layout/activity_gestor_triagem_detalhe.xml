@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+
+            <LinearLayout style="@style/G.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="18dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:id="@+id/txtTriagemTitulo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Triagem #000000" android:textColor="#111111" android:textSize="19sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtTriagemStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="4dp" android:paddingBottom="4dp" android:text="Concluída" android:textSize="12sp" android:textStyle="bold" />
+                </LinearLayout>
+                <TextView android:id="@+id/txtTriagemData" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Realizada em --" android:textSize="13sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal" android:paddingTop="10dp" android:paddingBottom="10dp">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Coleta de origem" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtTriagemColeta" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="10dp" android:paddingBottom="10dp">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Coleta feita por" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtTriagemEmpresa" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="10dp" android:paddingBottom="10dp">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Total Triado" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtTriagemTotal" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 kg" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:paddingTop="10dp">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Duração" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtTriagemDuracao" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="horizontal">
+                <LinearLayout android:layout_width="0dp" android:layout_height="82dp" android:layout_weight="1" android:layout_marginEnd="6dp" android:background="@drawable/status_card_cooperado_background" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/txtStatPeso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#2E7D32" android:textSize="26sp" android:textStyle="bold" />
+                    <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Peso Total (em kg)" android:textSize="9sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="82dp" android:layout_weight="1" android:layout_marginStart="3dp" android:layout_marginEnd="3dp" android:background="@drawable/status_card_cooperado_background" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/txtStatMateriais" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#882B4E" android:textSize="26sp" android:textStyle="bold" />
+                    <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Materiais" android:textSize="9sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="82dp" android:layout_weight="1" android:layout_marginStart="6dp" android:background="@drawable/status_card_cooperado_background" android:gravity="center" android:orientation="vertical">
+                    <TextView android:id="@+id/txtStatFunc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#2E7D32" android:textSize="26sp" android:textStyle="bold" />
+                    <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Funcionários" android:textSize="9sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Funcionários Participantes" />
+            <LinearLayout android:id="@+id/listaParticipantes" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Materiais Separados" />
+            <LinearLayout android:id="@+id/listaMateriaisSep" style="@style/G.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" />
+
+            <TextView android:id="@+id/btnExportar" style="@style/G.BtnOutline" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Exportar Relatorio" />
+            <ProgressBar android:id="@+id/progresso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:layout_marginTop="8dp" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
