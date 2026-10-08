@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_empresa_header" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <TextView style="@style/G.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cooperativas" android:textSize="24sp" />
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Filtre as cooperativas por material, quantidade e localização" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp"
+                android:background="@drawable/input_field_cooperado_background" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="14dp">
+                <EditText android:id="@+id/edtBuscaMaterial" android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1" android:background="@null"
+                    android:hint="Ex.: Papelão" android:inputType="text" android:textColor="#222222" android:textColorHint="#8A8A8A" android:textSize="13sp" />
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_search_dark" android:contentDescription="Buscar" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
+                <TextView android:id="@+id/chipMelhorPreco" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginEnd="8dp"
+                    android:background="@drawable/card_unselected_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
+                    android:text="Categorias" android:textColor="#444444" android:textSize="12sp" />
+                <TextView android:id="@+id/chipNota4" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:background="@drawable/btn_green_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
+                    android:text="★ 4+" android:textColor="#FFFFFF" android:textSize="12sp" />
+            </LinearLayout>
+
+            <EditText android:id="@+id/edtBuscaCidadeE" style="@style/G.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="Cidade ou localização" android:inputType="text" />
+            <EditText android:id="@+id/edtBuscaQuantidadeE" style="@style/G.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:hint="Quantidade mínima disponível (kg)" android:inputType="numberDecimal" />
+            <ProgressBar android:id="@+id/progressoBuscaE" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:visibility="gone" />
+            <TextView android:id="@+id/txtVazioBusca" style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp"
+                android:text="Nenhuma cooperativa encontrada com esses filtros." android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaBusca" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <include layout="@layout/include_empresa_nav" />
+</LinearLayout>
