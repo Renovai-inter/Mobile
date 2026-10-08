@@ -170,6 +170,52 @@
 
 
                 <!-- ============================= -->
+                <!-- TOKEN -->
+                <!-- ============================= -->
+
+                <TextView
+                    android:id="@+id/labelToken"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="7dp"
+                    android:text="Código de redefinição"
+                    android:textColor="#000000"
+                    android:textSize="12sp" />
+
+                <LinearLayout
+                    android:id="@+id/campoToken"
+                    android:layout_width="match_parent"
+                    android:layout_height="65dp"
+                    android:layout_marginBottom="16dp"
+                    android:gravity="center_vertical"
+                    android:background="#F8F8F8"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="15dp"
+                        android:contentDescription="Código"
+                        android:src="@drawable/senha_icon"
+                        android:scaleType="fitCenter" />
+
+                    <EditText
+                        android:id="@+id/edtToken"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Cole aqui o código recebido"
+                        android:inputType="textVisiblePassword"
+                        android:paddingEnd="10dp"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
+
+                </LinearLayout>
+
+                <!-- ============================= -->
                 <!-- SENHA -->
                 <!-- ============================= -->
 
@@ -292,6 +338,14 @@
                     android:textStyle="bold" />
 
             </com.google.android.material.card.MaterialCardView>
+
+            <ProgressBar
+                android:id="@+id/progressoAlterar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="14dp"
+                android:visibility="gone" />
 
         </LinearLayout>
 
