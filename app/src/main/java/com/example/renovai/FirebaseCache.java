@@ -3,6 +3,7 @@ package com.example.renovai;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -40,6 +41,12 @@ public final class FirebaseCache {
     /** Limite de um documento do Firestore é 1 MiB; deixamos uma folga. */
     private static final int LIMITE_JSON = 900 * 1024;
 
+    /**
+     * true quando o app foi compilado com o app/google-services.json (Firebase configurado). Sem
+     * ele o app funciona normalmente, só sem cache offline e sem relatórios na nuvem.
+     */
+    private static boolean ativo;
+
     public interface AoLer {
         /** json pode vir null (nada salvo ainda). */
         void aoLer(String json);
@@ -54,6 +61,11 @@ public final class FirebaseCache {
 
     /** Chamado uma única vez, em RenovaiApplication.onCreate(). */
     public static void init(Context context) {
+        ativo = !FirebaseApp.getApps(context).isEmpty();
+        if (!ativo) {
+            Log.w(TAG, "Firebase não configurado (sem google-services.json): cache offline desligado");
+            return;
+        }
         try {
             FirebaseFirestore.getInstance()
                     .setFirestoreSettings(
@@ -75,6 +87,7 @@ public final class FirebaseCache {
      * salvo no aparelho, então só precisa de internet na primeira vez.
      */
     public static void garantirLogin(Runnable depois) {
+        if (!ativo) return;
         FirebaseAuth auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             depois.run();
@@ -97,7 +110,13 @@ public final class FirebaseCache {
         return SessionManager.getEmail();
     }
 
+    /** Firebase configurado neste build (ver {@link #init}). */
+    public static boolean ativo() {
+        return ativo;
+    }
+
     private static String uid() {
+        if (!ativo) return null;
         return FirebaseAuth.getInstance().getCurrentUser() != null
                 ? FirebaseAuth.getInstance().getCurrentUser().getUid()
                 : null;
@@ -121,7 +140,7 @@ public final class FirebaseCache {
 
     /** Salva (ou substitui) a cópia de uma listagem. Funciona offline: sincroniza depois. */
     public static void salvar(String conta, String chave, String json) {
-        if (json == null) return;
+        if (!ativo || json == null) return;
         if (json.length() > LIMITE_JSON) {
             Log.w(TAG, "Listagem '" + chave + "' grande demais para o cache (" + json.length() + ")");
             return;
@@ -141,6 +160,10 @@ public final class FirebaseCache {
 
     /** Lê uma listagem do cache LOCAL do aparelho (rápido e funciona sem internet). */
     public static void ler(String conta, String chave, AoLer callback) {
+        if (!ativo) {
+            callback.aoLer(null);
+            return;
+        }
         garantirLogin(
                 () -> {
                     com.google.firebase.firestore.CollectionReference col = colecao(conta);
@@ -161,6 +184,10 @@ public final class FirebaseCache {
 
     /** Lê todas as listagens guardadas da conta, do cache LOCAL do aparelho. */
     public static void lerTudo(String conta, AoLerTudo callback) {
+        if (!ativo) {
+            callback.aoLer(new HashMap<>());
+            return;
+        }
         garantirLogin(
                 () -> {
                     com.google.firebase.firestore.CollectionReference col = colecao(conta);

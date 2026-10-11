@@ -116,7 +116,7 @@ public final class GestorRelatorios {
         }
         // também remove da nuvem (Storage + lista no Firestore)
         String coop = CooperadoSession.getCooperativaId();
-        if (coop == null) return;
+        if (coop == null || !FirebaseCache.ativo()) return;
         FirebaseCache.garantirLogin(
                 () -> {
                     refPdf(coop, m.id).delete();
@@ -147,7 +147,7 @@ public final class GestorRelatorios {
     /** Envia o PDF para o Storage e registra (com a URL) na lista do Firestore. */
     private static void enviarParaNuvem(Context c, Meta m) {
         final String coop = CooperadoSession.getCooperativaId();
-        if (coop == null || m.arquivo == null) return;
+        if (coop == null || m.arquivo == null || !FirebaseCache.ativo()) return;
         final Context app = c.getApplicationContext();
         FirebaseCache.garantirLogin(
                 () -> {
@@ -192,7 +192,7 @@ public final class GestorRelatorios {
      */
     public static void sincronizar(Context c, Runnable depois) {
         final String coop = CooperadoSession.getCooperativaId();
-        if (coop == null) {
+        if (coop == null || !FirebaseCache.ativo()) {
             depois.run();
             return;
         }
@@ -237,7 +237,7 @@ public final class GestorRelatorios {
             return;
         }
         String coop = CooperadoSession.getCooperativaId();
-        if (coop == null || m.url == null) {
+        if (coop == null || m.url == null || !FirebaseCache.ativo()) {
             android.widget.Toast.makeText(a, "Arquivo do relatório não encontrado.", android.widget.Toast.LENGTH_LONG).show();
             return;
         }

@@ -11,7 +11,7 @@ A API (Spring + Postgres) continua sendo a fonte da verdade. O app usa:
 ## Configuração (uma vez)
 
 ### 1. Cloudinary
-Em `Mobile-main/local.properties` (não vai para o Git), preencha:
+Em `local.properties` (na raiz do projeto) (não vai para o Git), preencha:
 ```
 cloudinary.cloudName=SEU_CLOUD_NAME
 cloudinary.uploadPreset=SEU_UPLOAD_PRESET
@@ -21,8 +21,9 @@ Enquanto estiver com `SEU_...`, o botão de anexar foto fica desativado ("Envio 
 
 ### 2. Firebase
 1. Console do Firebase → crie o projeto → **Adicionar app Android** com o pacote `com.example.renovai`.
-2. Baixe o `google-services.json` e coloque em `Mobile-main/app/google-services.json`.
-   Sem esse arquivo o build falha (o plugin `google-services` exige).
+2. Baixe o `google-services.json` e coloque em `app/google-services.json`.
+   Sem esse arquivo o app compila e roda normalmente, mas com o Firebase desligado
+   (sem cache offline e sem relatórios na nuvem). É assim que o CI compila.
 3. **Authentication → Sign-in method → Anônimo → Ativar.**
 4. **Firestore Database → Criar banco** e cole as regras de `firebase/firestore.rules`.
 5. **Storage → Começar** e cole as regras de `firebase/storage.rules`.
