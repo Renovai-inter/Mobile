@@ -14,7 +14,12 @@
 .cxx
 local.properties
 
+*.jks
+*.keystore
+.idea/
+**/build/
+app/release/
+
 # Arquivos locais do Android Studio/Gradle
 .gradle-local/
 exportToHTML/
-.idea/
