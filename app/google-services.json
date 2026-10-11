@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "949318511509",
+    "project_id": "renovai-23544",
+    "storage_bucket": "renovai-23544.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:949318511509:android:55c9c4dd6a22f121c4649c",
+        "android_client_info": {
+          "package_name": "com.example.renovai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvVY9B2Fyp1iafXvO9ugS0IIV5OAavspc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
