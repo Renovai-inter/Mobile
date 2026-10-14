@@ -7,6 +7,7 @@ import com.example.renovai.FuncionarioResolver;
 import com.example.renovai.PerfilResolver;
 import com.example.renovai.SessionManager;
 import com.example.renovai.dto.request.CadastroEmpresaRequest;
+import com.example.renovai.dto.request.GoogleLoginRequest;
 import com.example.renovai.dto.request.LoginRequest;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
 import com.example.renovai.dto.response.FuncionarioResponse;
@@ -42,10 +43,24 @@ public class AuthController {
         }
 
         LoginRequest request = new LoginRequest(email.trim(), senha);
+        enviarLogin(authApiService.login(request), callback, false);
+    }
 
-        authApiService
-                .login(request)
-                .enqueue(
+    /**
+     * Login com Google: o app já recebeu o ID token do Google (ver GoogleLogin); a API confere
+     * esse token e, se o e-mail tiver conta no Renovaí, devolve o mesmo JWT do login por senha.
+     */
+    public void loginGoogle(String idToken, LoginCallback callback) {
+        if (idToken == null || idToken.isEmpty()) {
+            callback.onErro("Não foi possível entrar com o Google.");
+            return;
+        }
+        enviarLogin(authApiService.loginGoogle(new GoogleLoginRequest(idToken)), callback, true);
+    }
+
+    /** Trata a resposta de /auth/login e /auth/google do mesmo jeito (sessão, empresa, cooperado). */
+    private void enviarLogin(Call<LoginResponse> chamada, LoginCallback callback, boolean google) {
+        chamada.enqueue(
                         new retrofit2.Callback<LoginResponse>() {
                             @Override
                             public void onResponse(
@@ -115,6 +130,9 @@ public class AuthController {
                                                     callback.onSuccess(body);
                                                 }
                                             });
+                                } else if (google && (response.code() == 400 || response.code() == 422)) {
+                                    // mensagem da API: conta inexistente, e-mail não verificado etc.
+                                    callback.onErro(com.example.renovai.EmpresaData.erro(response));
                                 } else if (response.code() == 401 || response.code() == 422) {
                                     callback.onErro("Email ou senha incorretos.");
                                 } else {

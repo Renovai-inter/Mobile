@@ -293,6 +293,31 @@
 
 
         <!-- ================================================= -->
+        <!-- ENTRAR COM GOOGLE -->
+        <!-- ================================================= -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogle"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="58dp"
+            android:layout_marginStart="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="45dp"
+            android:text="Entrar com Google"
+            android:textAllCaps="false"
+            android:textColor="#000000"
+            android:textSize="15sp"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="15dp"
+            app:strokeColor="#80000000"
+            app:strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtOu" />
+
+
+        <!-- ================================================= -->
         <!-- CADASTRO -->
         <!-- ================================================= -->
 
