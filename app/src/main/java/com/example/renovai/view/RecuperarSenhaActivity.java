@@ -27,7 +27,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Tela 1.7.1 — Redefinir senha, em duas etapas:
+ * Tela 1.7.1 — Redefinir senha (etapas 2 e 3 de 3 da verificação em dois fatores):
  *
  * <ol>
  *   <li>a pessoa digita o código de 6 dígitos recebido por e-mail (2º fator) e a API confere
@@ -83,8 +83,10 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
         progresso = findViewById(R.id.progressoAlterar);
         btnAlterar = findViewById(R.id.btnAlterar);
 
+        EtapasRedefinicao.marcar(this, EtapasRedefinicao.CODIGO);
         ((TextView) findViewById(R.id.txtInfoCodigo))
-                .setText("Digite o código de 6 dígitos que enviamos para " + email + ".");
+                .setText("Digite o código de 6 dígitos que enviamos para " + email
+                        + ". Ele chega de renovai.suporte@gmail.com e vale por 15 minutos.");
 
         ImageView btnVoltar = findViewById(R.id.btnVoltar);
         btnVoltar.setOnClickListener(v -> {
@@ -137,7 +139,10 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
                     edtCodigo.setEnabled(false);
                     txtReenviar.setVisibility(View.GONE);
                     grupoNovaSenha.setVisibility(View.VISIBLE);
-                    txtBtnAlterar.setText("Alterar");
+                    EtapasRedefinicao.marcar(RecuperarSenhaActivity.this, EtapasRedefinicao.NOVA_SENHA);
+                    ((TextView) findViewById(R.id.txtInfoCodigo))
+                            .setText("Código confirmado. Agora crie sua nova senha (mínimo 6 caracteres).");
+                    txtBtnAlterar.setText("Alterar senha");
                     findViewById(R.id.edtNovaSenha).requestFocus();
                 } else {
                     Toast.makeText(RecuperarSenhaActivity.this, EmpresaData.erro(r), Toast.LENGTH_LONG).show();

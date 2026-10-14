@@ -34,6 +34,7 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(false);
         getWindow().setStatusBarColor(Color.parseColor("#519059"));
         setContentView(R.layout.activity_esqueci_senha);
+        EtapasRedefinicao.marcar(this, EtapasRedefinicao.EMAIL);
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> {
             startActivity(new Intent(this, LoginActivity.class));
@@ -44,7 +45,10 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
 
     private void enviar() {
         String email = ((EditText) findViewById(R.id.edtEmail)).getText().toString().trim();
-        if (email.isEmpty()) { Toast.makeText(this, "Informe seu e-mail.", Toast.LENGTH_LONG).show(); return; }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Informe um e-mail válido.", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         View prog = findViewById(R.id.progressoEsqueci);
         View btn = findViewById(R.id.btnEnviar);

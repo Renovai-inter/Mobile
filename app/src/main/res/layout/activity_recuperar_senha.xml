@@ -149,17 +149,21 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
-                android:layout_marginBottom="22dp"
+                android:layout_marginBottom="18dp"
                 android:text="Redefinir senha"
                 android:textColor="#000000"
                 android:textSize="20sp"
                 android:textStyle="normal" />
+
+            <!-- Etapas: 1 E-mail → 2 Código (2º fator) → 3 Nova senha -->
+            <include layout="@layout/include_etapas_redefinicao" />
 
             <!-- Para qual e-mail o código foi enviado (preenchido pela Activity) -->
             <TextView
                 android:id="@+id/txtInfoCodigo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
                 android:layout_marginStart="35dp"
                 android:layout_marginEnd="35dp"
                 android:layout_marginBottom="18dp"
@@ -260,7 +264,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="7dp"
-                    android:text="Senha"
+                    android:text="Nova senha"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 
@@ -355,6 +359,7 @@
                 android:id="@+id/btnAlterar"
                 android:layout_width="300dp"
                 android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginStart="42dp"
                 android:layout_marginTop="40dp"
                 android:layout_marginEnd="42dp"
