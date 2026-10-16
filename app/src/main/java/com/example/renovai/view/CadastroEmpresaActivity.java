@@ -27,20 +27,19 @@ public class CadastroEmpresaActivity extends AppCompatActivity {
 
         EdgeToEdge.enable(this);
 
-        WindowCompat.getInsetsController(
-                getWindow(),
-                getWindow().getDecorView()
-        ).setAppearanceLightStatusBars(false);
+        WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
+                .setAppearanceLightStatusBars(false);
 
         getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
         setContentView(R.layout.activity_cadastro);
 
-        //Implementando os elementos
+        // Implementando os elementos
         ImageView btnVoltar = findViewById(R.id.btnVoltar);
         MaterialCardView btnCadastrar = findViewById(R.id.btnCadastrar);
         CheckBox checkTermos = findViewById(R.id.checkTermos);
 
+        EditText edtCpf = findViewById(R.id.edtCpfEmpresa);
         EditText edtNome = findViewById(R.id.edtNome);
         EditText edtEmail = findViewById(R.id.edtEmail);
         EditText edtTelefone = findViewById(R.id.edtTelefone);
@@ -50,47 +49,85 @@ public class CadastroEmpresaActivity extends AppCompatActivity {
         EditText edtSenha = findViewById(R.id.edtSenha);
         EditText edtConfirmarSenha = findViewById(R.id.edtConfirmarSenha);
 
-        //Ir para Escolhe activity
-        btnVoltar.setOnClickListener(v -> {
-            Intent intent = new Intent(this, EscolheActivity.class);
-            startActivity(intent);
-        });
+        // Ir para Escolhe activity
+        btnVoltar.setOnClickListener(
+                v -> {
+                    Intent intent = new Intent(this, EscolheActivity.class);
+                    startActivity(intent);
+                });
 
-        //Enviar cadastro
-        btnCadastrar.setOnClickListener(v -> {
-            if (!checkTermos.isChecked()) {
-                Toast.makeText(this, "Você precisa aceitar os Termos de Uso.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            btnCadastrar.setEnabled(false);
-
-            authController.cadastrarEmpresa(
-                    edtNome.getText().toString(),
-                    edtEmail.getText().toString(),
-                    edtTelefone.getText().toString(),
-                    edtEmpresa.getText().toString(),
-                    edtCnpj.getText().toString(),
-                    edtEndereco.getText().toString(),
-                    edtSenha.getText().toString(),
-                    edtConfirmarSenha.getText().toString(),
-                    new AuthController.CadastroEmpresaCallback() {
-                        @Override
-                        public void onSuccess(CadastroEmpresaResponse resposta) {
-                            Toast.makeText(CadastroEmpresaActivity.this,
-                                    "Empresa cadastrada com sucesso!", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(CadastroEmpresaActivity.this, LoginActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onErro(String mensagem) {
-                            btnCadastrar.setEnabled(true);
-                            Toast.makeText(CadastroEmpresaActivity.this, mensagem, Toast.LENGTH_LONG).show();
-                        }
+        // Enviar cadastro
+        btnCadastrar.setOnClickListener(
+                v -> {
+                    if (!checkTermos.isChecked()) {
+                        Toast.makeText(
+                                        this,
+                                        "Você precisa aceitar os Termos de Uso.",
+                                        Toast.LENGTH_SHORT)
+                                .show();
+                        return;
                     }
-            );
-        });
+
+                    btnCadastrar.setEnabled(false);
+
+                    authController.cadastrarEmpresa(
+                            edtNome.getText().toString(),
+                            edtCpf.getText().toString(),
+                            edtEmail.getText().toString(),
+                            edtTelefone.getText().toString(),
+                            edtEmpresa.getText().toString(),
+                            edtCnpj.getText().toString(),
+                            edtEndereco.getText().toString(),
+                            edtSenha.getText().toString(),
+                            edtConfirmarSenha.getText().toString(),
+                            new AuthController.CadastroEmpresaCallback() {
+                                @Override
+                                public void onSuccess(CadastroEmpresaResponse resposta) {
+                                    // Já vem com token: entra direto na área da Empresa, sem pedir
+                                    // login de novo.
+                                    com.example.renovai.SessionManager.salvarSessao(
+                                            resposta.getToken(),
+                                            resposta.getEmail(),
+                                            resposta.getRole());
+                                    com.example.renovai.SessionManager.salvarEmpresaId(
+                                            resposta.getEmpresaId());
+                                    com.example.renovai.GestorCache.limpar();
+                                    Toast.makeText(
+                                                    CadastroEmpresaActivity.this,
+                                                    "Empresa cadastrada com sucesso!",
+                                                    Toast.LENGTH_SHORT)
+                                            .show();
+                                    com.example.renovai.EmpresaData.precarregar(
+                                            () ->
+                                                    runOnUiThread(
+                                                            () -> {
+                                                                Intent intent =
+                                                                        new Intent(
+                                                                                CadastroEmpresaActivity
+                                                                                        .this,
+                                                                                com.example.renovai
+                                                                                        .view
+                                                                                        .EmpresaHomeActivity
+                                                                                        .class);
+                                                                intent.setFlags(
+                                                                        Intent
+                                                                                        .FLAG_ACTIVITY_NEW_TASK
+                                                                                | Intent
+                                                                                        .FLAG_ACTIVITY_CLEAR_TASK);
+                                                                startActivity(intent);
+                                                            }));
+                                }
+
+                                @Override
+                                public void onErro(String mensagem) {
+                                    btnCadastrar.setEnabled(true);
+                                    Toast.makeText(
+                                                    CadastroEmpresaActivity.this,
+                                                    mensagem,
+                                                    Toast.LENGTH_LONG)
+                                            .show();
+                                }
+                            });
+                });
     }
 }

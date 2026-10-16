@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+
+    <include layout="@layout/include_gestor_topbar" />
+
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+
+            <ImageView android:id="@+id/imgFotoColeta" android:layout_width="match_parent" android:layout_height="170dp"
+                android:background="@drawable/photo_placeholder_cooperado_background" android:contentDescription="Foto da coleta"
+                android:scaleType="centerCrop" />
+
+            <LinearLayout style="@style/G.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp">
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Informações da coleta" android:textSize="16sp" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="QUANTIDADE" />
+                        <TextView android:id="@+id/txtQuantidade" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0 kg" android:textColor="#2E7D32" android:textSize="22sp" android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DATA" />
+                        <TextView android:id="@+id/txtData" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:text="--/--/----" android:textColor="#222222" android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="horizontal">
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="FEITO POR" />
+                        <TextView android:id="@+id/txtFeitoPor" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:text="—" android:textColor="#222222" android:textSize="14sp" />
+                    </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ROTA" />
+                        <TextView android:id="@+id/txtRota" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp" android:text="-----" android:textColor="#222222" android:textSize="14sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="MATERIAIS" />
+                <LinearLayout android:id="@+id/listaMateriais" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" />
+                <TextView android:id="@+id/txtSemMateriais" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="Nenhum material separado ainda (coleta sem triagem)." />
+
+                <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="ORIGEM" />
+                <TextView android:id="@+id/txtOrigem" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="—" android:textColor="#222222" android:textSize="14sp" />
+
+                <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="TRIADA" />
+                <TextView android:id="@+id/txtTriada" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="—" android:textColor="#222222" android:textSize="14sp" />
+
+                <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="MÉTODO" />
+                <TextView android:id="@+id/txtMetodo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:text="—" android:textColor="#222222" android:textSize="14sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <include layout="@layout/include_gestor_nav" />
+</LinearLayout>

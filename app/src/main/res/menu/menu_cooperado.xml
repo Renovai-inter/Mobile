@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_rateios"
+        android:icon="@drawable/ic_rateio"
+        android:title="Rateios" />
+
+    <item
+        android:id="@+id/nav_coletas"
+        android:icon="@drawable/ic_coleta"
+        android:title="Coletas" />
+
+    <item
+        android:id="@+id/nav_home_cooperado"
+        android:icon="@drawable/ic_home_cooperado"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_triagens"
+        android:icon="@drawable/ic_triagem"
+        android:title="Triagens" />
+
+    <item
+        android:id="@+id/nav_perfil_cooperado"
+        android:icon="@drawable/ic_perfil_cooperado"
+        android:title="Perfil" />
+
+</menu>

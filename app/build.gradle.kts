@@ -1,6 +1,24 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
+
+// Firebase: o plugin lê o app/google-services.json (baixado do console do Firebase).
+// Só é aplicado quando o arquivo existe, para o projeto compilar sem ele (ex.: no CI).
+// Sem o arquivo o app funciona, só sem cache offline e sem relatórios na nuvem.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
+// Configuração do Cloudinary fica no local.properties (não vai para o Git):
+//   cloudinary.cloudName=SEU_CLOUD_NAME
+//   cloudinary.uploadPreset=SEU_UPLOAD_PRESET
+val localProps = Properties().apply {
+    val arquivo = rootProject.file("local.properties")
+    if (arquivo.exists()) arquivo.inputStream().use { load(it) }
+}
+fun localProp(nome: String): String = (localProps.getProperty(nome) ?: "").trim()
 
 android {
     namespace = "com.example.renovai"
@@ -32,6 +50,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${localProp("cloudinary.cloudName")}\"")
+        buildConfigField("String", "CLOUDINARY_UPLOAD_PRESET", "\"${localProp("cloudinary.uploadPreset")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -85,4 +110,13 @@ dependencies {
 
     // Glide (carregar foto da empresa e das cooperativas a partir de uma URL)
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    // Cloudinary: upload das fotos (coletas)
+    implementation("com.cloudinary:cloudinary-android:3.1.2")
+
+    // Firebase: Firestore (cache offline), Storage (relatórios PDF) e Auth (login anônimo p/ regras)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
+    implementation(libs.firebase.auth)
 }

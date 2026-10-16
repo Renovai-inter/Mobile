@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <LinearLayout style="@style/G.Card" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="18dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:id="@+id/txtPedidoTitulo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="Pedido #000000" android:textColor="#111111" android:textSize="20sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtPedidoStatus" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="5dp" android:paddingBottom="5dp"
+                        android:text="Em Negociação" android:textSize="11sp" android:textStyle="bold" />
+                </LinearLayout>
+                <TextView android:id="@+id/txtPedidoIniciado" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="Iniciado em --" android:textSize="13sp" />
+
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="EMPRESA SOLICITANTE" android:textStyle="normal" />
+                <TextView android:id="@+id/txtPedidoEmpresa" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#882B4E" android:textSize="14sp" />
+
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="MATERIAIS" android:textStyle="normal" />
+                <LinearLayout android:id="@+id/listaItensPedido" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="ENDEREÇO ENTREGA" android:textStyle="normal" />
+                <TextView android:id="@+id/txtPedidoEndereco" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Não informado" android:textColor="#882B4E" android:textSize="14sp" />
+
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="COMPLEMENTO" android:textStyle="normal" />
+                <TextView android:id="@+id/txtPedidoComplemento" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhum" android:textColor="#111111" android:textSize="14sp" />
+
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="PREÇO TOTAL ESTIMADO" android:textStyle="normal" />
+                <TextView android:id="@+id/txtPedidoTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#882B4E" android:textSize="26sp" android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/boxAcoesPedido" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="28dp" android:orientation="vertical">
+                <TextView android:id="@+id/btnConversar" style="@style/G.BtnOutline" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Conversar com a empresa" />
+                <TextView android:id="@+id/btnConcluir" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Marcar como concluído" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+    <ProgressBar android:id="@+id/progresso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:visibility="gone" />
+</LinearLayout>

@@ -9,10 +9,10 @@ public class EmpresaCooperativaFavorita {
     private String cooperativaId;
     private Date dataCriacao;
 
-    public EmpresaCooperativaFavorita() {
-    }
+    public EmpresaCooperativaFavorita() {}
 
-    public EmpresaCooperativaFavorita(String favoritoId, String empresaId, String cooperativaId, Date dataCriacao) {
+    public EmpresaCooperativaFavorita(
+            String favoritoId, String empresaId, String cooperativaId, Date dataCriacao) {
         this.favoritoId = favoritoId;
         this.empresaId = empresaId;
         this.cooperativaId = cooperativaId;
@@ -53,10 +53,16 @@ public class EmpresaCooperativaFavorita {
 
     @Override
     public String toString() {
-        return "EmpresaCooperativaFavorita{" +
-                "favoritoId='" + favoritoId + '\'' +
-                ", empresaId='" + empresaId + '\'' +
-                ", cooperativaId='" + cooperativaId + '\'' +
-                '}';
+        return "EmpresaCooperativaFavorita{"
+                + "favoritoId='"
+                + favoritoId
+                + '\''
+                + ", empresaId='"
+                + empresaId
+                + '\''
+                + ", cooperativaId='"
+                + cooperativaId
+                + '\''
+                + '}';
     }
 }

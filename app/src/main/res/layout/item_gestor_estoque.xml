@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_margin="7dp"
+    android:background="@drawable/estoque_card_bg" android:orientation="vertical">
+    <FrameLayout android:layout_width="match_parent" android:layout_height="84dp" android:background="@drawable/estoque_card_top">
+        <FrameLayout android:layout_width="54dp" android:layout_height="54dp" android:layout_gravity="center" android:background="@drawable/estoque_icon_circle">
+            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:layout_gravity="center" android:src="@drawable/ic_cube_white" android:contentDescription="Material" />
+        </FrameLayout>
+    </FrameLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="12dp">
+        <TextView android:id="@+id/txtEstoqueNome" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Material" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold" />
+        <View android:layout_width="26dp" android:layout_height="1.5dp" android:layout_marginTop="3dp" android:layout_marginBottom="6dp" android:background="#D98C9F" />
+        <TextView android:id="@+id/txtEstoquePeso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Peso:" android:textColor="#4A4A4A" android:textSize="11sp" />
+        <TextView android:id="@+id/txtEstoqueData" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Atualizado em:" android:textColor="#4A4A4A" android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

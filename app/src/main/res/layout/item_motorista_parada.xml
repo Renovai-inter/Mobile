@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardParadaM" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="4dp"
+    android:clickable="true" android:focusable="true" android:orientation="vertical">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal" android:padding="6dp">
+        <TextView android:id="@+id/txtParadaMNumero" android:layout_width="28dp" android:layout_height="28dp" android:gravity="center" android:text="1" android:textColor="#FFFFFF" android:textSize="12sp" android:textStyle="bold" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:id="@+id/txtParadaMTipo" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Coleta - 08:15 - Concluído" android:textSize="10sp" />
+            <TextView android:id="@+id/txtParadaMEndereco" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Endereço" android:textColor="#111111" android:textSize="13sp" android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+    <View android:id="@+id/linhaParadaM" android:layout_width="1.5dp" android:layout_height="16dp" android:layout_marginStart="20dp" android:background="#C9C9C9" />
+</LinearLayout>

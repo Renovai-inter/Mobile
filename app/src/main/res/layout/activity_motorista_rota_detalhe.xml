@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_gestor_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <FrameLayout android:layout_width="match_parent" android:layout_height="200dp">
+                <com.example.renovai.view.RotaMapView android:id="@+id/mapaRotaM" android:layout_width="match_parent" android:layout_height="match_parent" />
+            </FrameLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:orientation="horizontal">
+                <TextView android:id="@+id/txtResumoRotaM" style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="0 paradas" android:textSize="13sp" />
+                <TextView android:id="@+id/txtProxRotaM" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#882B4E" android:textSize="13sp" android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:background="@drawable/status_card_cooperado_background" android:orientation="vertical" android:padding="16dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:id="@+id/txtRotaMTitulo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Rota" android:textColor="#111111" android:textSize="19sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtRotaMStatus" android:layout_width="wrap_content" android:layout_height="wrap_content" android:paddingStart="12dp" android:paddingEnd="12dp" android:paddingTop="4dp" android:paddingBottom="4dp" android:text="Agendada" android:textSize="11sp" android:textStyle="bold" />
+                </LinearLayout>
+                <TextView android:id="@+id/txtRotaMIniciada" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="—" android:textSize="12sp" />
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="10dp" android:layout_marginBottom="10dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Veículo" android:textSize="14sp" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Não informado" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:layout_marginBottom="8dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Cooperativa" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtRotaMCoop" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="8dp" android:layout_marginBottom="8dp" android:background="#E4E4E4" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Sub" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Progresso" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtRotaMProgressoTxt" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 de 0 paradas" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Trajeto da Rota" />
+            <LinearLayout android:id="@+id/listaParadasM" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="vertical" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:background="@drawable/summary_green_background" android:orientation="vertical" android:padding="14dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Paradas concluídas" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtParadasConcM" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 / 0" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Distância total" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtDistanciaM" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:orientation="horizontal">
+                    <TextView style="@style/G.Green" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="Tempo estimado" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtTempoM" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" android:textColor="#111111" android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView android:id="@+id/btnIniciarRotaM" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Iniciar Rota" />
+            <LinearLayout android:id="@+id/boxIniciadaM" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:orientation="vertical" android:visibility="gone">
+                <TextView android:id="@+id/btnGpsM" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Abrir GPS do trajeto" />
+                <TextView android:id="@+id/btnFinalizarM" style="@style/G.BtnOutline" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Finalizar Rota" android:textColor="#882B4E" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

@@ -1,0 +1,52 @@
+package com.example.renovai.view;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.example.renovai.CooperadoPreload;
+import com.example.renovai.CooperadoSession;
+import com.example.renovai.GestorBottomNav;
+import com.example.renovai.GestorData;
+import com.example.renovai.GestorUi;
+import com.example.renovai.R;
+import com.example.renovai.SessionManager;
+
+/** Tela 4.6 — Perfil do gestor: nome, cargo, e-mail e cooperativa (somente leitura, vindos da sessão do login), Suporte e sair. */
+public class GestorPerfilActivity extends GestorBaseActivity {
+
+    @Override
+    protected void onCreate(Bundle b) {
+        super.onCreate(b);
+        if (!preparar(R.layout.activity_gestor_perfil, GestorBottomNav.Aba.PERFIL)) return;
+        titulo("Perfil");
+        topoPerfil("Perfil: Gestor");
+
+        // os 4 campos do layout são reaproveitados: Nome, E-mail, Cargo e Cooperativa (sem lápis: a API não edita perfil do gestor)
+        campo(R.id.campoNome, "Nome", CooperadoSession.getUsuarioNome(), null);
+        campo(R.id.campoEmail, "E-mail", SessionManager.getEmail(), null);
+        campo(R.id.campoCpf, "Cargo", CooperadoSession.getCargo(), null);
+        campo(R.id.campoTelefone, "Cooperativa", CooperadoSession.getCooperativaNome(), null);
+
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle("Suporte")
+                .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
+                .setPositiveButton("Enviar e-mail", (d, w) -> {
+                    Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Gestor)");
+                    try { startActivity(i); } catch (Exception e) { toast("Nenhum app de e-mail encontrado."); }
+                }).setNegativeButton("Fechar", null).show());
+        findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(this, "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
+    }
+
+    private void sair() {
+        SessionManager.logout();
+        CooperadoSession.limpar();
+        GestorData.limparTudo();
+        CooperadoPreload.limpar();
+        Intent i = new Intent(this, LoginActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+    }
+}

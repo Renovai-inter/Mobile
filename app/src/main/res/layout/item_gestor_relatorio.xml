@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp"
+    android:background="@drawable/status_card_cooperado_background" android:gravity="center_vertical" android:orientation="horizontal" android:padding="12dp">
+    <ImageView android:id="@+id/imgRelatorio" android:layout_width="74dp" android:layout_height="74dp"
+        android:background="@drawable/photo_placeholder_cooperado_background" android:contentDescription="Relatório" android:scaleType="centerCrop" />
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="14dp" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/txtRelatorioNome" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Relatório" android:textColor="#882B4E" android:textSize="16sp" android:textStyle="bold" />
+        <TextView android:id="@+id/txtRelatorioPeriodo" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="4dp" android:text="Período: --" android:textColor="#519059" android:textSize="11sp" android:textStyle="bold" />
+        <TextView android:id="@+id/txtRelatorioTipo" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:layout_marginTop="2dp" android:text="Negociações" android:textSize="11sp" />
+    </LinearLayout>
+</LinearLayout>

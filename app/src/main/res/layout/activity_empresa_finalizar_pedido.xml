@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_empresa_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                <FrameLayout android:layout_width="46dp" android:layout_height="46dp">
+                    <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/avatar_maroon_background" />
+                    <TextView android:id="@+id/txtIniciaisCoopFinal" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="--" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" />
+                </FrameLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:id="@+id/txtNomeCoopFinal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nome da cooperativa" android:textColor="#111111" android:textSize="17sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtContatoCoopFinal" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Contato não informado" android:textSize="11sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Confira o valor proposto. Entrega e pagamento serão combinados diretamente com a cooperativa." />
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="24dp" android:text="Preço Total estimado" android:textColor="#222222" android:textSize="14sp" />
+            <TextView android:id="@+id/txtTotalFinal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="R$ 0,00" android:textColor="#882B4E" android:textSize="26sp" android:textStyle="bold" />
+
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="60dp" android:text="Pagamentos são feitos diretamente com a cooperativa" />
+            <TextView android:id="@+id/btnConcluirPedido" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:text="Enviar pedido" />
+            <ProgressBar android:id="@+id/progressoFinal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:layout_marginTop="10dp" android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

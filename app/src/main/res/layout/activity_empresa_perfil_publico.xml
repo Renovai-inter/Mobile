@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+    <include layout="@layout/include_empresa_topbar" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                <FrameLayout android:layout_width="56dp" android:layout_height="56dp">
+                    <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/avatar_maroon_background" />
+                    <TextView android:id="@+id/txtIniciaisPP" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="--" android:textColor="#FFFFFF" android:textSize="18sp" android:textStyle="bold" />
+                </FrameLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="12dp" android:layout_weight="1" android:orientation="vertical">
+                    <TextView android:id="@+id/txtNomePP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nome da cooperativa" android:textColor="#111111" android:textSize="18sp" android:textStyle="bold" />
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="★ " android:textColor="#E0A93A" android:textSize="12sp" />
+                        <TextView android:id="@+id/txtNotaPP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4.3 (28 avaliações)" android:textColor="#519059" android:textSize="12sp" android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+                <ImageView android:id="@+id/imgFavPP" android:layout_width="26dp" android:layout_height="26dp" android:contentDescription="Favoritar" android:src="@drawable/favoritos_empresa_icon" app:tint="#E0A93A" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/trilhaPP" style="@style/G.Track" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" />
+
+            <LinearLayout android:id="@+id/abaSobre" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="vertical">
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="DESCRIÇÃO" android:textStyle="normal" />
+                <TextView android:id="@+id/txtDescricaoPP" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:background="@drawable/card_unselected_background" android:padding="14dp" android:text="—" android:textColor="#444444" android:textSize="13sp" />
+
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" android:text="INFORMAÇÕES" android:textStyle="normal" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:background="@drawable/card_unselected_background" android:orientation="vertical" android:padding="14dp">
+                    <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Endereço" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtEnderecoPP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="—" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                    android:background="@drawable/card_unselected_background" android:orientation="vertical" android:padding="14dp">
+                    <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Horário" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtHorarioPP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="—" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                    android:background="@drawable/card_unselected_background" android:orientation="vertical" android:padding="14dp">
+                    <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Meios de comunicação" android:textStyle="normal" android:textSize="14sp" />
+                    <TextView android:id="@+id/txtContatoPP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="—" android:textColor="#882B4E" android:textSize="14sp" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/abaMateriais" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="vertical" android:visibility="gone">
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="MATERIAIS DISPONÍVEIS" android:textStyle="normal" />
+                <LinearLayout android:id="@+id/listaMateriaisPP" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+                <TextView android:id="@+id/txtSemMateriaisPP" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="Nenhum material disponível no momento." />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/abaComentarios" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:orientation="vertical" android:visibility="gone">
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="AVALIAÇÕES" android:textStyle="normal" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
+                    android:background="@drawable/card_unselected_background" android:gravity="center_vertical" android:orientation="horizontal" android:padding="16dp">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:orientation="vertical">
+                        <TextView android:id="@+id/txtNotaGrandePP" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="4.3" android:textColor="#882B4E" android:textSize="30sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="★★★★★" android:textColor="#E0A93A" android:textSize="12sp" />
+                        <TextView android:id="@+id/txtQtdAvalPP" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 avaliações" android:textSize="11sp" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/barrasEstrelas" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="18dp" android:layout_weight="1" android:orientation="vertical" />
+                </LinearLayout>
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="COMENTÁRIOS" android:textStyle="normal" />
+                <LinearLayout android:id="@+id/listaComentariosPP" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
+                <TextView android:id="@+id/txtSemComentariosPP" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:text="Ainda não há comentários." />
+                <TextView android:id="@+id/btnComentarPP" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="Fazer um comentário" />
+            </LinearLayout>
+
+            <TextView android:id="@+id/btnFazerPedidoPP" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="22dp" android:text="Fazer um pedido" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

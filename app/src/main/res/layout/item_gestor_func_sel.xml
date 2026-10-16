@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/cardFuncSel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"
+    android:background="@drawable/status_card_cooperado_background" android:gravity="center_vertical" android:orientation="horizontal" android:padding="10dp">
+    <CheckBox android:id="@+id/chkFunc" android:layout_width="wrap_content" android:layout_height="wrap_content" android:buttonTint="#519059" android:clickable="false" android:focusable="false" android:minWidth="0dp" android:minHeight="0dp" />
+    <FrameLayout android:layout_width="34dp" android:layout_height="34dp" android:layout_marginStart="6dp">
+        <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/avatar_green_background" />
+        <TextView android:id="@+id/txtFuncSelAvatar" android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="--" android:textColor="#FFFFFF" android:textSize="11sp" android:textStyle="bold" />
+    </FrameLayout>
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:orientation="vertical">
+        <TextView android:id="@+id/txtFuncSelNome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nome" android:textColor="#111111" android:textSize="13sp" android:textStyle="bold" />
+        <TextView android:id="@+id/txtFuncSelCargo" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Função" android:textSize="10sp" />
+    </LinearLayout>
+    <TextView android:id="@+id/txtFuncSelBadge" android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:paddingStart="10dp" android:paddingEnd="10dp" android:paddingTop="3dp" android:paddingBottom="3dp" android:text="Ativo" android:textSize="11sp" android:textStyle="bold" />
+</LinearLayout>
