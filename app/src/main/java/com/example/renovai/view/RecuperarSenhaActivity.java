@@ -172,6 +172,8 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
             public void onResponse(Call<Void> c, Response<Void> r) {
                 carregando(false);
                 if (r.isSuccessful()) {
+                    // Se este e-mail entra pelo Google neste aparelho, passa a usar a senha nova.
+                    com.example.renovai.CofreCredenciais.atualizarSeExistir(email, senha);
                     Toast.makeText(RecuperarSenhaActivity.this, "Senha alterada. Entre com a nova senha.", Toast.LENGTH_LONG).show();
                     Intent intent = new Intent(RecuperarSenhaActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);

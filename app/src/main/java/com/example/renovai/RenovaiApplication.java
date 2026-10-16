@@ -8,6 +8,8 @@ public class RenovaiApplication extends Application {
     public void onCreate() {
         super.onCreate();
         SessionManager.init(this);
+        // Senhas cifradas (Android Keystore) usadas pelo "Entrar com Google" — ver CofreCredenciais.
+        CofreCredenciais.init(this);
         // Necessário para a área de Cooperado (ver CooperadoSession.java) — não
         // mexe em SessionManager, só inicializa o SharedPreferences próprio.
         CooperadoSession.init(this);

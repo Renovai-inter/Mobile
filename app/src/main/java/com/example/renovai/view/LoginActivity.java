@@ -167,8 +167,9 @@ public class LoginActivity extends AppCompatActivity {
             }));
         });
 
-        // ENTRAR COM GOOGLE: o Google devolve um ID token, a API confere e devolve o JWT do
-        // Renovaí (mesmo fluxo de sessão e de telas do login por senha).
+        // ENTRAR COM GOOGLE: o Google devolve um ID token, o próprio app confere o token
+        // (GoogleTokenValidator) e entra pelo /auth/login com a senha guardada neste aparelho
+        // (CofreCredenciais). A API não muda.
         MaterialButton btnGoogle = findViewById(R.id.btnGoogle);
         btnGoogle.setOnClickListener(v -> {
             CharSequence textoOriginal = btnGoogle.getText();
@@ -185,7 +186,10 @@ public class LoginActivity extends AppCompatActivity {
                     Toast.makeText(LoginActivity.this,
                             "Conectando ao servidor — a primeira tentativa pode demorar um pouco.",
                             Toast.LENGTH_LONG).show();
-                    authController.loginGoogle(idToken, callbackDeLogin(liberar));
+                    authController.loginGoogle(
+                            idToken,
+                            GoogleLogin.serverClientId(LoginActivity.this),
+                            callbackDeLogin(liberar));
                 }
 
                 @Override

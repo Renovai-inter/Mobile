@@ -20,7 +20,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
 
 /**
  * "Entrar com Google" via Credential Manager. Abre a janela de contas Google do aparelho e devolve
- * o ID token, que o app manda para a API (POST /auth/google) — ver AuthController.loginGoogle.
+ * o ID token, que o próprio app confere (GoogleTokenValidator) — ver AuthController.loginGoogle.
  *
  * <p>O server client id é o "ID do cliente da Web" do projeto Firebase. O plugin google-services
  * gera o recurso default_web_client_id a partir do app/google-services.json; sem esse arquivo o

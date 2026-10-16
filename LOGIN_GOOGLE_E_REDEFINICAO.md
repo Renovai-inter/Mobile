@@ -1,15 +1,28 @@
 # Login com Google e redefinição de senha por código
 
-Depende da API (Spring-API) com os endpoints `/auth/google`, `/auth/esqueci-senha`,
-`/auth/verificar-codigo` e `/auth/redefinir-senha` (branch `feat/login-google-codigo-email`).
+- **Login com Google:** feito todo no app. A API **não muda** (usa o `POST /auth/login` de sempre).
+- **Redefinição de senha:** depende da API com `/auth/esqueci-senha` enviando o código por e-mail,
+  `/auth/verificar-codigo` e `/auth/redefinir-senha` (branch `feat/login-google-codigo-email` da Spring-API).
 
 ## Login com Google
 
-1. Na tela de login, **Entrar com Google** abre a lista de contas Google do aparelho (Credential Manager).
-2. O app recebe um *ID token* do Google e manda para `POST /auth/google`.
-3. A API confere o token no Google e, se o e-mail tiver conta no Renovaí, devolve o mesmo JWT do
-   login por senha. O app segue o mesmo caminho de sempre (Empresa, Gestor, Cooperado, Motorista).
-4. O login com Google **não cria conta**: quem ainda não tem cadastro recebe a mensagem para se cadastrar.
+1. Na tela de login, **Entrar com Google** abre a lista de contas Google do aparelho
+   (Credential Manager, classe `GoogleLogin`).
+2. O app recebe um *ID token* do Google e o próprio app o confere (`controller/GoogleTokenValidator`):
+   assinatura RS256 com as chaves públicas do Google, `iss` = accounts.google.com,
+   `aud` = ID do cliente da Web do Firebase, `exp` não vencido e `email_verified` = true.
+3. Com o e-mail confirmado, o app busca a senha desse e-mail guardada **neste aparelho**
+   (`CofreCredenciais`: AES-256/GCM com a chave no Android Keystore) e faz o login normal
+   `POST /auth/login`. Daí em diante o caminho é o de sempre (Empresa, Gestor, Cooperado, Motorista).
+4. A senha é guardada no **primeiro login com e-mail e senha** no aparelho. Antes disso o botão do
+   Google avisa: "entre uma vez com e-mail e senha".
+5. Se a senha mudar em outro lugar, o login pelo Google falha uma vez, a senha guardada é apagada e
+   o app pede para entrar com a senha nova. Ao redefinir a senha pelo app, a senha guardada é atualizada.
+6. O login com Google **não cria conta**.
+
+> Limite: o Google só serve para destravar a senha guardada no aparelho. Quem garante o acesso na
+> API continua sendo a senha. Para a API aceitar o Google sem senha, seria preciso um endpoint novo
+> na API (ex.: `/auth/google`).
 
 ### Configuração (Firebase `renovai-23544`)
 
@@ -48,4 +61,3 @@ plano Blaze. Por isso o 2º fator é o código gerado e conferido pela API.
 2. No servidor, defina:
    - `MAIL_USERNAME=renovai.suporte@gmail.com` (já é o padrão se não for definido)
    - `MAIL_PASSWORD=<senha de app de 16 letras>`
-   - `GOOGLE_CLIENT_ID=949318511509-f49jjr67tvpdqm6i51pp0l8rlitbmjn1.apps.googleusercontent.com`
