@@ -2,6 +2,7 @@ package com.example.renovai.controller;
 
 import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
+import com.example.renovai.CofreCredenciais;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.FuncionarioResolver;
 import com.example.renovai.PerfilResolver;
@@ -29,6 +30,10 @@ public class AuthController {
         void onErro(String mensagem);
     }
 
+    private static final String SENHA_GUARDADA_INVALIDA =
+            "A senha desta conta mudou. Entre uma vez com e-mail e a senha nova para voltar a"
+                    + " usar o Google.";
+
     private final AuthApiService authApiService;
 
     public AuthController() {
@@ -41,11 +46,83 @@ public class AuthController {
             return;
         }
 
-        LoginRequest request = new LoginRequest(email.trim(), senha);
+        String emailLimpo = email.trim();
+        LoginRequest request = new LoginRequest(emailLimpo, senha);
+        enviarLogin(
+                authApiService.login(request),
+                new LoginCallback() {
+                    @Override
+                    public void onSuccess(LoginResponse usuario) {
+                        // Guarda a senha (cifrada, só neste aparelho) para o "Entrar com Google".
+                        CofreCredenciais.salvar(emailLimpo, senha);
+                        callback.onSuccess(usuario);
+                    }
 
-        authApiService
-                .login(request)
-                .enqueue(
+                    @Override
+                    public void onErro(String mensagem) {
+                        callback.onErro(mensagem);
+                    }
+                },
+                false);
+    }
+
+    /**
+     * Login com Google feito pelo próprio app, sem mudar a API:
+     *
+     * <ol>
+     *   <li>o app confere o ID token do Google (GoogleTokenValidator) e pega o e-mail confirmado;
+     *   <li>busca a senha desse e-mail guardada neste aparelho (CofreCredenciais), que é salva
+     *       no primeiro login com e-mail e senha;
+     *   <li>faz o login normal da API (POST /auth/login) com esse e-mail e essa senha.
+     * </ol>
+     *
+     * @param clientId "ID do cliente da Web" do Firebase (GoogleLogin.serverClientId)
+     */
+    public void loginGoogle(String idToken, String clientId, LoginCallback callback) {
+        GoogleTokenValidator.validar(
+                idToken,
+                clientId,
+                new GoogleTokenValidator.Callback() {
+                    @Override
+                    public void onValido(String email) {
+                        String senha = CofreCredenciais.ler(email);
+                        if (senha == null) {
+                            callback.onErro(
+                                    "Para usar o Google com "
+                                            + email
+                                            + " neste aparelho, entre uma vez com e-mail e senha."
+                                            + " Depois disso o botão do Google entra direto.");
+                            return;
+                        }
+                        enviarLogin(
+                                authApiService.login(new LoginRequest(email, senha)),
+                                new LoginCallback() {
+                                    @Override
+                                    public void onSuccess(LoginResponse usuario) {
+                                        callback.onSuccess(usuario);
+                                    }
+
+                                    @Override
+                                    public void onErro(String mensagem) {
+                                        if (SENHA_GUARDADA_INVALIDA.equals(mensagem)) {
+                                            CofreCredenciais.remover(email);
+                                        }
+                                        callback.onErro(mensagem);
+                                    }
+                                },
+                                true);
+                    }
+
+                    @Override
+                    public void onInvalido(String mensagem) {
+                        callback.onErro(mensagem);
+                    }
+                });
+    }
+
+    /** Trata a resposta de /auth/login (sessão, empresa, cooperado). */
+    private void enviarLogin(Call<LoginResponse> chamada, LoginCallback callback, boolean google) {
+        chamada.enqueue(
                         new retrofit2.Callback<LoginResponse>() {
                             @Override
                             public void onResponse(
@@ -115,6 +192,10 @@ public class AuthController {
                                                     callback.onSuccess(body);
                                                 }
                                             });
+                                } else if (google
+                                        && (response.code() == 401 || response.code() == 422)) {
+                                    // A senha guardada não vale mais (foi trocada em outro lugar).
+                                    callback.onErro(SENHA_GUARDADA_INVALIDA);
                                 } else if (response.code() == 401 || response.code() == 422) {
                                     callback.onErro("Email ou senha incorretos.");
                                 } else {

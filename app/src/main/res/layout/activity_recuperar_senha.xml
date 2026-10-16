@@ -149,11 +149,28 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="18dp"
-                android:layout_marginBottom="22dp"
+                android:layout_marginBottom="18dp"
                 android:text="Redefinir senha"
                 android:textColor="#000000"
                 android:textSize="20sp"
                 android:textStyle="normal" />
+
+            <!-- Etapas: 1 E-mail → 2 Código (2º fator) → 3 Nova senha -->
+            <include layout="@layout/include_etapas_redefinicao" />
+
+            <!-- Para qual e-mail o código foi enviado (preenchido pela Activity) -->
+            <TextView
+                android:id="@+id/txtInfoCodigo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:layout_marginStart="35dp"
+                android:layout_marginEnd="35dp"
+                android:layout_marginBottom="18dp"
+                android:gravity="center"
+                android:text="Digite o código de 6 dígitos que enviamos para o seu e-mail."
+                android:textColor="#6B7280"
+                android:textSize="13sp" />
 
 
             <!-- ================================================= -->
@@ -179,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="7dp"
-                    android:text="Código de redefinição"
+                    android:text="Código de 6 dígitos"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 
@@ -207,13 +224,35 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="Cole aqui o código recebido"
-                        android:inputType="textVisiblePassword"
+                        android:hint="000000"
+                        android:inputType="number"
+                        android:maxLength="6"
+                        android:letterSpacing="0.3"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
                         android:textSize="14sp" />
 
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtReenviar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginBottom="16dp"
+                    android:padding="4dp"
+                    android:text="Reenviar código"
+                    android:textColor="#519059"
+                    android:textSize="13sp" />
+
+                <!-- Nova senha: só aparece depois que o código é confirmado -->
+                <LinearLayout
+                    android:id="@+id/grupoNovaSenha"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                 <!-- ============================= -->
                 <!-- SENHA -->
@@ -225,7 +264,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="7dp"
-                    android:text="Senha"
+                    android:text="Nova senha"
                     android:textColor="#000000"
                     android:textSize="12sp" />
 
@@ -307,6 +346,8 @@
 
                 </LinearLayout>
 
+                </LinearLayout>
+
             </LinearLayout>
 
 
@@ -318,8 +359,9 @@
                 android:id="@+id/btnAlterar"
                 android:layout_width="300dp"
                 android:layout_height="50dp"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginStart="42dp"
-                android:layout_marginTop="74dp"
+                android:layout_marginTop="40dp"
                 android:layout_marginEnd="42dp"
                 android:clickable="true"
                 android:focusable="true"
@@ -329,10 +371,11 @@
                 app:strokeWidth="0dp">
 
                 <TextView
+                    android:id="@+id/txtBtnAlterar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Alterar"
+                    android:text="Continuar"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
                     android:textStyle="bold" />

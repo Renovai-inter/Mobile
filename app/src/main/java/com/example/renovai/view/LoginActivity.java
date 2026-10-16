@@ -14,7 +14,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.renovai.GoogleLogin;
 import com.example.renovai.MainActivity;
+import com.google.android.material.button.MaterialButton;
 import com.example.renovai.controller.AuthController;
 
 import com.example.renovai.R;
@@ -159,9 +161,59 @@ public class LoginActivity extends AppCompatActivity {
                     "Conectando ao servidor — a primeira tentativa pode demorar um pouco.",
                     Toast.LENGTH_LONG).show();
 
-            authController.login(email, senha, new AuthController.LoginCallback() {
+            authController.login(email, senha, callbackDeLogin(() -> {
+                btnEntrar.setEnabled(true);
+                btnEntrar.setText(textoOriginalBtnEntrar);
+            }));
+        });
+
+        // ENTRAR COM GOOGLE: o Google devolve um ID token, o próprio app confere o token
+        // (GoogleTokenValidator) e entra pelo /auth/login com a senha guardada neste aparelho
+        // (CofreCredenciais). A API não muda.
+        MaterialButton btnGoogle = findViewById(R.id.btnGoogle);
+        btnGoogle.setOnClickListener(v -> {
+            CharSequence textoOriginal = btnGoogle.getText();
+            Runnable liberar = () -> {
+                btnGoogle.setEnabled(true);
+                btnGoogle.setText(textoOriginal);
+            };
+            btnGoogle.setEnabled(false);
+            btnGoogle.setText("Abrindo o Google...");
+            GoogleLogin.entrar(LoginActivity.this, new GoogleLogin.Callback() {
                 @Override
-                public void onSuccess(LoginResponse usuario) {
+                public void onIdToken(String idToken) {
+                    btnGoogle.setText("Entrando...");
+                    Toast.makeText(LoginActivity.this,
+                            "Conectando ao servidor — a primeira tentativa pode demorar um pouco.",
+                            Toast.LENGTH_LONG).show();
+                    authController.loginGoogle(
+                            idToken,
+                            GoogleLogin.serverClientId(LoginActivity.this),
+                            callbackDeLogin(liberar));
+                }
+
+                @Override
+                public void onErro(String mensagem) {
+                    liberar.run();
+                    Toast.makeText(LoginActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                }
+
+                @Override
+                public void onCancelado() {
+                    liberar.run();
+                }
+            });
+        });
+    }
+
+    /**
+     * Callback comum ao login por senha e ao login com Google: abre a área certa para o perfil.
+     * {@code liberarBotao} devolve o botão ao estado normal quando dá erro.
+     */
+    private AuthController.LoginCallback callbackDeLogin(Runnable liberarBotao) {
+        return new AuthController.LoginCallback() {
+            @Override
+            public void onSuccess(LoginResponse usuario) {
                     runOnUiThread(() -> {
 
                         Class<?> destino = destinoParaRole(usuario.getRole());
@@ -216,18 +268,14 @@ public class LoginActivity extends AppCompatActivity {
                     });
                 }
 
-                @Override
-                public void onErro(String mensagem) {
-                    runOnUiThread(() -> {
-                        btnEntrar.setEnabled(true);
-                        btnEntrar.setText(textoOriginalBtnEntrar);
-                        Toast.makeText(LoginActivity.this, mensagem, Toast.LENGTH_LONG).show();
-                    });
-                }
-            });
-        });
-
-
+            @Override
+            public void onErro(String mensagem) {
+                runOnUiThread(() -> {
+                    liberarBotao.run();
+                    Toast.makeText(LoginActivity.this, mensagem, Toast.LENGTH_LONG).show();
+                });
+            }
+        };
     }
 
     /**

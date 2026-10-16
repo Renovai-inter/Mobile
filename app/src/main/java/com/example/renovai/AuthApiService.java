@@ -4,6 +4,7 @@ import com.example.renovai.dto.request.CadastroEmpresaRequest;
 import com.example.renovai.dto.request.LoginRequest;
 import com.example.renovai.dto.request.EsqueciSenhaRequest;
 import com.example.renovai.dto.request.RedefinirSenhaRequest;
+import com.example.renovai.dto.request.VerificarCodigoRequest;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
 import com.example.renovai.dto.response.LoginResponse;
 import retrofit2.Call;
@@ -20,6 +21,10 @@ public interface AuthApiService {
 
     @POST("auth/esqueci-senha")
     Call<Void> esqueciSenha(@Body EsqueciSenhaRequest request);
+
+    /** Confere o código de 6 dígitos enviado por e-mail, sem gastá-lo. */
+    @POST("auth/verificar-codigo")
+    Call<Void> verificarCodigo(@Body VerificarCodigoRequest request);
 
     @POST("auth/redefinir-senha")
     Call<Void> redefinirSenha(@Body RedefinirSenhaRequest request);

@@ -12,7 +12,20 @@
           "package_name": "com.example.renovai"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "949318511509-hf7ieau8kqltlska22phmrm10m22hl04.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.renovai",
+            "certificate_hash": "b85b2ae90088185b0c7f65bc6411280e7fc4f7de"
+          }
+        },
+        {
+          "client_id": "949318511509-f49jjr67tvpdqm6i51pp0l8rlitbmjn1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAvVY9B2Fyp1iafXvO9ugS0IIV5OAavspc"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "949318511509-f49jjr67tvpdqm6i51pp0l8rlitbmjn1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
