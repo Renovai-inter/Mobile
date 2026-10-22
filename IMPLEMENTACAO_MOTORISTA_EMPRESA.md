@@ -103,11 +103,12 @@ A tela 1.7.1 (nova senha) já existia mas não chamava nenhuma API; a 1.7 (pedir
 Criei `EsqueciSenhaActivity` (1.7) e liguei a tela existente (`RecuperarSenhaActivity`, 1.7.1) em
 `POST /auth/esqueci-senha` e `POST /auth/redefinir-senha` (endpoints que já existiam prontos no backend).
 
-**Limitação importante que não dava pra resolver só no app:** o projeto não tem nenhum serviço de
-e-mail — a API gera o código de redefinição e grava no banco, mas **não envia pra ninguém**. Por isso
-tive que colocar um campo pra colar o código manualmente na tela 1.7.1: hoje, na prática, só quem tem
-acesso ao banco (o script `listar_cooperados.py` já dá essa base, adaptável) consegue recuperar esse
-código pra passar pro usuário. Isso é uma limitação de infraestrutura do projeto, não do app.
+**Atualização — código de 6 dígitos por e-mail:** a API agora envia o código (remetente
+renovai.suporte@gmail.com, válido por 15 min, 5 tentativas). O fluxo ficou em três telas:
+`EsqueciSenhaActivity` (1.7, e-mail → `POST /auth/esqueci-senha`) → `CodigoSenhaActivity` (1.7.1, seis
+caixinhas → `POST /auth/verificar-codigo`) → `RecuperarSenhaActivity` (1.7.2, nova senha →
+`POST /auth/redefinir-senha` com `{email, token: código, novaSenha}`). O envio depende de
+`MAIL_USERNAME`/`MAIL_PASSWORD` (senha de app do Gmail) configurados no servidor da API.
 
 ## Revisão geral do app (pedido "revise tudo")
 

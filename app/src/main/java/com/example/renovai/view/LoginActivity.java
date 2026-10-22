@@ -131,6 +131,7 @@ public class LoginActivity extends AppCompatActivity {
         Button btnEntrar = findViewById(R.id.btnEntrar);
         TextView edtEmail = findViewById(R.id.edtEmail);
         TextView edtSenha = findViewById(R.id.edtSenha);
+        com.example.renovai.SenhaVisivel.ativar(findViewById(R.id.edtSenha));
 
         // Ir para a tela de recuperar senha (1.7 — pede o e-mail antes)
         txtEsqueceuSenha.setOnClickListener(v -> {
@@ -246,7 +247,8 @@ public class LoginActivity extends AppCompatActivity {
             if (r.contains("EMPRESA")) {
                 return com.example.renovai.view.EmpresaHomeActivity.class;
             }
-            if (r.contains("GESTOR")) {
+            // Admin da cooperativa (quem fez o cadastro da cooperativa) usa a mesma área do Gestor.
+            if (r.contains("GESTOR") || r.equals("ADMIN_COOPERATIVA")) {
                 return GestorHomeActivity.class;
             }
             if (r.contains("MOTORISTA")) {

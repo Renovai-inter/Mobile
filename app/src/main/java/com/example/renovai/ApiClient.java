@@ -25,7 +25,7 @@ public final class ApiClient {
                     .addInterceptor(new AuthInterceptor())
                     .addInterceptor(logging)
                     .connectTimeout(100, TimeUnit.SECONDS)
-                    .readTimeout(100, TimeUnit.SECONDS)
+                    .readTimeout(170, TimeUnit.SECONDS) // o Render gratuito pode levar mais de 1 min para acordar
                     .writeTimeout(100, TimeUnit.SECONDS)
                     .callTimeout(180, TimeUnit.SECONDS)
                     .build();

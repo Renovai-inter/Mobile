@@ -3,19 +3,28 @@ package com.example.renovai.controller;
 import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
 import com.example.renovai.CooperadoSession;
+import com.example.renovai.Documento;
 import com.example.renovai.FuncionarioResolver;
 import com.example.renovai.PerfilResolver;
 import com.example.renovai.SessionManager;
+import com.example.renovai.dto.request.CadastroCooperativaRequest;
 import com.example.renovai.dto.request.CadastroEmpresaRequest;
 import com.example.renovai.dto.request.LoginRequest;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
 import com.example.renovai.dto.response.FuncionarioResponse;
 import com.example.renovai.dto.response.LoginResponse;
 
+import android.util.Log;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import retrofit2.Call;
 import retrofit2.Response;
 
 public class AuthController {
+
+    private static final String TAG = "AuthController";
 
     public interface LoginCallback {
         void onSuccess(LoginResponse usuario);
@@ -23,10 +32,22 @@ public class AuthController {
         void onErro(String mensagem);
     }
 
-    public interface CadastroEmpresaCallback {
-        void onSuccess(CadastroEmpresaResponse resposta);
-
+    public interface CadastroErroCallback {
+        /** Erro de digitação ou parecido: a tela mostra um Toast. */
         void onErro(String mensagem);
+
+        /** Erro que precisa de explicação (conta existente, servidor, conexão): pop-up. */
+        default void onFalha(FalhaCadastro falha) {
+            onErro(falha.mensagem);
+        }
+    }
+
+    public interface CadastroEmpresaCallback extends CadastroErroCallback {
+        void onSuccess(CadastroEmpresaResponse resposta);
+    }
+
+    public interface CadastroCooperativaCallback extends CadastroErroCallback {
+        void onSuccess();
     }
 
     private final AuthApiService authApiService;
@@ -41,7 +62,8 @@ public class AuthController {
             return;
         }
 
-        LoginRequest request = new LoginRequest(email.trim(), senha);
+        // A API salva os e-mails em minúsculas e busca no login pelo texto exato
+        LoginRequest request = new LoginRequest(email.trim().toLowerCase(java.util.Locale.ROOT), senha);
 
         authApiService
                 .login(request)
@@ -75,29 +97,20 @@ public class AuthController {
                                                 }
                                                 SessionManager.salvarEmpresaId(empresaId);
 
-                                                // ÁREA COOPERADO: se o login não for de Perfil
-                                                // (Empresa ou
-                                                // admin de Cooperativa — roles fixos
-                                                // "GESTOR_EMPRESA" e
-                                                // "ADMIN_COOPERATIVA", ver AuthService.login() no
-                                                // backend),
-                                                // então body.getUsuarioId() é de fato um
-                                                // Usuario.usuarioId
-                                                // (cooperado/motorista/gestor de cooperativa), e dá
-                                                // pra
-                                                // resolver o Funcionario correspondente e cacheá-lo
-                                                // em
-                                                // CooperadoSession — ver FuncionarioResolver.
+                                                // Fora o login de Perfil da Empresa
+                                                // ("GESTOR_EMPRESA"), body.getUsuarioId() é um
+                                                // Usuario.usuarioId (cooperado, motorista, gestor
+                                                // ou admin de cooperativa — o cadastro de
+                                                // cooperativa cria o admin como Funcionario com
+                                                // cargo "Admin"), e dá pra resolver o Funcionario
+                                                // e cacheá-lo em CooperadoSession (a área do
+                                                // Gestor usa a cooperativa dele) — ver
+                                                // FuncionarioResolver. Contas antigas de admin que
+                                                // entram por Perfil devolvem o perfilId: aí o
+                                                // resolver só não acha nada.
                                                 boolean provavelmenteFuncionario =
-                                                        body.getRole() == null
-                                                                || (!"GESTOR_EMPRESA"
-                                                                                .equalsIgnoreCase(
-                                                                                        body
-                                                                                                .getRole())
-                                                                        && !"ADMIN_COOPERATIVA"
-                                                                                .equalsIgnoreCase(
-                                                                                        body
-                                                                                                .getRole()));
+                                                        !"GESTOR_EMPRESA"
+                                                                .equalsIgnoreCase(body.getRole());
 
                                                 if (provavelmenteFuncionario
                                                         && body.getUsuarioId() != null) {
@@ -155,70 +168,26 @@ public class AuthController {
             String senha,
             String confirmacaoSenha,
             CadastroEmpresaCallback callback) {
-        if (nome == null || nome.trim().isEmpty()) {
-            callback.onErro("Preencha o nome.");
-            return;
+        String erro =
+                validarCadastro(
+                        nome, cpf, email, telefone, nomeEmpresa, "empresa", cnpj, senha,
+                        confirmacaoSenha);
+        if (erro == null && (endereco == null || endereco.trim().isEmpty())) {
+            erro = "Preencha o endereço da empresa.";
         }
-
-        if (email == null || email.trim().isEmpty()) {
-            callback.onErro("Preencha o email.");
-            return;
-        }
-
-        if (telefone == null || telefone.trim().isEmpty()) {
-            callback.onErro("Preencha o telefone.");
-            return;
-        }
-
-        if (nomeEmpresa == null || nomeEmpresa.trim().isEmpty()) {
-            callback.onErro("Preencha o nome da empresa.");
-            return;
-        }
-
-        if (cnpj == null || cnpj.trim().isEmpty()) {
-            callback.onErro("Preencha o cnpj.");
-            return;
-        }
-
-        if (endereco == null || endereco.trim().isEmpty()) {
-            callback.onErro("Preencha o endereço da empresa.");
-            return;
-        }
-
-        if (senha == null || senha.trim().isEmpty()) {
-            callback.onErro("Preencha a senha");
-            return;
-        }
-
-        if (confirmacaoSenha == null || confirmacaoSenha.trim().isEmpty()) {
-            callback.onErro("Preencha o campo confirmar senha'");
-            return;
-        }
-
-        if (!confirmacaoSenha.equals(senha)) {
-            callback.onErro(
-                    "As senhas não coincidem, o campo confirmar senha deve ser igual ao de senha");
-            return;
-        }
-
-        if (cpf == null || !cpf.replaceAll("\\D", "").matches("[0-9]{11}")) {
-            callback.onErro("Informe o CPF do responsável com 11 dígitos.");
-            return;
-        }
-        if (senha.length() < 6
-                || senha.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
-            callback.onErro("A senha deve ter ao menos 6 caracteres e até 72 bytes.");
+        if (erro != null) {
+            callback.onErro(erro);
             return;
         }
         CadastroEmpresaRequest request =
                 new CadastroEmpresaRequest(
                         nome.trim(),
-                        cpf.trim(),
+                        Documento.numeros(cpf),
                         email.trim(),
                         telefone.trim(),
                         senha,
                         nomeEmpresa.trim(),
-                        cnpj.trim(),
+                        Documento.numeros(cnpj),
                         endereco.trim());
 
         authApiService
@@ -234,24 +203,235 @@ public class AuthController {
                                     SessionManager.salvarSessao(
                                             body.getToken(), body.getEmail(), body.getRole());
                                     callback.onSuccess(body);
-                                } else if (response.code() == 422) {
-                                    callback.onErro(com.example.renovai.EmpresaData.erro(response));
-                                } else if (response.code() == 400) {
-                                    callback.onErro(com.example.renovai.EmpresaData.erro(response));
                                 } else {
-                                    callback.onErro(
-                                            "Erro ao cadastrar (código "
-                                                    + response.code()
-                                                    + "). Tente novamente.");
+                                    tratarErroCadastro(response, "empresa", email.trim(), callback);
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<CadastroEmpresaResponse> call, Throwable t) {
-                                callback.onErro(
-                                        "Não foi possível conectar ao servidor. Verifique sua"
-                                            + " internet.");
+                                Log.w(TAG, "Cadastro de empresa sem resposta", t);
+                                callback.onFalha(FalhaCadastro.conexao());
                             }
                         });
+    }
+
+    /**
+     * Cadastro de cooperativa (POST /auth/cadastro-cooperativa). Cria a cooperativa e o
+     * administrador dela; a API não devolve token, então depois a pessoa entra pelo login.
+     */
+    public void cadastrarCooperativa(
+            String nomeResponsavel,
+            String cpf,
+            String email,
+            String contatoPreferencial, // WHATSAPP, TELEFONE ou EMAIL (CHECK do banco)
+            String nomeCooperativa,
+            String cnpj,
+            String cep,
+            String logradouro,
+            String numero,
+            String complemento,
+            String bairro,
+            String cidade,
+            String senha,
+            String confirmacaoSenha,
+            CadastroCooperativaCallback callback) {
+        String erro =
+                validarCadastro(
+                        nomeResponsavel, cpf, email, contatoPreferencial, nomeCooperativa, "cooperativa",
+                        cnpj, senha, confirmacaoSenha);
+        if (erro == null && Documento.numeros(cep).length() != 8) erro = "Informe o CEP com 8 números.";
+        if (erro == null && vazio(logradouro)) erro = "Preencha a rua da cooperativa.";
+        if (erro == null && vazio(numero)) erro = "Preencha o número do endereço.";
+        if (erro == null && vazio(bairro)) erro = "Preencha o bairro.";
+        if (erro == null && vazio(cidade)) erro = "Preencha a cidade.";
+        if (erro != null) {
+            callback.onErro(erro);
+            return;
+        }
+
+        CadastroCooperativaRequest request =
+                new CadastroCooperativaRequest(
+                        nomeResponsavel.trim(),
+                        Documento.formatarCpf(cpf),
+                        nomeCooperativa.trim(),
+                        contatoPreferencial,
+                        email.trim(),
+                        Documento.formatarCnpj(cnpj),
+                        senha,
+                        new CadastroCooperativaRequest.Endereco(
+                                Documento.formatarCep(cep),
+                                logradouro.trim(),
+                                numero.trim(),
+                                vazio(complemento) ? null : complemento.trim(),
+                                bairro.trim(),
+                                cidade.trim()));
+
+        authApiService
+                .cadastroCooperativa(request)
+                .enqueue(
+                        new retrofit2.Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    callback.onSuccess();
+                                } else {
+                                    tratarErroCadastro(response, "cooperativa", email.trim(), callback);
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Log.w(TAG, "Cadastro de cooperativa sem resposta", t);
+                                callback.onFalha(FalhaCadastro.conexao());
+                            }
+                        });
+    }
+
+    /**
+     * Traduz a resposta de erro da API. Campo mal preenchido (400, "Documento inválido.") vira
+     * Toast; conta/dado já existente, 409, 5xx e o resto viram pop-up com explicação.
+     */
+    private static void tratarErroCadastro(
+            Response<?> response, String tipo, String email, CadastroErroCallback callback) {
+        String corpo = null;
+        try {
+            if (response.errorBody() != null) corpo = response.errorBody().string();
+        } catch (java.io.IOException ignored) {
+        }
+        Log.w(TAG, "Cadastro de " + tipo + " recusado: HTTP " + response.code() + " " + corpo);
+
+        String mensagem = null;
+        JsonObject campos = null;
+        try {
+            JsonObject json = JsonParser.parseString(corpo).getAsJsonObject();
+            if (json.has("mensagem") && json.get("mensagem").isJsonPrimitive()) {
+                mensagem = json.get("mensagem").getAsString();
+            }
+            if (json.has("campos") && json.get("campos").isJsonObject()) {
+                campos = json.getAsJsonObject("campos");
+            }
+        } catch (Exception ignored) {
+            // corpo vazio ou que não é JSON (ex: página de erro do Render)
+        }
+        String m = mensagem == null ? "" : mensagem.toLowerCase(java.util.Locale.ROOT);
+        int codigo = response.code();
+
+        if (codigo == 400 && campos != null && campos.size() > 0) {
+            StringBuilder nomes = new StringBuilder();
+            for (String campo : campos.keySet()) {
+                if (nomes.length() > 0) nomes.append(", ");
+                nomes.append(nomeDoCampo(campo));
+            }
+            callback.onErro("Confira o preenchimento de: " + nomes + ".");
+        } else if (codigo == 400 || m.contains("documento inválido") || m.contains("72 bytes")) {
+            callback.onErro(mensagem != null ? mensagem : "Confira os dados preenchidos.");
+        } else if (m.contains("e-mail já cadastrado")) {
+            callback.onFalha(
+                    new FalhaCadastro(
+                            FalhaCadastro.Tipo.CONTA_EXISTENTE,
+                            "Este e-mail já tem conta",
+                            "Já existe uma conta no Renovai com o e-mail " + email + ".",
+                            "Se a conta é sua, entre pelo login. Não lembra a senha? Use"
+                                    + " \"Esqueceu a senha?\" na tela de login."));
+        } else if (m.contains("cpf já cadastrado")) {
+            callback.onFalha(
+                    new FalhaCadastro(
+                            FalhaCadastro.Tipo.DADOS_EM_USO,
+                            "CPF já cadastrado",
+                            "Este CPF já é responsável por outra conta no Renovai. Cada CPF só pode"
+                                    + " estar ligado a uma conta.",
+                            "Se a conta é sua, entre pelo login. Se não, confira se o CPF foi"
+                                    + " digitado certo."));
+        } else if (m.contains("cnpj já cadastrado")) {
+            callback.onFalha(
+                    new FalhaCadastro(
+                            FalhaCadastro.Tipo.DADOS_EM_USO,
+                            "Esta " + tipo + " já tem cadastro",
+                            "O CNPJ informado já pertence a uma " + tipo + " cadastrada no Renovai.",
+                            "Peça acesso a quem cuida da conta da " + tipo + ", ou confira se o CNPJ"
+                                    + " foi digitado certo."));
+        } else if (codigo == 409 || codigo >= 500) {
+            // 409 = o banco recusou gravar (DataIntegrityViolationException na API). As checagens
+            // de e-mail/CPF/CNPJ duplicado já passaram nesse ponto, então não é culpa dos dados.
+            callback.onFalha(
+                    new FalhaCadastro(
+                            FalhaCadastro.Tipo.SERVIDOR,
+                            "Problema no servidor",
+                            "O servidor não conseguiu salvar o cadastro (erro " + codigo + "). Não"
+                                    + " é um problema nos dados que você digitou, e nada foi salvo:"
+                                    + " sua conta ainda não existe.",
+                            "Tente de novo em alguns minutos. Se continuar, avise a equipe do"
+                                    + " Renovai."));
+        } else {
+            callback.onFalha(
+                    new FalhaCadastro(
+                            FalhaCadastro.Tipo.OUTRO,
+                            "Não foi possível cadastrar",
+                            mensagem != null && !mensagem.isEmpty()
+                                    ? mensagem
+                                    : "O servidor recusou o cadastro (erro " + codigo + ").",
+                            null));
+        }
+    }
+
+    /** Nome legível dos campos que a API devolve em "campos" no erro 400. */
+    private static String nomeDoCampo(String campo) {
+        switch (campo) {
+            case "nome": case "nomeResponsavel": return "nome";
+            case "cpf": case "cpfResponsavel": return "CPF";
+            case "email": return "e-mail";
+            case "telefone": case "contatoPreferencial": return "telefone";
+            case "nomeEmpresa": return "nome da empresa";
+            case "cnpj": return "CNPJ";
+            case "senha": return "senha";
+            case "endereco": return "endereço";
+            case "endereco.cep": return "CEP";
+            case "endereco.logradouro": return "rua";
+            case "endereco.numero": return "número";
+            case "endereco.complemento": return "complemento";
+            case "endereco.bairro": return "bairro";
+            case "endereco.cidade": return "cidade";
+            default: return campo;
+        }
+    }
+
+    /** Campos comuns aos cadastros de empresa e cooperativa. Devolve a mensagem de erro ou null. */
+    private static String validarCadastro(
+            String nome,
+            String cpf,
+            String email,
+            String telefone,
+            String nomeOrganizacao,
+            String tipo,
+            String cnpj,
+            String senha,
+            String confirmacaoSenha) {
+        if (vazio(nome)) return "Preencha o nome.";
+        if (!Documento.cpfValido(cpf)) {
+            return "CPF do responsável inválido: confira os 11 números (os dois últimos são dígitos"
+                    + " verificadores).";
+        }
+        if (vazio(email) || !android.util.Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
+            return "Informe um e-mail válido.";
+        }
+        if (vazio(telefone)) return "Preencha o telefone.";
+        if (vazio(nomeOrganizacao)) return "Preencha o nome da " + tipo + ".";
+        if (!Documento.cnpjValido(cnpj)) {
+            return "CNPJ da " + tipo + " inválido: confira os 14 números (os dois últimos são"
+                    + " dígitos verificadores).";
+        }
+        if (senha == null || senha.length() < 6
+                || senha.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            return "A senha deve ter ao menos 6 caracteres e até 72 bytes.";
+        }
+        if (!senha.equals(confirmacaoSenha)) {
+            return "As senhas não coincidem, o campo confirmar senha deve ser igual ao de senha";
+        }
+        return null;
+    }
+
+    private static boolean vazio(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }

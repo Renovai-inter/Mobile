@@ -8,7 +8,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FAFAF8"
-    tools:context=".view.CadastroEmpresaActivity">
+    tools:context=".view.CadastroActivity">
 
 
     <!-- ===================================================== -->
@@ -180,11 +180,12 @@
                 <!-- ==================== NOME ==================== -->
 
                 <TextView
+                    android:id="@+id/labelNome"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
                     android:layout_marginBottom="7dp"
-                    android:text="Nome"
+                    android:text="Nome do responsável"
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
@@ -222,7 +223,7 @@
 
 
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_marginBottom="7dp" android:text="CPF do responsável" android:textColor="#000000" android:textSize="16sp" />
-                <EditText android:id="@+id/edtCpfEmpresa" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="18dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Somente os 11 números" android:inputType="number" android:maxLength="11" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                <EditText android:id="@+id/edtCpf" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="18dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="000.000.000-00" android:inputType="number" android:digits="0123456789.-" android:maxLength="14" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
 
                 <!-- ==================== E-MAIL ==================== -->
 
@@ -268,7 +269,73 @@
                 </LinearLayout>
 
 
-                <!-- ==================== TELEFONE ==================== -->
+                <!-- ==================== CONTATO PREFERENCIAL (só cooperativa) ==================== -->
+                <!-- No banco, cooperativas.contato_preferencial só aceita WHATSAPP, TELEFONE ou EMAIL -->
+
+                <LinearLayout
+                    android:id="@+id/containerContatoCooperativa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="18dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginBottom="7dp"
+                        android:text="Como prefere ser contatado?"
+                        android:textColor="#000000"
+                        android:textSize="16sp" />
+
+                    <RadioGroup
+                        android:id="@+id/grupoContato"
+                        android:layout_width="match_parent"
+                        android:layout_height="55dp"
+                        android:background="#F8F8F8"
+                        android:checkedButton="@+id/radioWhatsapp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:paddingStart="10dp">
+
+                        <RadioButton
+                            android:id="@+id/radioWhatsapp"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.2"
+                            android:buttonTint="#519059"
+                            android:text="WhatsApp"
+                            android:textSize="14sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioTelefone"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1.1"
+                            android:buttonTint="#519059"
+                            android:text="Telefone"
+                            android:textSize="14sp" />
+
+                        <RadioButton
+                            android:id="@+id/radioEmail"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:buttonTint="#519059"
+                            android:text="E-mail"
+                            android:textSize="14sp" />
+                    </RadioGroup>
+                </LinearLayout>
+
+
+                <!-- ==================== TELEFONE (só empresa: a API de cooperativa não guarda telefone) ==================== -->
+
+                <LinearLayout
+                    android:id="@+id/containerTelefone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -311,10 +378,13 @@
 
                 </LinearLayout>
 
+                </LinearLayout>
+
 
                 <!-- ==================== EMPRESA ==================== -->
 
                 <TextView
+                    android:id="@+id/labelOrganizacao"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
@@ -341,7 +411,7 @@
                         android:src="@drawable/empresa_icon" />
 
                     <EditText
-                        android:id="@+id/edtEmpresa"
+                        android:id="@+id/edtOrganizacao"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -390,8 +460,10 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="CNPJ da empresa"
+                        android:hint="00.000.000/0000-00"
                         android:inputType="number"
+                        android:digits="0123456789./-"
+                        android:maxLength="18"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
                         android:textColorHint="#999999"
@@ -411,7 +483,26 @@
                     android:textColor="#000000"
                     android:textSize="16sp" />
 
+                <!-- Cooperativa: a API pede o endereço em partes (só aparece no cadastro de cooperativa) -->
                 <LinearLayout
+                    android:id="@+id/containerEnderecoCooperativa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                    <EditText android:id="@+id/edtCep" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="12dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="CEP (00000-000)" android:inputType="number" android:digits="0123456789-" android:maxLength="9" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                    <EditText android:id="@+id/edtLogradouro" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="12dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Rua / Avenida" android:inputType="textPostalAddress" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:orientation="horizontal">
+                        <EditText android:id="@+id/edtNumero" android:layout_width="0dp" android:layout_height="55dp" android:layout_weight="1" android:layout_marginEnd="8dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Número" android:inputType="text" android:maxLength="20" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                        <EditText android:id="@+id/edtComplemento" android:layout_width="0dp" android:layout_height="55dp" android:layout_weight="2" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Complemento (opcional)" android:inputType="text" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                    </LinearLayout>
+                    <EditText android:id="@+id/edtBairro" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="12dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Bairro" android:inputType="text" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                    <EditText android:id="@+id/edtCidade" android:layout_width="match_parent" android:layout_height="55dp" android:layout_marginBottom="18dp" android:background="#F8F8F8" android:paddingStart="16dp" android:paddingEnd="10dp" android:hint="Cidade" android:inputType="text" android:textColor="#000000" android:textColorHint="#999999" android:textSize="15sp" />
+                </LinearLayout>
+
+                <!-- Empresa: endereço em uma linha só -->
+                <LinearLayout
+                    android:id="@+id/containerEnderecoEmpresa"
                     android:layout_width="match_parent"
                     android:layout_height="55dp"
                     android:layout_marginBottom="18dp"
@@ -478,7 +569,7 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:background="@null"
-                        android:hint="Mínimo de 8 dígitos"
+                        android:hint="Mínimo de 6 caracteres"
                         android:inputType="textPassword"
                         android:paddingEnd="10dp"
                         android:textColor="#000000"
@@ -530,37 +621,6 @@
                         android:textSize="15sp" />
 
                 </LinearLayout>
-
-            </LinearLayout>
-
-
-            <!-- ================================================= -->
-            <!-- TERMOS DE USO -->
-            <!-- ================================================= -->
-
-            <LinearLayout
-                android:id="@+id/termosContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="30dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <CheckBox
-                    android:id="@+id/checkTermos"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:buttonTint="#922B56" />
-
-                <TextView
-                    android:id="@+id/textoTermos"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:text="Li e aceito os Termos de Uso"
-                    android:textColor="#000000"
-                    android:textSize="15sp" />
 
             </LinearLayout>
 

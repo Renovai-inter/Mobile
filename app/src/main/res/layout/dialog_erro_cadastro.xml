@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Pop-up de erro do cadastro (CadastroActivity): ícone, título, explicação e até dois botões. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_erro_background"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="28dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="20dp">
+
+    <ImageView
+        android:id="@+id/imgErro"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/dialog_erro_icone_background"
+        android:contentDescription="@null"
+        android:padding="16dp"
+        android:src="@drawable/ic_erro_alerta" />
+
+    <TextView
+        android:id="@+id/txtTituloErro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textColor="#882B4E"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtMensagemErro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:lineSpacingExtra="3dp"
+        android:textColor="#444444"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/txtDicaErro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:background="#F3F8F3"
+        android:gravity="center"
+        android:padding="12dp"
+        android:textColor="#3D6E43"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/btnPrimarioErro"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="22dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="#519059"
+        app:cardCornerRadius="25dp"
+        app:cardElevation="0dp"
+        app:strokeWidth="0dp">
+
+        <TextView
+            android:id="@+id/txtPrimarioErro"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/btnSecundarioErro"
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:layout_marginTop="6dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:textColor="#882B4E"
+        android:textSize="15sp"
+        android:visibility="gone" />
+
+</LinearLayout>

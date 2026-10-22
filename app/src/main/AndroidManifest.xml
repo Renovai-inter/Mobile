@@ -25,6 +25,10 @@
         <activity
             android:name=".view.EsqueciSenhaActivity"
             android:exported="false" />
+        <activity
+            android:name=".view.CodigoSenhaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- ===================== Área Motorista (telas 3.1 a 3.3) ===================== -->
         <activity android:name=".view.MotoristaHomeActivity" android:exported="false" />
@@ -54,7 +58,7 @@
             android:name=".view.EscolheActivity"
             android:exported="false" />
         <activity
-            android:name=".view.CadastroEmpresaActivity"
+            android:name=".view.CadastroActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

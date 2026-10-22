@@ -34,16 +34,20 @@ public class EscolheActivity extends AppCompatActivity {
         View empresaButton = findViewById(R.id.empresaButton);
         View cooperativaButton = findViewById(R.id.cooperativaButton);
 
-        // Ir para o cadastro de empresa
-        empresaButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CadastroEmpresaActivity.class);
-            startActivity(intent);
-        });
+        // Mesma tela de cadastro para os dois; o tipo escolhido vai no Intent
+        empresaButton.setOnClickListener(v -> abrirCadastro(CadastroActivity.TIPO_EMPRESA));
+        cooperativaButton.setOnClickListener(v -> abrirCadastro(CadastroActivity.TIPO_COOPERATIVA));
 
         // Voltar para tela de login
         btnVoltar.setOnClickListener(v -> {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         });
+    }
+
+    private void abrirCadastro(String tipo) {
+        Intent intent = new Intent(this, CadastroActivity.class);
+        intent.putExtra(CadastroActivity.EXTRA_TIPO, tipo);
+        startActivity(intent);
     }
 }
