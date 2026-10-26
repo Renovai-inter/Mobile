@@ -13,6 +13,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.renovai.Imagens;
 import com.example.renovai.R;
 
 import java.math.BigDecimal;
@@ -43,15 +44,22 @@ public class TriagemListAdapter extends RecyclerView.Adapter<TriagemListAdapter.
         public final BigDecimal pesoAtualKg;
         public final int progressoPercentual;
         public final String dataConclusaoIso; // pode ser null
+        public final String imagemUrl; // primeira foto de triagem do grupo (pode ser null)
 
         public Grupo(String coletaId, String triagemIdReferencia, StatusGrupo status,
                       BigDecimal pesoAtualKg, int progressoPercentual, String dataConclusaoIso) {
+            this(coletaId, triagemIdReferencia, status, pesoAtualKg, progressoPercentual, dataConclusaoIso, null);
+        }
+
+        public Grupo(String coletaId, String triagemIdReferencia, StatusGrupo status,
+                      BigDecimal pesoAtualKg, int progressoPercentual, String dataConclusaoIso, String imagemUrl) {
             this.coletaId = coletaId;
             this.triagemIdReferencia = triagemIdReferencia;
             this.status = status;
             this.pesoAtualKg = pesoAtualKg;
             this.progressoPercentual = progressoPercentual;
             this.dataConclusaoIso = dataConclusaoIso;
+            this.imagemUrl = imagemUrl;
         }
     }
 
@@ -89,6 +97,7 @@ public class TriagemListAdapter extends RecyclerView.Adapter<TriagemListAdapter.
                 ? "#" + grupo.triagemIdReferencia.substring(0, 6).toUpperCase(Locale.ROOT)
                 : "#------";
         holder.txtIdTriagem.setText(idCurto);
+        Imagens.carregar(holder.foto, grupo.imagemUrl, true, com.example.renovai.TipoImagem.TRIAGEM);
 
         String idColetaCurto = grupo.coletaId != null && grupo.coletaId.length() >= 6
                 ? "#" + grupo.coletaId.substring(0, 6).toUpperCase(Locale.ROOT)
@@ -135,7 +144,7 @@ public class TriagemListAdapter extends RecyclerView.Adapter<TriagemListAdapter.
             case EM_ANDAMENTO:
                 corBorda = Color.parseColor("#E8A9BB");
                 corBadgeFundo = Color.parseColor("#FBE4EA");
-                corBadgeTexto = Color.parseColor("#C2185B");
+                corBadgeTexto = Color.parseColor("#882B4E");
                 iconeRes = R.drawable.ic_refresh_cooperado;
                 texto = "Em Andamento";
                 break;
@@ -181,7 +190,14 @@ public class TriagemListAdapter extends RecyclerView.Adapter<TriagemListAdapter.
         return itens.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        Imagens.limpar(holder.foto);
+        super.onViewRecycled(holder);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView foto;
         TextView txtIdTriagem, txtColetaVinculadaTriagem, txtLabelPesoTriagem, txtPesoTriagem,
                 txtProgressoPercentTriagem, txtTriadoEm, txtDetalhesTriagem, btnContinuarTriagem,
                 txtStatusTriagem;
@@ -191,6 +207,7 @@ public class TriagemListAdapter extends RecyclerView.Adapter<TriagemListAdapter.
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            foto = itemView.findViewById(R.id.imgFotoColetaTriagem);
             txtIdTriagem = itemView.findViewById(R.id.txtIdTriagem);
             txtColetaVinculadaTriagem = itemView.findViewById(R.id.txtColetaVinculadaTriagem);
             txtLabelPesoTriagem = itemView.findViewById(R.id.txtLabelPesoTriagem);

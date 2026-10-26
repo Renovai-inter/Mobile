@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.app.DatePickerDialog;
 import android.net.Uri;
 import android.os.Bundle;
@@ -48,7 +49,7 @@ import java.util.Locale;
  * há onde persisti-los ainda. Isso está documentado em IMPLEMENTACAO.md.
  *
  * <p>FOTO: a API não tem endpoint de upload, então a foto vai para o Cloudinary
- * (CloudinaryUploader) e a URL devolvida é enviada no campo imagemUrl do POST /coletas — que a API
+ * (CloudinaryUpload, upload unsigned direto na API do Cloudinary) e a URL devolvida é enviada no campo imagemUrl do POST /coletas — que a API
  * já aceita.
  */
 public class AdicionarColetaActivity extends AppCompatActivity {
@@ -68,6 +69,8 @@ public class AdicionarColetaActivity extends AppCompatActivity {
 
     private boolean tipoExterno = false, registrando;
     private Uri fotoSelecionada;
+    // URL do Cloudinary da foto já enviada: se a API falhar, o "Registrar" de novo não sobe a foto outra vez.
+    private String fotoUrlEnviada;
     private final List<String> materiaisColetados = new ArrayList<>();
     private final List<RotaResponse> rotasCarregadas = new ArrayList<>();
 
@@ -77,6 +80,7 @@ public class AdicionarColetaActivity extends AppCompatActivity {
                     uri -> {
                         if (uri == null) return;
                         fotoSelecionada = uri;
+                        fotoUrlEnviada = null;
                         imgPreviewFotoColeta.setImageURI(uri);
                         imgPreviewFotoColeta.setVisibility(View.VISIBLE);
                         txtSemFotoColeta.setVisibility(View.GONE);
@@ -117,7 +121,7 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         btnSalvarMaterial.setEnabled(false);
         btnAdicionarOutroMaterial.setEnabled(false);
         // Foto: enviada ao Cloudinary no momento do registro (ver registrarColeta)
-        boolean fotoDisponivel = com.example.renovai.CloudinaryUploader.estaConfigurado();
+        boolean fotoDisponivel = com.example.renovai.CloudinaryUpload.estaConfigurado();
         findViewById(R.id.btnAnexarFoto).setEnabled(fotoDisponivel);
         txtSemFotoColeta.setText(
                 fotoDisponivel ? "Nenhuma foto anexada" : "Envio de foto não configurado");
@@ -367,25 +371,27 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         progressRegistrarColeta.setVisibility(View.VISIBLE);
         btnRegistrarColeta.setEnabled(false);
 
-        if (fotoSelecionada == null) {
-            enviarColeta(peso, rotaId, null);
+        if (fotoSelecionada == null || fotoUrlEnviada != null) {
+            enviarColeta(peso, rotaId, fotoUrlEnviada);
             return;
         }
 
         // 1º a foto vai para o Cloudinary; 2º a URL vai junto com a coleta para a API.
         final String rotaFinal = rotaId;
-        com.example.renovai.CloudinaryUploader.enviarFoto(
+        com.example.renovai.CloudinaryUpload.enviar(
+                this,
                 fotoSelecionada,
-                "coletas/" + CooperadoSession.getCooperativaId(),
-                new com.example.renovai.CloudinaryUploader.Callback() {
+                com.example.renovai.TipoImagem.COLETA,
+                new com.example.renovai.CloudinaryUpload.Retorno() {
                     @Override
-                    public void onSucesso(String url) {
+                    public void sucesso(String url) {
+                        fotoUrlEnviada = url;
                         if (isFinishing() || isDestroyed()) return;
                         enviarColeta(peso, rotaFinal, url);
                     }
 
                     @Override
-                    public void onErro(String mensagem) {
+                    public void erro(String mensagem) {
                         registrando = false;
                         if (isFinishing() || isDestroyed()) return;
                         progressRegistrarColeta.setVisibility(View.GONE);

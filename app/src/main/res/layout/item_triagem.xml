@@ -60,7 +60,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Em Andamento"
-                android:textColor="#C2185B"
+                android:textColor="#882B4E"
                 android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
@@ -77,6 +77,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imgFotoColetaTriagem"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@string/foto_triagem"
+            android:scaleType="centerCrop"
+            android:src="@drawable/pedido_foto_placeholder" />
 
         <LinearLayout
             android:layout_width="0dp"

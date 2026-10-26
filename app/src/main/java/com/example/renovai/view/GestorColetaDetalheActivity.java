@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.example.renovai.Imagens;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
@@ -89,6 +90,6 @@ public class GestorColetaDetalheActivity extends GestorBaseActivity {
         ((TextView) findViewById(R.id.txtTriada)).setText(algumPeso ? "Sim" : (linhas > 0 ? "Em andamento" : "Não"));
 
         ImageView foto = findViewById(R.id.imgFotoColeta);
-        if (col.getImagemUrl() != null && !col.getImagemUrl().trim().isEmpty()) Glide.with(this).load(col.getImagemUrl()).into(foto);
+        Imagens.coleta(foto, col.getColetaId(), col.getImagemUrl(), false);
     }
 }

@@ -2,145 +2,60 @@ package com.example.renovai.view;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.renovai.EmpresaBottomNav;
-import com.example.renovai.EmpresaData;
+import androidx.fragment.app.Fragment;
+
+import com.example.renovai.EmpresaCarrinho;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
-import com.example.renovai.dto.response.EmpresaResponses;
-import com.example.renovai.dto.response.PedidoResponse;
+import com.example.renovai.SessionManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/** Tela 5.1 — Home (Dashboard) da Empresa. */
-public class EmpresaHomeActivity extends EmpresaBaseActivity {
+/**
+ * Casca da Empresa: as abas do menu (Favoritas · Cooperativas · Home · Pedidos · Perfil) são
+ * Fragments trocados aqui dentro, com histórico (ver MenuActivity).
+ */
+public class EmpresaHomeActivity extends MenuActivity {
 
     @Override
     protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_empresa_home, EmpresaBottomNav.Aba.HOME)) return;
-        com.example.renovai.EmpresaCarrinho.restaurarPendente(this);
-        if (com.example.renovai.EmpresaCarrinho.envio != null) {
-            startActivity(new Intent(this, EmpresaFinalizarPedidoActivity.class));
+        boolean logado = SessionManager.estaLogado() && SessionManager.getEmpresaId() != null;
+        super.onCreate(logado ? b : null);
+        if (!logado) {
+            Toast.makeText(
+                            this,
+                            "Não foi possível identificar a empresa. Faça login novamente.",
+                            Toast.LENGTH_LONG)
+                    .show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
         }
-        findViewById(R.id.btnBuscarMateriaisE)
-                .setOnClickListener(
-                        v -> startActivity(new Intent(this, EmpresaCooperativasActivity.class)));
-        findViewById(R.id.btnMeusPedidosE)
-                .setOnClickListener(
-                        v -> startActivity(new Intent(this, EmpresaPedidosActivity.class)));
+        montar(R.layout.activity_empresa_menu, R.id.bottomNavigationEmpresa, b);
+        // o cabeçalho de cada aba desce sozinho para baixo da barra de status (EmpresaAbaFragment)
+        GestorUi.insets(null, findViewById(R.id.bottomNavigationEmpresa));
+
+        if (b == null) {
+            // pedido que ficou no meio do envio (app fechado): retoma a finalização
+            EmpresaCarrinho.restaurarPendente(this);
+            if (EmpresaCarrinho.envio != null) {
+                startActivity(new Intent(this, EmpresaFinalizarPedidoActivity.class));
+            }
+        }
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!vivo()) return;
-        EmpresaData.meuPerfil(
-                false,
-                (p, c) -> {
-                    if (vivo()) preencherHeader(p.nomeEmpresa);
-                });
-        EmpresaData.dashboard(
-                false,
-                new com.example.renovai.GestorData.Ouvinte<EmpresaResponses.Dashboard>() {
-                    @Override
-                    public void aoReceber(EmpresaResponses.Dashboard d, boolean c) {
-                        if (vivo()) renderDashboard(d);
-                    }
-
-                    @Override
-                    public void aoErro(String m) {}
-                });
-        EmpresaData.pedidos(
-                false,
-                new com.example.renovai.GestorData.Ouvinte<List<PedidoResponse>>() {
-                    @Override
-                    public void aoReceber(List<PedidoResponse> l, boolean c) {
-                        if (vivo()) renderPedidos(l);
-                    }
-
-                    @Override
-                    public void aoErro(String m) {
-                        if (vivo()) toast(m);
-                    }
-                });
-        EmpresaData.favoritos(
-                false,
-                new com.example.renovai.GestorData.Ouvinte<List<EmpresaResponses.Favorito>>() {
-                    @Override
-                    public void aoReceber(List<EmpresaResponses.Favorito> l, boolean c) {
-                        if (vivo()) renderFavoritas(l);
-                    }
-
-                    @Override
-                    public void aoErro(String m) {}
-                });
+    protected int abaInicial() {
+        return R.id.nav_home;
     }
 
-    private void renderDashboard(EmpresaResponses.Dashboard d) {
-        ((TextView) findViewById(R.id.txtPedidosMes))
-                .setText(
-                        String.valueOf(
-                                d.totalPedidosEnviados == null ? 0 : d.totalPedidosEnviados));
-        ((TextView) findViewById(R.id.txtEmNegociacao))
-                .setText(String.valueOf(d.totalPedidosAceitos == null ? 0 : d.totalPedidosAceitos));
-        ((TextView) findViewById(R.id.txtFinalizados))
-                .setText(GestorUi.dinheiro(d.valorTotalNegociado));
-    }
-
-    private void renderPedidos(List<PedidoResponse> lista) {
-        List<PedidoResponse> ordenada = new ArrayList<>(lista);
-        ordenada.sort(
-                (a, b) ->
-                        String.valueOf(b.getDataPedido())
-                                .compareTo(String.valueOf(a.getDataPedido())));
-        LinearLayout raiz = findViewById(R.id.listaPedidosRecentes);
-        raiz.removeAllViews();
-        findViewById(R.id.txtSemPedidos)
-                .setVisibility(ordenada.isEmpty() ? View.VISIBLE : View.GONE);
-        for (PedidoResponse p : ordenada.subList(0, Math.min(3, ordenada.size()))) {
-            View v =
-                    LayoutInflater.from(this)
-                            .inflate(R.layout.item_empresa_pedido_recente, raiz, false);
-            ((TextView) v.findViewById(R.id.txtPedidoRecenteSub))
-                    .setText(
-                            GestorUi.idCurto(p.getPedidoId())
-                                    + (p.getValorTotal() != null
-                                            ? " — " + GestorUi.dinheiro(p.getValorTotal())
-                                            : ""));
-            ((TextView) v.findViewById(R.id.txtPedidoRecenteData))
-                    .setText(GestorUi.data(p.getDataPedido()));
-            TextView badge = v.findViewById(R.id.txtPedidoRecenteBadge);
-            int estado =
-                    com.example.renovai.EmpresaStatus.estado(
-                            null, p.getStatusAtual(), p.getDataConclusao());
-            badge.setText(com.example.renovai.EmpresaPedidos.rotulo(estado));
-            GestorUi.badge(badge, com.example.renovai.EmpresaStatus.cor(estado));
-            badge.setCompoundDrawables(null, null, null, null);
-            v.setOnClickListener(x -> EmpresaPedidoCard.abrirDetalhe(this, p.getPedidoId(), null));
-            raiz.addView(v);
-        }
-    }
-
-    private void renderFavoritas(List<EmpresaResponses.Favorito> lista) {
-        ((TextView) findViewById(R.id.txtTotalFavoritasE)).setText(String.valueOf(lista.size()));
-        LinearLayout raiz = findViewById(R.id.linhaCooperativasRecentes);
-        raiz.removeAllViews();
-        findViewById(R.id.txtSemFavoritas)
-                .setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
-        for (EmpresaResponses.Favorito f : lista.subList(0, Math.min(2, lista.size()))) {
-            View v = LayoutInflater.from(this).inflate(R.layout.item_cooperativa_card, raiz, false);
-            ((TextView) v.findViewById(R.id.txtNome))
-                    .setText(f.cooperativaNome == null ? "Cooperativa" : f.cooperativaNome);
-            v.findViewById(R.id.txtAvaliacao).setVisibility(View.GONE);
-            v.setOnClickListener(
-                    x -> EmpresaCooperativaCard.abrirPerfilPublico(this, f.cooperativaId));
-            raiz.addView(v);
-        }
+    @Override
+    protected Fragment criarAba(int aba) {
+        if (aba == R.id.nav_favoritas) return new EmpresaFavoritasFragment();
+        if (aba == R.id.nav_cooperativas) return new EmpresaCooperativasFragment();
+        if (aba == R.id.nav_home) return new EmpresaHomeFragment();
+        if (aba == R.id.nav_pedidos) return new EmpresaPedidosFragment();
+        if (aba == R.id.nav_perfil) return new EmpresaPerfilFragment();
+        return null;
     }
 }

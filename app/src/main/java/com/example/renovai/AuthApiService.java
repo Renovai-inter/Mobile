@@ -4,6 +4,7 @@ import com.example.renovai.dto.request.CadastroCooperativaRequest;
 import com.example.renovai.dto.request.CadastroEmpresaRequest;
 import com.example.renovai.dto.request.LoginRequest;
 import com.example.renovai.dto.request.EsqueciSenhaRequest;
+import com.example.renovai.dto.request.GoogleLoginRequest;
 import com.example.renovai.dto.request.RedefinirSenhaRequest;
 import com.example.renovai.dto.request.VerificarCodigoRequest;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
@@ -16,6 +17,10 @@ public interface AuthApiService {
 
     @POST("auth/login")
     Call<LoginResponse> login(@Body LoginRequest request);
+
+    /** Login com Google: a API confere o ID token no Google e devolve o mesmo login. */
+    @POST("auth/google")
+    Call<LoginResponse> loginGoogle(@Body GoogleLoginRequest request);
 
     @POST("auth/cadastro")
     Call<CadastroEmpresaResponse> cadastroEmpresa(@Body CadastroEmpresaRequest request);

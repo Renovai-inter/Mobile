@@ -4,11 +4,13 @@ import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.Documento;
+import com.example.renovai.FirebaseCache;
 import com.example.renovai.FuncionarioResolver;
 import com.example.renovai.PerfilResolver;
 import com.example.renovai.SessionManager;
 import com.example.renovai.dto.request.CadastroCooperativaRequest;
 import com.example.renovai.dto.request.CadastroEmpresaRequest;
+import com.example.renovai.dto.request.GoogleLoginRequest;
 import com.example.renovai.dto.request.LoginRequest;
 import com.example.renovai.dto.response.CadastroEmpresaResponse;
 import com.example.renovai.dto.response.FuncionarioResponse;
@@ -18,6 +20,9 @@ import android.util.Log;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -65,86 +70,142 @@ public class AuthController {
         // A API salva os e-mails em minúsculas e busca no login pelo texto exato
         LoginRequest request = new LoginRequest(email.trim().toLowerCase(java.util.Locale.ROOT), senha);
 
-        authApiService
-                .login(request)
-                .enqueue(
-                        new retrofit2.Callback<LoginResponse>() {
-                            @Override
-                            public void onResponse(
-                                    Call<LoginResponse> call, Response<LoginResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    LoginResponse body = response.body();
-                                    SessionManager.salvarSessao(
-                                            body.getToken(), body.getEmail(), body.getRole());
+        authApiService.login(request).enqueue(aoResponderLogin(callback, false));
+    }
 
-                                    // A API não devolve empresaId no /auth/login, então resolvemos
-                                    // à
-                                    // parte via GET /perfis (ver PerfilResolver). Não bloqueia o
-                                    // sucesso do login: se não achar (ex: conta não é de empresa),
-                                    // simplesmente fica null.
-                                    PerfilResolver.resolverEmpresaId(
-                                            body.getEmail(),
-                                            empresaId -> {
-                                                if ("GESTOR_EMPRESA"
-                                                                .equalsIgnoreCase(body.getRole())
-                                                        && empresaId == null) {
-                                                    SessionManager.logout();
-                                                    callback.onErro(
-                                                            "Não foi possível carregar a conta da"
-                                                                + " empresa. Tente entrar"
-                                                                + " novamente.");
+    /**
+     * Login com Google: o app já recebeu o ID token do Google (LoginActivity) e a API o confere no
+     * Google. Só entra quem já tem conta no Renovaí com o mesmo e-mail — a API não cria conta.
+     */
+    public void loginGoogle(String idToken, LoginCallback callback) {
+        if (idToken == null || idToken.isEmpty()) {
+            callback.onErro("O Google não devolveu o login. Tente de novo.");
+            return;
+        }
+        authApiService
+                .loginGoogle(new GoogleLoginRequest(idToken))
+                .enqueue(aoResponderLogin(callback, true));
+    }
+
+    /**
+     * Mesmo tratamento para o login por senha e pelo Google: guarda a sessão, resolve a empresa
+     * ou o cooperado e salva a cópia da conta no Firestore.
+     */
+    private retrofit2.Callback<LoginResponse> aoResponderLogin(
+            LoginCallback callback, boolean google) {
+        return new retrofit2.Callback<LoginResponse>() {
+            @Override
+            public void onResponse(
+                    Call<LoginResponse> call, Response<LoginResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    LoginResponse body = response.body();
+                    SessionManager.salvarSessao(
+                            body.getToken(), body.getEmail(), body.getRole());
+
+                    // A API não devolve empresaId no /auth/login, então resolvemos
+                    // à
+                    // parte via GET /perfis (ver PerfilResolver). Não bloqueia o
+                    // sucesso do login: se não achar (ex: conta não é de empresa),
+                    // simplesmente fica null.
+                    PerfilResolver.resolverEmpresaId(
+                            body.getEmail(),
+                            empresaId -> {
+                                if ("GESTOR_EMPRESA"
+                                                .equalsIgnoreCase(body.getRole())
+                                        && empresaId == null) {
+                                    SessionManager.logout();
+                                    callback.onErro(
+                                            "Não foi possível carregar a conta da"
+                                                + " empresa. Tente entrar"
+                                                + " novamente.");
+                                    return;
+                                }
+                                SessionManager.salvarEmpresaId(empresaId);
+
+                                // Fora o login de Perfil da Empresa
+                                // ("GESTOR_EMPRESA"), body.getUsuarioId() é um
+                                // Usuario.usuarioId (cooperado, motorista, gestor
+                                // ou admin de cooperativa — o cadastro de
+                                // cooperativa cria o admin como Funcionario com
+                                // cargo "Admin"), e dá pra resolver o Funcionario
+                                // e cacheá-lo em CooperadoSession (a área do
+                                // Gestor usa a cooperativa dele) — ver
+                                // FuncionarioResolver. Contas antigas de admin que
+                                // entram por Perfil devolvem o perfilId: aí o
+                                // resolver só não acha nada.
+                                boolean provavelmenteFuncionario =
+                                        !"GESTOR_EMPRESA"
+                                                .equalsIgnoreCase(body.getRole());
+
+                                if (provavelmenteFuncionario
+                                        && body.getUsuarioId() != null) {
+                                    CooperadoSession.salvarUsuarioId(
+                                            body.getUsuarioId());
+
+                                    FuncionarioResolver.resolverPorUsuarioId(
+                                            body.getUsuarioId(),
+                                            funcionario -> {
+                                                if (funcionario != null) {
+                                                    salvarCooperadoSeEncontrado(
+                                                            funcionario);
+                                                    salvarCopiaDaConta(
+                                                            body.getUsuarioId(),
+                                                            funcionario);
+                                                    callback.onSuccess(body);
                                                     return;
                                                 }
-                                                SessionManager.salvarEmpresaId(empresaId);
-
-                                                // Fora o login de Perfil da Empresa
-                                                // ("GESTOR_EMPRESA"), body.getUsuarioId() é um
-                                                // Usuario.usuarioId (cooperado, motorista, gestor
-                                                // ou admin de cooperativa — o cadastro de
-                                                // cooperativa cria o admin como Funcionario com
-                                                // cargo "Admin"), e dá pra resolver o Funcionario
-                                                // e cacheá-lo em CooperadoSession (a área do
-                                                // Gestor usa a cooperativa dele) — ver
-                                                // FuncionarioResolver. Contas antigas de admin que
-                                                // entram por Perfil devolvem o perfilId: aí o
-                                                // resolver só não acha nada.
-                                                boolean provavelmenteFuncionario =
-                                                        !"GESTOR_EMPRESA"
-                                                                .equalsIgnoreCase(body.getRole());
-
-                                                if (provavelmenteFuncionario
-                                                        && body.getUsuarioId() != null) {
-                                                    CooperadoSession.salvarUsuarioId(
-                                                            body.getUsuarioId());
-
-                                                    FuncionarioResolver.resolverPorUsuarioId(
-                                                            body.getUsuarioId(),
-                                                            funcionario -> {
-                                                                salvarCooperadoSeEncontrado(
-                                                                        funcionario);
-                                                                callback.onSuccess(body);
-                                                            });
-                                                } else {
-                                                    callback.onSuccess(body);
-                                                }
+                                                // A API não achou (ou falhou):
+                                                // usa a cópia do último login
+                                                // salva no Firestore, se houver.
+                                                restaurarDaCopiaDaConta(
+                                                        body.getEmail(),
+                                                        body.getUsuarioId(),
+                                                        () -> callback.onSuccess(body));
                                             });
-                                } else if (response.code() == 401 || response.code() == 422) {
-                                    callback.onErro("Email ou senha incorretos.");
                                 } else {
-                                    callback.onErro(
-                                            "Erro ao entrar (código "
-                                                    + response.code()
-                                                    + "). Tente novamente.");
+                                    salvarCopiaDaConta(body.getUsuarioId(), null);
+                                    callback.onSuccess(body);
                                 }
-                            }
+                            });
+                } else if (google) {
+                    callback.onErro(erroGoogle(response));
+                } else if (response.code() == 401 || response.code() == 422) {
+                    callback.onErro("Email ou senha incorretos.");
+                } else {
+                    callback.onErro(
+                            "Erro ao entrar (código "
+                                    + response.code()
+                                    + "). Tente novamente.");
+                }
+            }
 
-                            @Override
-                            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                                callback.onErro(
-                                        "Não foi possível conectar ao servidor. Verifique sua"
-                                            + " internet.");
-                            }
-                        });
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                callback.onErro(
+                        "Não foi possível conectar ao servidor. Verifique sua"
+                            + " internet.");
+            }
+        };
+    }
+
+    /** Mensagem do erro do login com Google (a API manda o motivo em "mensagem"). */
+    private static String erroGoogle(Response<?> response) {
+        if (response.code() == 404 || response.code() >= 500) {
+            // 404/500: a versão da API no servidor ainda não tem a rota /auth/google
+            return "O login com Google ainda não está disponível no servidor. Entre com e-mail e"
+                    + " senha.";
+        }
+        try {
+            if (response.errorBody() != null) {
+                JsonObject json = JsonParser.parseString(response.errorBody().string()).getAsJsonObject();
+                if (json.has("mensagem") && json.get("mensagem").isJsonPrimitive()) {
+                    return json.get("mensagem").getAsString();
+                }
+            }
+        } catch (Exception ignorado) {
+            // corpo fora do formato da API: usa a mensagem genérica
+        }
+        return "Não foi possível entrar com o Google (código " + response.code() + ").";
     }
 
     private void salvarCooperadoSeEncontrado(FuncionarioResponse funcionario) {
@@ -155,6 +216,51 @@ public class AuthController {
                 funcionario.getCooperativaNome(),
                 funcionario.getCargo(),
                 funcionario.getUsuarioNome());
+    }
+
+    /**
+     * Cópia da conta logada no Firestore (ver FirebaseCache.salvarConta). Sem token nem senha.
+     * Usa só os dados deste login (funcionario pode ser null), nunca sobras de outra conta.
+     */
+    private static void salvarCopiaDaConta(String usuarioId, FuncionarioResponse funcionario) {
+        Map<String, String> dados = new HashMap<>();
+        dados.put("role", SessionManager.getRole());
+        dados.put("usuarioId", usuarioId);
+        dados.put("empresaId", SessionManager.getEmpresaId());
+        if (funcionario != null) {
+            dados.put("funcionarioId", funcionario.getFuncionarioId());
+            dados.put("cooperativaId", funcionario.getCooperativaId());
+            dados.put("cooperativaNome", funcionario.getCooperativaNome());
+            dados.put("cargo", funcionario.getCargo());
+            dados.put("nome", funcionario.getUsuarioNome());
+        }
+        FirebaseCache.salvarConta(SessionManager.getEmail(), dados);
+    }
+
+    /**
+     * Preenche o CooperadoSession com a cópia do Firestore quando a API não devolveu o
+     * Funcionario. Só vale se a cópia for do mesmo usuarioId (nunca mistura contas).
+     */
+    private static void restaurarDaCopiaDaConta(String email, String usuarioId, Runnable depois) {
+        if (!FirebaseCache.ativo()) {
+            depois.run();
+            return;
+        }
+        FirebaseCache.lerConta(
+                email,
+                copia -> {
+                    if (copia.get("funcionarioId") != null
+                            && usuarioId.equals(copia.get("usuarioId"))) {
+                        Log.i(TAG, "Funcionario restaurado da cópia da conta no Firestore");
+                        CooperadoSession.salvar(
+                                copia.get("funcionarioId"),
+                                copia.get("cooperativaId"),
+                                copia.get("cooperativaNome"),
+                                copia.get("cargo"),
+                                copia.get("nome"));
+                    }
+                    depois.run();
+                });
     }
 
     public void cadastrarEmpresa(
@@ -202,6 +308,9 @@ public class AuthController {
                                     CadastroEmpresaResponse body = response.body();
                                     SessionManager.salvarSessao(
                                             body.getToken(), body.getEmail(), body.getRole());
+                                    SessionManager.salvarEmpresaId(body.getEmpresaId());
+                                    CooperadoSession.limpar();
+                                    salvarCopiaDaConta(null, null);
                                     callback.onSuccess(body);
                                 } else {
                                     tratarErroCadastro(response, "empresa", email.trim(), callback);

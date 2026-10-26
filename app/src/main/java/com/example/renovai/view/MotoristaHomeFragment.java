@@ -1,29 +1,48 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-import com.example.renovai.MotoristaBottomNav;
+import com.example.renovai.GestorUi;
 import com.example.renovai.MotoristaData;
 import com.example.renovai.MotoristaRotas;
 import com.example.renovai.R;
 import com.example.renovai.dto.response.GestorResponses;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-/** "Rotas da semana": mesmas 3 seções da Home, sem o recorte "hoje" nas concluídas. */
-public class MotoristaRotasActivity extends MotoristaBaseActivity {
+/** Tela 3.1 — Home do Motorista: contadores do dia e as 3 seções de rotas. */
+public class MotoristaHomeFragment extends MotoristaAbaFragment {
 
-    @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        preparar(R.layout.activity_motorista_rotas, MotoristaBottomNav.Aba.ROTAS);
+    public MotoristaHomeFragment() {
+        super(R.layout.activity_motorista_home);
     }
 
     @Override
-    protected void onResume() {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
+        LocalDate hoje = LocalDate.now();
+        String rotulo =
+                hoje.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, GestorUi.BR)
+                        + ", "
+                        + hoje.format(DateTimeFormatter.ofPattern("dd 'de' MMMM", GestorUi.BR));
+        ((TextView) findViewById(R.id.txtDataHoje)).setText(capitalizar(rotulo));
+    }
+
+    private static String capitalizar(String s) {
+        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
         if (!vivo() || coopId() == null) return;
         MotoristaData.rotas(
@@ -43,6 +62,12 @@ public class MotoristaRotasActivity extends MotoristaBaseActivity {
 
     private void render(List<GestorResponses.Rota> todas) {
         MotoristaRotas.Grupo g = MotoristaRotas.classificar(todas);
+
+        ((TextView) findViewById(R.id.txtQtdAndamento)).setText("—");
+        ((TextView) findViewById(R.id.txtQtdConcluidas)).setText("—");
+        ((TextView) findViewById(R.id.txtQtdAtribuidas))
+                .setText(String.valueOf(g.disponiveis.size()));
+
         preencher(
                 R.id.listaAndamento,
                 R.id.txtSemAndamento,
@@ -58,15 +83,15 @@ public class MotoristaRotasActivity extends MotoristaBaseActivity {
         raiz.removeAllViews();
         findViewById(idVazio).setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
         for (GestorResponses.Rota r : lista) {
-            View v = LayoutInflater.from(this).inflate(R.layout.item_motorista_rota, raiz, false);
+            View v = LayoutInflater.from(tela()).inflate(R.layout.item_motorista_rota, raiz, false);
             boolean iniciada = false;
             MotoristaRotaCard.bind(
-                    this,
+                    tela(),
                     v,
                     r,
                     iniciada,
                     concluidas,
-                    () -> MotoristaRotaCard.abrirDetalhe(this, r.rotaId));
+                    () -> MotoristaRotaCard.abrirDetalhe(tela(), r.rotaId));
             raiz.addView(v);
         }
     }

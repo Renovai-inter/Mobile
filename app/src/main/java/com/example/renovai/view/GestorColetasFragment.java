@@ -1,5 +1,8 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -9,7 +12,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
@@ -20,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tela 4.2 — Listagem de coletas com filtros de estado (Todos/Agendado/Pendente/Imediata) e origem (Interna/Externa). */
-public class GestorColetasActivity extends GestorBaseActivity {
+public class GestorColetasFragment extends GestorAbaFragment {
 
     private ColetaListAdapter adapter;
     private List<ColetaResponse> todas = new ArrayList<>();
@@ -28,10 +30,13 @@ public class GestorColetasActivity extends GestorBaseActivity {
     private boolean recentesPrimeiro = true;
     private TextView contador, ordenar, vazio;
 
+    public GestorColetasFragment() {
+        super(R.layout.activity_gestor_coletas);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_gestor_coletas, GestorBottomNav.Aba.COLETAS)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         contador = findViewById(R.id.txtContador);
         ordenar = findViewById(R.id.txtOrdenar);
         vazio = findViewById(R.id.txtVazio);
@@ -40,12 +45,12 @@ public class GestorColetasActivity extends GestorBaseActivity {
         GestorUi.segmentado(findViewById(R.id.trilhaOrigem), new String[]{"Todas", "Interna", "Externa"}, 0, false, i -> { origem = i; render(); });
 
         adapter = new ColetaListAdapter(c -> {
-            Intent i = new Intent(this, GestorColetaDetalheActivity.class);
+            Intent i = new Intent(tela(), GestorColetaDetalheActivity.class);
             i.putExtra(GestorColetaDetalheActivity.EXTRA_COLETA_ID, c.getColetaId());
             startActivity(i);
         });
         RecyclerView r = findViewById(R.id.recyclerColetas);
-        r.setLayoutManager(new LinearLayoutManager(this));
+        r.setLayoutManager(new LinearLayoutManager(tela()));
         r.setAdapter(adapter);
 
         ordenar.setOnClickListener(v -> {
@@ -56,7 +61,7 @@ public class GestorColetasActivity extends GestorBaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo() || funcId() == null) return;
         GestorData.coletas(false, new GestorData.Ouvinte<List<ColetaResponse>>() {

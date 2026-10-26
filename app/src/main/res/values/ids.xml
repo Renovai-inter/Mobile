@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Padding de topo original do cabeçalho, antes de somar a barra de status (TelaInsets.topo). -->
+    <item name="tag_padding_topo" type="id" />
+</resources>

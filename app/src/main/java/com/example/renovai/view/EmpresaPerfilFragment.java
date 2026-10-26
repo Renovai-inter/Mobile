@@ -1,5 +1,8 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -7,7 +10,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.example.renovai.EmpresaBottomNav;
 import com.example.renovai.EmpresaCarrinho;
 import com.example.renovai.EmpresaData;
 import com.example.renovai.GestorCache;
@@ -30,17 +32,20 @@ import java.util.Set;
 /**
  * Tela 5.6 — Perfil da Empresa: nome, e-mail, CNPJ, endereço e materiais de interesse (editáveis).
  */
-public class EmpresaPerfilActivity extends EmpresaBaseActivity {
+public class EmpresaPerfilFragment extends EmpresaAbaFragment {
 
     private EmpresaResponses.MeuPerfil eu;
     private List<CategoriaMaterialResponse> categorias = new ArrayList<>();
     private List<EmpresaResponses.MaterialInteresse> interesses = new ArrayList<>();
     private boolean salvandoInteresses;
 
+    public EmpresaPerfilFragment() {
+        super(R.layout.activity_empresa_perfil);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_empresa_perfil, EmpresaBottomNav.Aba.PERFIL)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         titulo("Perfil");
 
         campo(
@@ -49,7 +54,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
                 null,
                 v ->
                         GestorUi.pedirTexto(
-                                this,
+                                tela(),
                                 "Nome da empresa",
                                 "",
                                 eu != null ? eu.nomeEmpresa : "",
@@ -61,7 +66,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
                 null,
                 v ->
                         GestorUi.pedirTexto(
-                                this,
+                                tela(),
                                 "E-mail",
                                 "email@exemplo.com",
                                 eu != null ? eu.email : "",
@@ -73,7 +78,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
                 null,
                 v ->
                         GestorUi.pedirTexto(
-                                this,
+                                tela(),
                                 "CNPJ (00.000.000/0000-00)",
                                 "",
                                 eu != null ? eu.cnpj : "",
@@ -85,7 +90,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
                 null,
                 v ->
                         GestorUi.pedirTexto(
-                                this,
+                                tela(),
                                 "Endereço",
                                 "",
                                 eu != null ? eu.endereco : "",
@@ -96,7 +101,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
         findViewById(R.id.btnSuporteE)
                 .setOnClickListener(
                         v ->
-                                new AlertDialog.Builder(this)
+                                new AlertDialog.Builder(tela())
                                         .setTitle("Suporte")
                                         .setMessage(
                                                 "Precisa de ajuda? Envie um e-mail para"
@@ -124,7 +129,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
                 .setOnClickListener(
                         v ->
                                 GestorUi.confirmar(
-                                        this,
+                                        tela(),
                                         "Sair da conta",
                                         "Deseja sair da conta?",
                                         "Sair",
@@ -143,7 +148,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo()) return;
         EmpresaData.meuPerfil(
@@ -294,7 +299,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
             marcados[i] = idsAtuais.contains(categorias.get(i).getCategoriaId());
         }
         boolean[] selecao = marcados.clone();
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(tela())
                 .setTitle("Materiais de interesse")
                 .setMultiChoiceItems(
                         nomes, selecao, (d, which, checked) -> selecao[which] = checked)
@@ -374,7 +379,7 @@ public class EmpresaPerfilActivity extends EmpresaBaseActivity {
         SessionManager.logout();
         GestorCache.limpar();
         EmpresaCarrinho.limpar();
-        Intent i = new Intent(this, LoginActivity.class);
+        Intent i = new Intent(tela(), LoginActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }

@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide;
+import com.example.renovai.Imagens;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.CooperadoUi;
 import com.example.renovai.R;
@@ -139,11 +140,8 @@ public class CompletarTriagemActivity extends AppCompatActivity {
     private void preencherTela() {
         txtQuantidadeMateriais.setText("Quantidade de materiais: " + materiais.size());
 
-        if (!materiais.isEmpty()
-                && materiais.get(0).getImagemUrl() != null
-                && !materiais.get(0).getImagemUrl().trim().isEmpty()) {
-            Glide.with(this).load(materiais.get(0).getImagemUrl()).into(imgFotoColetaVinculada);
-        }
+        // Foto da coleta de origem (busca em GET /coletas/{id} se ainda não estiver no cache).
+        Imagens.coleta(imgFotoColetaVinculada, coletaId, null, false);
 
         preencherEquipe();
         preencherMateriais();
@@ -180,6 +178,8 @@ public class CompletarTriagemActivity extends AppCompatActivity {
             TextView txtNome = linha.findViewById(R.id.txtNomeMaterialTriagem);
             TextView txtStatus = linha.findViewById(R.id.txtStatusMaterialTriagem);
             TextView txtKg = linha.findViewById(R.id.txtKgMaterialTriagem);
+            Imagens.carregar(linha.findViewById(R.id.imgFotoMaterialTriagem), material.getImagemUrl(),
+                    true, com.example.renovai.TipoImagem.TRIAGEM);
 
             txtNome.setText(
                     material.getMaterialCategoria() != null

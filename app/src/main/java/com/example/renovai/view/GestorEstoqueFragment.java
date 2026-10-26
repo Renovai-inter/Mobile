@@ -1,5 +1,8 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -7,7 +10,6 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
@@ -18,14 +20,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tela 4.3 — Estoque atual da cooperativa: material, peso e data da última atualização. */
-public class GestorEstoqueActivity extends GestorBaseActivity {
+public class GestorEstoqueFragment extends GestorAbaFragment {
 
     private ListaAdapter<GestorResponses.Estoque> adapter;
 
+    public GestorEstoqueFragment() {
+        super(R.layout.activity_gestor_estoque);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_gestor_estoque, GestorBottomNav.Aba.ESTOQUE)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         adapter =
                 new ListaAdapter<>(
                         R.layout.item_gestor_estoque,
@@ -45,12 +50,12 @@ public class GestorEstoqueActivity extends GestorBaseActivity {
                 getResources().getDisplayMetrics().widthPixels
                         / getResources().getDisplayMetrics().density;
         int colunas = larguraDp < 360 || getResources().getConfiguration().fontScale > 1.2f ? 1 : 2;
-        r.setLayoutManager(new GridLayoutManager(this, colunas));
+        r.setLayoutManager(new GridLayoutManager(tela(), colunas));
         r.setAdapter(adapter);
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo() || funcId() == null) return;
         GestorData.estoque(

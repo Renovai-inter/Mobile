@@ -1,8 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Base.Theme.Renovai" parent="Theme.Material3.DayNight.NoActionBar">
+    <!--
+        As telas foram desenhadas em fundo claro: o tema é sempre claro (no modo escuro do sistema
+        os textos ficavam claros sobre fundo claro). As cores da marca substituem o roxo padrão do
+        Material 3 em botões, diálogos, cursores, carregamentos e seleções.
+    -->
+    <style name="Base.Theme.Renovai" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/vinho</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/vinho_claro</item>
+        <item name="colorOnPrimaryContainer">@color/vinho</item>
+        <item name="colorSecondary">@color/verde</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/verde_claro</item>
+        <item name="colorOnSecondaryContainer">#1F4D26</item>
+        <item name="colorTertiary">@color/verde</item>
+        <item name="colorAccent">@color/vinho</item>
+        <item name="colorControlActivated">@color/vinho</item>
+        <item name="android:textColorHighlight">#55882B4E</item>
+        <item name="android:colorBackground">@color/background_light_cooperado</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Renovai.Dialogo</item>
+        <!-- Os cabeçalhos são escuros (verde/vinho) e ficam por trás da barra de status: ícones brancos. -->
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="Theme.Renovai" parent="Base.Theme.Renovai" />
+
+    <!-- Diálogos (AlertDialog) com os botões no vinho do app. -->
+    <style name="ThemeOverlay.Renovai.Dialogo" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/vinho</item>
+        <item name="colorSurface">@color/white</item>
+    </style>
 
 </resources>

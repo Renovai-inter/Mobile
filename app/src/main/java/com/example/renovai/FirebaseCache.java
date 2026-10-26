@@ -138,6 +138,69 @@ public final class FirebaseCache {
         return s.replace("/", "_");
     }
 
+    /**
+     * Cópia dos dados da conta logada em usuarios/{uid}/contas/{conta} (o mesmo documento que
+     * agrupa o cache dessa conta). Nunca guarda token nem senha: só quem é a pessoa (role,
+     * usuarioId, empresa/cooperativa, cargo, nome). Valores null não apagam o que já estava lá.
+     */
+    public static void salvarConta(String conta, Map<String, String> dados) {
+        if (!ativo || conta == null) return;
+        garantirLogin(
+                () -> {
+                    String uid = uid();
+                    if (uid == null) return;
+                    Map<String, Object> doc = new HashMap<>();
+                    for (Map.Entry<String, String> d : dados.entrySet()) {
+                        if (d.getValue() != null) doc.put(d.getKey(), d.getValue());
+                    }
+                    doc.put("email", conta);
+                    doc.put("ultimoLogin", FieldValue.serverTimestamp());
+                    documentoConta(uid, conta)
+                            .set(doc, SetOptions.merge())
+                            .addOnFailureListener(e -> Log.w(TAG, "Falha ao salvar a conta", e));
+                });
+    }
+
+    /** Lê a cópia da conta (servidor se houver internet, senão o cache do aparelho). */
+    public static void lerConta(String conta, AoLerTudo callback) {
+        if (!ativo || conta == null) {
+            callback.aoLer(new HashMap<>());
+            return;
+        }
+        garantirLogin(
+                () -> {
+                    String uid = uid();
+                    if (uid == null) {
+                        callback.aoLer(new HashMap<>());
+                        return;
+                    }
+                    documentoConta(uid, conta)
+                            .get()
+                            .addOnCompleteListener(
+                                    t -> {
+                                        Map<String, String> mapa = new HashMap<>();
+                                        DocumentSnapshot d = t.isSuccessful() ? t.getResult() : null;
+                                        if (d != null && d.exists() && d.getData() != null) {
+                                            for (Map.Entry<String, Object> c : d.getData().entrySet()) {
+                                                if (c.getValue() instanceof String) {
+                                                    mapa.put(c.getKey(), (String) c.getValue());
+                                                }
+                                            }
+                                        }
+                                        callback.aoLer(mapa);
+                                    });
+                });
+    }
+
+    private static com.google.firebase.firestore.DocumentReference documentoConta(
+            String uid, String conta) {
+        return FirebaseFirestore.getInstance()
+                .collection("usuarios")
+                .document(uid)
+                .collection("contas")
+                .document(sanitizar(conta));
+    }
+
     /** Salva (ou substitui) a cópia de uma listagem. Funciona offline: sincroniza depois. */
     public static void salvar(String conta, String chave, String json) {
         if (!ativo || json == null) return;

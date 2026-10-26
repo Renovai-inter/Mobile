@@ -45,5 +45,4 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <include layout="@layout/include_empresa_nav" />
 </LinearLayout>

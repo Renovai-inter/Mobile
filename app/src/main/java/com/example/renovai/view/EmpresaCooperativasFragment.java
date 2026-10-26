@@ -1,5 +1,8 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,7 +16,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.example.renovai.EmpresaBottomNav;
 import com.example.renovai.EmpresaData;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
@@ -29,7 +31,7 @@ import retrofit2.Response;
 import java.util.*;
 
 /** Busca por categoria, estoque mínimo e localização, com interesses pré-selecionados. */
-public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
+public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
     private List<CategoriaMaterialResponse> categorias = new ArrayList<>();
     private final Set<String> selecionadas = new LinkedHashSet<>();
     private final Map<String, CooperativaResponse> resultados = new LinkedHashMap<>();
@@ -41,11 +43,13 @@ public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
     private final Runnable pesquisa = this::buscar;
     private final List<Call<?>> chamadas = new ArrayList<>();
 
+    public EmpresaCooperativasFragment() {
+        super(R.layout.activity_empresa_cooperativas);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_empresa_cooperativas, EmpresaBottomNav.Aba.COOPERATIVAS))
-            return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         TextWatcher watcher =
                 new TextWatcher() {
                     @Override
@@ -106,7 +110,7 @@ public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo()) return;
         EmpresaData.meuPerfil(
@@ -138,7 +142,7 @@ public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
             nomes[i] = categorias.get(i).getNomeCategoria();
             marcados[i] = novos.contains(categorias.get(i).getCategoriaId());
         }
-        new AlertDialog.Builder(this)
+        new AlertDialog.Builder(tela())
                 .setTitle("Categorias de material")
                 .setMultiChoiceItems(
                         nomes,
@@ -268,10 +272,10 @@ public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
             Double nota = p == null ? null : p.mediaAvaliacoes;
             if (apenas4Mais && (nota == null || nota < 4)) continue;
             View v =
-                    LayoutInflater.from(this)
+                    LayoutInflater.from(tela())
                             .inflate(R.layout.item_empresa_cooperativa_busca, raiz, false);
             EmpresaCooperativaCard.bind(
-                    this,
+                    tela(),
                     v,
                     coop.getCooperativaId(),
                     coop.getNome(),
@@ -301,9 +305,9 @@ public class EmpresaCooperativasActivity extends EmpresaBaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroyView() {
         handler.removeCallbacks(pesquisa);
         for (Call<?> c : chamadas) c.cancel();
-        super.onDestroy();
+        super.onDestroyView();
     }
 }

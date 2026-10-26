@@ -8,6 +8,7 @@
 
     <LinearLayout
         android:id="@+id/headerAdicionarColeta"
+        android:tag="topo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/header_cooperado_background"
@@ -116,6 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/outline_button_cooperado_background"
+                app:backgroundTint="@null"
                 android:paddingTop="12dp"
                 android:paddingBottom="12dp"
                 android:text="Anexar foto da coleta"
@@ -323,6 +325,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:background="@drawable/filled_button_cooperado_background"
+                    app:backgroundTint="@null"
                     android:paddingTop="12dp"
                     android:paddingBottom="12dp"
                     android:text="Salvar material"
@@ -380,6 +383,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
                 android:background="@drawable/filled_button_cooperado_background"
+                app:backgroundTint="@null"
                 android:paddingTop="14dp"
                 android:paddingBottom="14dp"
                 android:text="Registrar"

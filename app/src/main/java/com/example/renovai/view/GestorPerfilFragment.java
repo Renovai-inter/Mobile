@@ -1,5 +1,9 @@
 package com.example.renovai.view;
 
+import android.view.View;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -8,19 +12,21 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.example.renovai.CooperadoPreload;
 import com.example.renovai.CooperadoSession;
-import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
 import com.example.renovai.SessionManager;
 
 /** Tela 4.6 — Perfil do gestor: nome, cargo, e-mail e cooperativa (somente leitura, vindos da sessão do login), Suporte e sair. */
-public class GestorPerfilActivity extends GestorBaseActivity {
+public class GestorPerfilFragment extends GestorAbaFragment {
+
+    public GestorPerfilFragment() {
+        super(R.layout.activity_gestor_perfil);
+    }
 
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_gestor_perfil, GestorBottomNav.Aba.PERFIL)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         titulo("Perfil");
         topoPerfil("Perfil: Gestor");
 
@@ -30,14 +36,14 @@ public class GestorPerfilActivity extends GestorBaseActivity {
         campo(R.id.campoCpf, "Cargo", CooperadoSession.getCargo(), null);
         campo(R.id.campoTelefone, "Cooperativa", CooperadoSession.getCooperativaNome(), null);
 
-        findViewById(R.id.btnSuporte).setOnClickListener(v -> new AlertDialog.Builder(this).setTitle("Suporte")
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> new AlertDialog.Builder(tela()).setTitle("Suporte")
                 .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
                 .setPositiveButton("Enviar e-mail", (d, w) -> {
                     Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));
                     i.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Gestor)");
                     try { startActivity(i); } catch (Exception e) { toast("Nenhum app de e-mail encontrado."); }
                 }).setNegativeButton("Fechar", null).show());
-        findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(this, "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
+        findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(tela(), "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
     }
 
     private void sair() {
@@ -45,7 +51,7 @@ public class GestorPerfilActivity extends GestorBaseActivity {
         CooperadoSession.limpar();
         GestorData.limparTudo();
         CooperadoPreload.limpar();
-        Intent i = new Intent(this, LoginActivity.class);
+        Intent i = new Intent(tela(), LoginActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }

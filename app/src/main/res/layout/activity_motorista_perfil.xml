@@ -14,5 +14,4 @@
                 android:text="Sair da conta" android:textColor="#882B4E" android:textSize="14sp" android:clickable="true" android:focusable="true" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-    <include layout="@layout/include_motorista_nav" />
 </LinearLayout>

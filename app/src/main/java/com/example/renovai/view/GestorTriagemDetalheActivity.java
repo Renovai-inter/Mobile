@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -54,6 +55,11 @@ public class GestorTriagemDetalheActivity extends GestorBaseActivity {
         for (TriagemResponse t : todas) if (t.getColetaId() != null && t.getColetaId().equalsIgnoreCase(coletaId)) linhas.add(t);
         if (linhas.isEmpty()) return;
 
+        String fotoUrl = null;
+        for (ColetaResponse c : coletas)
+            if (coletaId != null && coletaId.equalsIgnoreCase(c.getColetaId())) fotoUrl = c.getImagemUrl();
+        com.example.renovai.Imagens.coleta(findViewById(R.id.imgFotoColetaTriagem), coletaId, fotoUrl, false);
+
         boolean concluida = true; double total = 0; String data = null;
         Set<String> equipe = new LinkedHashSet<>();
         for (TriagemResponse t : linhas) {
@@ -98,6 +104,9 @@ public class GestorTriagemDetalheActivity extends GestorBaseActivity {
             View v = LayoutInflater.from(this).inflate(R.layout.item_gestor_material_linha, mats, false);
             ((TextView) v.findViewById(R.id.txtMaterialNome)).setText(t.getMaterialCategoria() == null ? "Material" : t.getMaterialCategoria());
             ((TextView) v.findViewById(R.id.txtMaterialKg)).setText(GestorUi.kg(com.example.renovai.controller.TriagemController.pesoReal(t).doubleValue()));
+            android.widget.ImageView fotoTriagem = v.findViewById(R.id.imgFotoTriagemMaterial);
+            fotoTriagem.setVisibility(View.VISIBLE);
+            com.example.renovai.Imagens.carregar(fotoTriagem, t.getImagemUrl(), true, com.example.renovai.TipoImagem.TRIAGEM);
             mats.addView(v);
         }
     }

@@ -1,93 +1,50 @@
 package com.example.renovai.view;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.renovai.GestorUi;
-import com.example.renovai.MotoristaBottomNav;
-import com.example.renovai.MotoristaData;
-import com.example.renovai.MotoristaRotas;
+import androidx.fragment.app.Fragment;
+
+import com.example.renovai.CooperadoSession;
 import com.example.renovai.R;
-import com.example.renovai.dto.response.GestorResponses;
+import com.example.renovai.TelaInsets;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-/** Tela 3.1 — Home do Motorista: contadores do dia e as 3 seções de rotas. */
-public class MotoristaHomeActivity extends MotoristaBaseActivity {
+/**
+ * Casca do Motorista: as abas do menu (Rotas · Home · Perfil) são Fragments trocados aqui dentro,
+ * com histórico (ver MenuActivity).
+ */
+public class MotoristaHomeActivity extends MenuActivity {
 
     @Override
     protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_motorista_home, MotoristaBottomNav.Aba.HOME)) return;
-        LocalDate hoje = LocalDate.now();
-        String rotulo =
-                hoje.getDayOfWeek().getDisplayName(java.time.format.TextStyle.FULL, GestorUi.BR)
-                        + ", "
-                        + hoje.format(DateTimeFormatter.ofPattern("dd 'de' MMMM", GestorUi.BR));
-        ((TextView) findViewById(R.id.txtDataHoje)).setText(capitalizar(rotulo));
-    }
-
-    private static String capitalizar(String s) {
-        return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
+        boolean logado = CooperadoSession.temCooperadoResolvido();
+        super.onCreate(logado ? b : null);
+        if (!logado) {
+            Toast.makeText(
+                            this,
+                            "Não foi possível identificar o motorista. Faça login novamente.",
+                            Toast.LENGTH_LONG)
+                    .show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+        montar(R.layout.activity_motorista_menu, R.id.bottomNavigationMotorista, b);
+        TelaInsets.conteudo(this, true);
+        TelaInsets.navegacao(findViewById(R.id.bottomNavigationMotorista));
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!vivo() || coopId() == null) return;
-        MotoristaData.rotas(
-                true,
-                new com.example.renovai.GestorData.Ouvinte<List<GestorResponses.Rota>>() {
-                    @Override
-                    public void aoReceber(List<GestorResponses.Rota> l, boolean c) {
-                        if (vivo()) render(l);
-                    }
-
-                    @Override
-                    public void aoErro(String m) {
-                        if (vivo()) toast(m);
-                    }
-                });
+    protected int abaInicial() {
+        return R.id.nav_m_home;
     }
 
-    private void render(List<GestorResponses.Rota> todas) {
-        MotoristaRotas.Grupo g = MotoristaRotas.classificar(todas);
-
-        ((TextView) findViewById(R.id.txtQtdAndamento)).setText("—");
-        ((TextView) findViewById(R.id.txtQtdConcluidas)).setText("—");
-        ((TextView) findViewById(R.id.txtQtdAtribuidas))
-                .setText(String.valueOf(g.disponiveis.size()));
-
-        preencher(
-                R.id.listaAndamento,
-                R.id.txtSemAndamento,
-                java.util.Collections.emptyList(),
-                false);
-        preencher(R.id.listaAgendadas, R.id.txtSemAgendadas, g.disponiveis, false);
-        preencher(R.id.listaConcluidas, R.id.txtSemConcluidas, g.inativas, true);
-    }
-
-    private void preencher(
-            int idLista, int idVazio, List<GestorResponses.Rota> lista, boolean concluidas) {
-        LinearLayout raiz = findViewById(idLista);
-        raiz.removeAllViews();
-        findViewById(idVazio).setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
-        for (GestorResponses.Rota r : lista) {
-            View v = LayoutInflater.from(this).inflate(R.layout.item_motorista_rota, raiz, false);
-            boolean iniciada = false;
-            MotoristaRotaCard.bind(
-                    this,
-                    v,
-                    r,
-                    iniciada,
-                    concluidas,
-                    () -> MotoristaRotaCard.abrirDetalhe(this, r.rotaId));
-            raiz.addView(v);
-        }
+    @Override
+    protected Fragment criarAba(int aba) {
+        if (aba == R.id.nav_m_rotas) return new MotoristaRotasFragment();
+        if (aba == R.id.nav_m_home) return new MotoristaHomeFragment();
+        if (aba == R.id.nav_m_perfil) return new MotoristaPerfilFragment();
+        return null;
     }
 }

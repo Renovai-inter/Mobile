@@ -6,11 +6,13 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.renovai.Imagens;
 import com.example.renovai.R;
 import com.example.renovai.dto.response.ColetaResponse;
 
@@ -83,6 +85,7 @@ public class ColetaListAdapter extends RecyclerView.Adapter<ColetaListAdapter.Vi
                         ? "#" + coleta.getColetaId().substring(0, 6).toUpperCase(Locale.ROOT)
                         : "#------";
         holder.txtIdColeta.setText(idCurto);
+        Imagens.coleta(holder.foto, coleta.getColetaId(), coleta.getImagemUrl(), true);
 
         String tipo =
                 com.example.renovai.GestorUi.tem(coleta.getTipoColeta(), "EXTERN")
@@ -122,7 +125,7 @@ public class ColetaListAdapter extends RecyclerView.Adapter<ColetaListAdapter.Vi
             case "Pendente":
                 corBorda = Color.parseColor("#E8A9BB");
                 corBadgeFundo = Color.parseColor("#FBE4EA");
-                corBadgeTexto = Color.parseColor("#C2185B");
+                corBadgeTexto = Color.parseColor("#882B4E");
                 break;
             case "Agendada":
             case "Concluída":
@@ -157,11 +160,19 @@ public class ColetaListAdapter extends RecyclerView.Adapter<ColetaListAdapter.Vi
         return itens.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        Imagens.limpar(holder.foto);
+        super.onViewRecycled(holder);
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
         TextView txtIdColeta, txtStatusColeta, txtFeitoPorColeta, txtPesoColeta, txtDetalhesColeta;
+        ImageView foto;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
+            foto = itemView.findViewById(R.id.imgFotoColeta);
             txtIdColeta = itemView.findViewById(R.id.txtIdColeta);
             txtStatusColeta = itemView.findViewById(R.id.txtStatusColeta);
             txtFeitoPorColeta = itemView.findViewById(R.id.txtFeitoPorColeta);

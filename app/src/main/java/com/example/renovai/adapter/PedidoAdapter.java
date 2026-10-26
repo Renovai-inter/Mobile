@@ -105,7 +105,7 @@ public class PedidoAdapter extends RecyclerView.Adapter<PedidoAdapter.ViewHolder
             default:
                 corBorda = Color.parseColor("#E8A9BB");
                 corBadgeFundo = Color.parseColor("#FBE4EA");
-                corBadgeTexto = Color.parseColor("#C2185B");
+                corBadgeTexto = Color.parseColor("#882B4E");
                 texto = "ANDAMENTO";
                 break;
         }

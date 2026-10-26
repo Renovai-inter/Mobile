@@ -1,16 +1,17 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.renovai.CooperadoBottomNav;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.CooperadoUi;
 import com.example.renovai.DetalheDialogHelper;
@@ -18,13 +19,12 @@ import com.example.renovai.R;
 import com.example.renovai.adapter.TriagemListAdapter;
 import com.example.renovai.controller.TriagemController;
 import com.example.renovai.dto.response.TriagemResponse;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /** Tela 2.7 — Histórico de todas as triagens do cooperado (GET /triagens/por-cooperado/{id}). */
-public class ListagemTriagensActivity extends AppCompatActivity {
+public class CooperadoTriagensFragment extends TelaFragment {
 
     private TextView txtContadorTriagens, txtOrdenarTriagens, txtSemTriagensList;
     private RecyclerView recyclerTriagensList;
@@ -32,37 +32,30 @@ public class ListagemTriagensActivity extends AppCompatActivity {
     private List<TriagemListAdapter.Grupo> grupos = new ArrayList<>();
     private boolean ordemDecrescente = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_triagens_list);
+    public CooperadoTriagensFragment() {
+        super(R.layout.activity_triagens_list);
+    }
 
-        if (!CooperadoSession.temCooperadoResolvido()) {
-            Toast.makeText(
-                            this,
-                            "Não foi possível identificar o cooperado. Faça login novamente.",
-                            Toast.LENGTH_LONG)
-                    .show();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
 
         TextView txtNomeCooperativaHeader = findViewById(R.id.txtNomeCooperativaHeader);
         TextView txtIniciaisCooperado = findViewById(R.id.txtIniciaisCooperado);
         String cooperativa = CooperadoSession.getCooperativaNome();
-        txtNomeCooperativaHeader.setText(cooperativa != null ? cooperativa : "Nome Cooperativa");
+        txtNomeCooperativaHeader.setText(com.example.renovai.GestorUi.nomeCabecalho(cooperativa));
         txtIniciaisCooperado.setText(CooperadoUi.gerarIniciais(CooperadoSession.getUsuarioNome()));
         findViewById(R.id.btnPerfilHeader)
                 .setOnClickListener(
-                        v -> startActivity(new Intent(this, PerfilCooperadoActivity.class)));
+                        v -> abrirAba(R.id.nav_perfil_cooperado));
 
         txtContadorTriagens = findViewById(R.id.txtContadorTriagens);
         txtOrdenarTriagens = findViewById(R.id.txtOrdenarTriagens);
         txtSemTriagensList = findViewById(R.id.txtSemTriagensList);
 
         recyclerTriagensList = findViewById(R.id.recyclerTriagensList);
-        recyclerTriagensList.setLayoutManager(new LinearLayoutManager(this));
+        recyclerTriagensList.setLayoutManager(new LinearLayoutManager(tela()));
         adapter =
                 new TriagemListAdapter(
                         new TriagemListAdapter.OnTriagemClickListener() {
@@ -75,7 +68,7 @@ public class ListagemTriagensActivity extends AppCompatActivity {
                             public void onContinuarClick(TriagemListAdapter.Grupo grupo) {
                                 Intent intent =
                                         new Intent(
-                                                ListagemTriagensActivity.this,
+                                                tela(),
                                                 CompletarTriagemActivity.class);
                                 intent.putExtra(
                                         CompletarTriagemActivity.EXTRA_COLETA_ID, grupo.coletaId);
@@ -91,14 +84,12 @@ public class ListagemTriagensActivity extends AppCompatActivity {
                     atualizarLista();
                 });
 
-        BottomNavigationView nav = findViewById(R.id.bottomNavigationCooperado);
-        CooperadoBottomNav.configurar(this, nav, CooperadoBottomNav.Aba.TRIAGENS);
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        if (isFinishing() || !CooperadoSession.temCooperadoResolvido()) return;
+        if (!vivo() || !CooperadoSession.temCooperadoResolvido()) return;
         carregarTriagens();
     }
 
@@ -109,16 +100,16 @@ public class ListagemTriagensActivity extends AppCompatActivity {
                         new TriagemController.ListaCallback() {
                             @Override
                             public void onSuccess(List<TriagemResponse> triagens) {
-                                if (isFinishing() || isDestroyed()) return;
+                                if (!vivo()) return;
                                 grupos = TriagemController.agruparPorColeta(triagens);
                                 atualizarLista();
                             }
 
                             @Override
                             public void onErro(String mensagem) {
-                                if (isFinishing() || isDestroyed()) return;
+                                if (!vivo()) return;
                                 Toast.makeText(
-                                                ListagemTriagensActivity.this,
+                                                tela(),
                                                 mensagem,
                                                 Toast.LENGTH_SHORT)
                                         .show();
@@ -148,7 +139,7 @@ public class ListagemTriagensActivity extends AppCompatActivity {
     private void mostrarDetalheTriagem(TriagemListAdapter.Grupo grupo) {
         double kg = grupo.pesoAtualKg != null ? grupo.pesoAtualKg.doubleValue() : 0;
         DetalheDialogHelper.mostrar(
-                this,
+                tela(),
                 "Detalhes da triagem",
                 new String[][] {
                     {"COLETA VINCULADA", grupo.coletaId},
@@ -159,6 +150,9 @@ public class ListagemTriagensActivity extends AppCompatActivity {
                     },
                     {"PROGRESSO", grupo.progressoPercentual + "%"},
                     {"STATUS", grupo.status.name()},
-                });
+                },
+                com.example.renovai.TipoImagem.TRIAGEM,
+                grupo.triagemIdReferencia,
+                grupo.imagemUrl);
     }
 }

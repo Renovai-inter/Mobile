@@ -1,14 +1,12 @@
 package com.example.renovai.view;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
@@ -42,14 +40,12 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
 
         WindowCompat.getInsetsController(
                 getWindow(),
                 getWindow().getDecorView()
         ).setAppearanceLightStatusBars(false);
 
-        getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
         setContentView(R.layout.activity_recuperar_senha);
 

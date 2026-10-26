@@ -3,6 +3,10 @@
     android:id="@+id/cardColetaSel" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp"
     android:background="@drawable/status_card_cooperado_background" android:gravity="center_vertical" android:orientation="horizontal" android:padding="14dp">
     <CheckBox android:id="@+id/chkColeta" android:layout_width="wrap_content" android:layout_height="wrap_content" android:buttonTint="#519059" android:clickable="false" android:focusable="false" android:minWidth="0dp" android:minHeight="0dp" />
+    <ImageView android:id="@+id/imgFotoColetaSelecao" android:layout_width="44dp"
+        android:layout_height="44dp" android:layout_marginStart="8dp"
+        android:scaleType="centerCrop" android:contentDescription="@string/foto_coleta"
+        android:src="@drawable/pedido_foto_placeholder" />
     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:layout_weight="1" android:orientation="vertical">
         <TextView android:id="@+id/txtColetaSelNome" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Coleta #000000" android:textColor="#111111" android:textSize="15sp" android:textStyle="bold" />
         <TextView android:id="@+id/txtColetaSelSub" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="—" />

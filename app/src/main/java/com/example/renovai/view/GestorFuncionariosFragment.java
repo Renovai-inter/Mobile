@@ -1,5 +1,7 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -11,7 +13,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
@@ -21,15 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tela 4.9 — Lista de funcionários (Pendentes / Ativos / Inativos) com busca. */
-public class GestorFuncionariosActivity extends GestorBaseActivity {
+public class GestorFuncionariosFragment extends GestorAbaFragment {
 
     private List<FuncionarioDetalhe> todos = new ArrayList<>();
     private EditText busca;
 
+    public GestorFuncionariosFragment() {
+        super(R.layout.activity_gestor_funcionarios);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_gestor_funcionarios, GestorBottomNav.Aba.EQUIPE)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         busca = findViewById(R.id.edtBusca);
         busca.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int a, int c, int d) { }
@@ -39,7 +43,7 @@ public class GestorFuncionariosActivity extends GestorBaseActivity {
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo() || funcId() == null) return;
         GestorData.funcionarios(false, new GestorData.Ouvinte<List<FuncionarioDetalhe>>() {
@@ -67,12 +71,12 @@ public class GestorFuncionariosActivity extends GestorBaseActivity {
 
     private void secao(LinearLayout raiz, String titulo, List<FuncionarioDetalhe> lista, int corBorda, int avatarBg, boolean apagado) {
         if (lista.isEmpty()) return;
-        View s = LayoutInflater.from(this).inflate(R.layout.item_gestor_secao, raiz, false);
+        View s = LayoutInflater.from(tela()).inflate(R.layout.item_gestor_secao, raiz, false);
         ((TextView) s.findViewById(R.id.txtSecaoTitulo)).setText(titulo);
         ((TextView) s.findViewById(R.id.txtSecaoContador)).setText(String.valueOf(lista.size()));
         raiz.addView(s);
         for (FuncionarioDetalhe f : lista) {
-            View v = LayoutInflater.from(this).inflate(R.layout.item_gestor_funcionario, raiz, false);
+            View v = LayoutInflater.from(tela()).inflate(R.layout.item_gestor_funcionario, raiz, false);
             GestorUi.borda(v.findViewById(R.id.cardFunc), corBorda);
             v.findViewById(R.id.bgAvatarFunc).setBackgroundResource(avatarBg);
             TextView av = v.findViewById(R.id.txtAvatarFunc);
@@ -83,7 +87,7 @@ public class GestorFuncionariosActivity extends GestorBaseActivity {
             nome.setTextColor(apagado ? Color.parseColor("#777777") : Color.parseColor("#111111"));
             ((TextView) v.findViewById(R.id.txtFuncCargo)).setText(f.cargo == null ? "Função" : f.cargo);
             v.setOnClickListener(x -> {
-                Intent i = new Intent(this, GestorFuncionarioDetalheActivity.class);
+                Intent i = new Intent(tela(), GestorFuncionarioDetalheActivity.class);
                 i.putExtra(GestorFuncionarioDetalheActivity.EXTRA_ID, f.funcionarioId);
                 startActivity(i);
             });

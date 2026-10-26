@@ -13,5 +13,4 @@
                 android:layout_height="wrap_content" android:layout_marginTop="10dp" android:nestedScrollingEnabled="false" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-    <include layout="@layout/include_gestor_nav" />
 </LinearLayout>

@@ -1,11 +1,13 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.example.renovai.EmpresaBottomNav;
 import com.example.renovai.EmpresaData;
 import com.example.renovai.R;
 import com.example.renovai.dto.response.EmpresaResponses;
@@ -13,16 +15,19 @@ import com.example.renovai.dto.response.EmpresaResponses;
 import java.util.List;
 
 /** Tela 5.5 — Cooperativas Favoritas. */
-public class EmpresaFavoritasActivity extends EmpresaBaseActivity {
+public class EmpresaFavoritasFragment extends EmpresaAbaFragment {
 
-    @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        preparar(R.layout.activity_empresa_favoritas, EmpresaBottomNav.Aba.FAVORITAS);
+    public EmpresaFavoritasFragment() {
+        super(R.layout.activity_empresa_favoritas);
     }
 
     @Override
-    protected void onResume() {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
+    }
+
+    @Override
+    public void onResume() {
         super.onResume();
         if (!vivo()) return;
         EmpresaData.meuPerfil(
@@ -55,10 +60,10 @@ public class EmpresaFavoritasActivity extends EmpresaBaseActivity {
         findViewById(R.id.txtVazioFav).setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
         for (EmpresaResponses.Favorito f : lista) {
             View v =
-                    LayoutInflater.from(this)
+                    LayoutInflater.from(tela())
                             .inflate(R.layout.item_empresa_cooperativa_busca, raiz, false);
             EmpresaCooperativaCard.bind(
-                    this,
+                    tela(),
                     v,
                     f.cooperativaId,
                     f.cooperativaNome,

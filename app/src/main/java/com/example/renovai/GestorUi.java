@@ -52,6 +52,20 @@ public final class GestorUi {
         return false;
     }
 
+    /**
+     * Nome da cooperativa para o cabeçalho: sem o "Cooperativa" do começo (o contexto já diz que é
+     * uma cooperativa) — "Cooperativa de Reciclagem Vida" vira "Reciclagem Vida".
+     */
+    public static String nomeCabecalho(String nome) {
+        if (nome == null || nome.trim().isEmpty()) return "Renovaí";
+        String curto =
+                nome.trim()
+                        .replaceFirst("(?iu)^(cooperativa|coop\\.?)\\s+((de|da|do|das|dos)\\s+)?", "")
+                        .trim();
+        if (curto.isEmpty()) return nome.trim();
+        return Character.toUpperCase(curto.charAt(0)) + curto.substring(1);
+    }
+
     public static String iniciais(String nome) {
         return CooperadoUi.gerarIniciais(nome);
     }
@@ -194,7 +208,7 @@ public final class GestorUi {
                 break;
             default:
                 fundo = Color.parseColor("#FBE4EA");
-                texto = Color.parseColor("#C2185B");
+                texto = Color.parseColor("#882B4E");
                 icone = R.drawable.ic_refresh_cooperado;
                 break;
         }

@@ -1,11 +1,13 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import com.example.renovai.EmpresaBottomNav;
 import com.example.renovai.EmpresaPedidos;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
@@ -14,15 +16,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Tela 5.4 — Listagem de Pedidos da empresa, com abas Todos/Ativos/Concluídos. */
-public class EmpresaPedidosActivity extends EmpresaBaseActivity {
+public class EmpresaPedidosFragment extends EmpresaAbaFragment {
 
     private List<EmpresaPedidos.Vista> todos = new ArrayList<>();
     private int aba = 0;
 
+    public EmpresaPedidosFragment() {
+        super(R.layout.activity_empresa_pedidos);
+    }
+
     @Override
-    protected void onCreate(Bundle b) {
-        super.onCreate(b);
-        if (!preparar(R.layout.activity_empresa_pedidos, EmpresaBottomNav.Aba.PEDIDOS)) return;
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
         GestorUi.segmentado(
                 findViewById(R.id.trilhaPedidos),
                 new String[] {
@@ -41,17 +46,17 @@ public class EmpresaPedidosActivity extends EmpresaBaseActivity {
                     new LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT));
-            filtro.setMinimumWidth(GestorUi.dp(this, 88));
+            filtro.setMinimumWidth(GestorUi.dp(tela(), 88));
             filtro.setPadding(
-                    GestorUi.dp(this, 12),
-                    GestorUi.dp(this, 12),
-                    GestorUi.dp(this, 12),
-                    GestorUi.dp(this, 12));
+                    GestorUi.dp(tela(), 12),
+                    GestorUi.dp(tela(), 12),
+                    GestorUi.dp(tela(), 12),
+                    GestorUi.dp(tela(), 12));
         }
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
         if (!vivo()) return;
         com.example.renovai.EmpresaData.meuPerfil(
@@ -96,8 +101,8 @@ public class EmpresaPedidosActivity extends EmpresaBaseActivity {
         findViewById(R.id.txtVazioPedidos).setVisibility(f.isEmpty() ? View.VISIBLE : View.GONE);
         for (EmpresaPedidos.Vista v : f) {
             View item =
-                    LayoutInflater.from(this).inflate(R.layout.item_empresa_pedido, raiz, false);
-            EmpresaPedidoCard.bind(this, item, v);
+                    LayoutInflater.from(tela()).inflate(R.layout.item_empresa_pedido, raiz, false);
+            EmpresaPedidoCard.bind(tela(), item, v);
             raiz.addView(item);
         }
     }

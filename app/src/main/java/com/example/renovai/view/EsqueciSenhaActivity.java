@@ -1,7 +1,6 @@
 package com.example.renovai.view;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -11,7 +10,6 @@ import android.widget.Toast;
 
 import java.util.Locale;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
@@ -34,17 +32,14 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView()).setAppearanceLightStatusBars(false);
-        getWindow().setStatusBarColor(Color.parseColor("#519059"));
         setContentView(R.layout.activity_esqueci_senha);
 
-        findViewById(R.id.btnVoltar).setOnClickListener(v -> {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-        });
+        // Voltar para a tela anterior (o login continua aberto embaixo)
+        findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
         findViewById(R.id.btnEnviar).setOnClickListener(v -> enviar());
         com.example.renovai.TelaComTeclado.ajustar(findViewById(R.id.telaEsqueci));
+        ApiClient.acordarServidor();
     }
 
     private void mostrarErroEmail(String mensagem) {
@@ -63,6 +58,8 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
         View btn = findViewById(R.id.btnEnviar);
         prog.setVisibility(View.VISIBLE);
         btn.setEnabled(false);
+        // O servidor (Render gratuito) dorme quando fica parado e pode levar até 2 minutos para acordar.
+        Toast.makeText(this, "Enviando o código... Na primeira tentativa o servidor pode levar até 2 minutos para responder.", Toast.LENGTH_LONG).show();
 
         AuthApiService api = ApiClient.createService(AuthApiService.class);
         api.esqueciSenha(new EsqueciSenhaRequest(email)).enqueue(new Callback<Void>() {
@@ -70,6 +67,7 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
             public void onResponse(Call<Void> c, Response<Void> r) {
                 prog.setVisibility(View.GONE);
                 btn.setEnabled(true);
+                // Só segue para a tela do código quando a API confirma que o e-mail saiu (204).
                 if (r.isSuccessful()) {
                     // Não finaliza: o "voltar" da tela do código retorna aqui para corrigir o e-mail
                     Intent intent = new Intent(EsqueciSenhaActivity.this, CodigoSenhaActivity.class);
@@ -79,14 +77,17 @@ public class EsqueciSenhaActivity extends AppCompatActivity {
                     mostrarErroEmail("Não encontramos nenhuma conta com o e-mail " + email
                             + ". Confira se digitou certo ou faça seu cadastro.");
                 } else {
-                    Toast.makeText(EsqueciSenhaActivity.this, EmpresaData.erro(r), Toast.LENGTH_LONG).show();
+                    // Ex.: 422 quando o e-mail não pôde ser enviado: o código nem fica valendo.
+                    mostrarErroEmail(EmpresaData.erro(r));
                 }
             }
             @Override
             public void onFailure(Call<Void> c, Throwable t) {
                 prog.setVisibility(View.GONE);
                 btn.setEnabled(true);
-                Toast.makeText(EsqueciSenhaActivity.this, "Sem conexão com o servidor.", Toast.LENGTH_LONG).show();
+                mostrarErroEmail(t instanceof java.io.InterruptedIOException
+                        ? "O servidor demorou demais para responder e o código não foi enviado. Tente de novo em instantes."
+                        : "Sem conexão com o servidor. Verifique sua internet e tente de novo.");
             }
         });
     }

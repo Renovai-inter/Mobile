@@ -1,16 +1,17 @@
 package com.example.renovai.view;
 
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.renovai.CooperadoBottomNav;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.CooperadoUi;
 import com.example.renovai.DetalheDialogHelper;
@@ -18,7 +19,6 @@ import com.example.renovai.R;
 import com.example.renovai.adapter.ColetaListAdapter;
 import com.example.renovai.controller.ColetaController;
 import com.example.renovai.dto.response.ColetaResponse;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.time.LocalDateTime;
@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Locale;
 
 /** Tela 2.6 — Histórico de todas as coletas do cooperado (GET /coletas/por-cooperado/{id}). */
-public class ListagemColetasActivity extends AppCompatActivity {
+public class CooperadoColetasFragment extends TelaFragment {
 
     private TextView txtContadorColetas, txtOrdenarColetas, txtSemColetasList;
     private RecyclerView recyclerColetasList;
@@ -37,37 +37,30 @@ public class ListagemColetasActivity extends AppCompatActivity {
     private List<ColetaResponse> coletas = new ArrayList<>();
     private boolean ordemDecrescente = true;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_coletas_list);
+    public CooperadoColetasFragment() {
+        super(R.layout.activity_coletas_list);
+    }
 
-        if (!CooperadoSession.temCooperadoResolvido()) {
-            Toast.makeText(
-                            this,
-                            "Não foi possível identificar o cooperado. Faça login novamente.",
-                            Toast.LENGTH_LONG)
-                    .show();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
-        }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
 
         TextView txtNomeCooperativaHeader = findViewById(R.id.txtNomeCooperativaHeader);
         TextView txtIniciaisCooperado = findViewById(R.id.txtIniciaisCooperado);
         String cooperativa = CooperadoSession.getCooperativaNome();
-        txtNomeCooperativaHeader.setText(cooperativa != null ? cooperativa : "Nome Cooperativa");
+        txtNomeCooperativaHeader.setText(com.example.renovai.GestorUi.nomeCabecalho(cooperativa));
         txtIniciaisCooperado.setText(CooperadoUi.gerarIniciais(CooperadoSession.getUsuarioNome()));
         findViewById(R.id.btnPerfilHeader)
                 .setOnClickListener(
-                        v -> startActivity(new Intent(this, PerfilCooperadoActivity.class)));
+                        v -> abrirAba(R.id.nav_perfil_cooperado));
 
         txtContadorColetas = findViewById(R.id.txtContadorColetas);
         txtOrdenarColetas = findViewById(R.id.txtOrdenarColetas);
         txtSemColetasList = findViewById(R.id.txtSemColetasList);
 
         recyclerColetasList = findViewById(R.id.recyclerColetasList);
-        recyclerColetasList.setLayoutManager(new LinearLayoutManager(this));
+        recyclerColetasList.setLayoutManager(new LinearLayoutManager(tela()));
         adapter = new ColetaListAdapter(this::mostrarDetalheColeta);
         recyclerColetasList.setAdapter(adapter);
 
@@ -79,16 +72,14 @@ public class ListagemColetasActivity extends AppCompatActivity {
                 });
 
         FloatingActionButton fab = findViewById(R.id.fabNovaColetaList);
-        fab.setOnClickListener(v -> startActivity(new Intent(this, AdicionarColetaActivity.class)));
+        fab.setOnClickListener(v -> startActivity(new Intent(tela(), AdicionarColetaActivity.class)));
 
-        BottomNavigationView nav = findViewById(R.id.bottomNavigationCooperado);
-        CooperadoBottomNav.configurar(this, nav, CooperadoBottomNav.Aba.COLETAS);
     }
 
     @Override
-    protected void onResume() {
+    public void onResume() {
         super.onResume();
-        if (isFinishing() || !CooperadoSession.temCooperadoResolvido()) return;
+        if (!vivo() || !CooperadoSession.temCooperadoResolvido()) return;
         carregarColetas();
     }
 
@@ -99,16 +90,16 @@ public class ListagemColetasActivity extends AppCompatActivity {
                         new ColetaController.ListaCallback() {
                             @Override
                             public void onSuccess(List<ColetaResponse> resultado) {
-                                if (isFinishing() || isDestroyed()) return;
+                                if (!vivo()) return;
                                 coletas = resultado;
                                 atualizarLista();
                             }
 
                             @Override
                             public void onErro(String mensagem) {
-                                if (isFinishing() || isDestroyed()) return;
+                                if (!vivo()) return;
                                 Toast.makeText(
-                                                ListagemColetasActivity.this,
+                                                tela(),
                                                 mensagem,
                                                 Toast.LENGTH_SHORT)
                                         .show();
@@ -137,7 +128,7 @@ public class ListagemColetasActivity extends AppCompatActivity {
     private void mostrarDetalheColeta(ColetaResponse coleta) {
         double kg = coleta.getQuantidadeKg() != null ? coleta.getQuantidadeKg().doubleValue() : 0;
         DetalheDialogHelper.mostrar(
-                this,
+                tela(),
                 "Detalhes da coleta",
                 new String[][] {
                     {"QUANTIDADE", formatarKg(kg) + " kg"},
@@ -151,7 +142,9 @@ public class ListagemColetasActivity extends AppCompatActivity {
                     },
                     {"ROTA", coleta.getRotaId() != null ? coleta.getRotaId() : "-----"},
                     {"STATUS", coleta.getStatusAtual()},
-                });
+                },
+                coleta.getColetaId(),
+                coleta.getImagemUrl());
     }
 
     private String formatarKg(double kg) {
