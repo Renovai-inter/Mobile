@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_a_cooperativas" android:icon="@drawable/cooperativa_empresa_icon" android:title="Cooperativas" />
+    <item android:id="@+id/nav_a_empresas" android:icon="@drawable/pedidos_empresa_icon" android:title="Empresas" />
+    <item android:id="@+id/nav_a_home" android:icon="@drawable/ic_home_cooperado" android:title="Home" />
+    <item android:id="@+id/nav_a_contas" android:icon="@drawable/ic_equipe" android:title="Contas" />
+    <item android:id="@+id/nav_a_perfil" android:icon="@drawable/ic_perfil_cooperado" android:title="Perfil" />
+</menu>

@@ -160,7 +160,7 @@ public class CooperadoHomeFragment extends TelaFragment {
                         v -> abrirAba(R.id.nav_triagens));
 
         FloatingActionButton fab = findViewById(R.id.fabNovaColeta);
-        fab.setOnClickListener(v -> startActivity(new Intent(tela(), AdicionarColetaActivity.class)));
+        fab.setOnClickListener(v -> escolherCadastro());
     }
 
     private void carregarDados() {
@@ -317,6 +317,14 @@ public class CooperadoHomeFragment extends TelaFragment {
     }
 
     private void mostrarDetalheColeta(ColetaResponse coleta) {
+        // descrição e data prevista da triagem ficam no Firestore (o banco da API não tem esses campos)
+        com.example.renovai.ColetaDetalhes.ler(coleta.getColetaId(), extra -> {
+            if (vivo()) mostrarDetalheColeta(coleta, extra);
+        });
+    }
+
+    private void mostrarDetalheColeta(
+            ColetaResponse coleta, com.example.renovai.ColetaDetalhes.Dados extra) {
         double kg = coleta.getQuantidadeKg() != null ? coleta.getQuantidadeKg().doubleValue() : 0;
         DetalheDialogHelper.mostrar(
                 tela(),
@@ -333,6 +341,9 @@ public class CooperadoHomeFragment extends TelaFragment {
                     },
                     {"ROTA", coleta.getRotaId() != null ? coleta.getRotaId() : "-----"},
                     {"STATUS", coleta.getStatusAtual()},
+                    {"PREVISÃO DA TRIAGEM", extra == null ? null
+                            : com.example.renovai.ColetaDetalhes.dataFormatada(extra.dataPrevistaTriagem)},
+                    {"DESCRIÇÃO", extra == null ? null : extra.descricao},
                 },
                 coleta.getColetaId(),
                 coleta.getImagemUrl());
@@ -375,5 +386,22 @@ public class CooperadoHomeFragment extends TelaFragment {
         } catch (DateTimeParseException e) {
             return "--";
         }
+    }
+
+    /** "+" da Home: painel para escolher entre registrar uma coleta ou cadastrar um material. */
+    private void escolherCadastro() {
+        com.google.android.material.bottomsheet.BottomSheetDialog painel =
+                new com.google.android.material.bottomsheet.BottomSheetDialog(requireContext());
+        View conteudo = getLayoutInflater().inflate(R.layout.sheet_escolher_cadastro, null);
+        conteudo.findViewById(R.id.opcaoColeta).setOnClickListener(v -> {
+            painel.dismiss();
+            startActivity(new Intent(tela(), AdicionarColetaActivity.class));
+        });
+        conteudo.findViewById(R.id.opcaoMaterial).setOnClickListener(v -> {
+            painel.dismiss();
+            startActivity(new Intent(tela(), AdicionarMaterialActivity.class));
+        });
+        painel.setContentView(conteudo);
+        painel.show();
     }
 }

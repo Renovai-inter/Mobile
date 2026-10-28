@@ -7,6 +7,13 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
             <TextView style="@style/G.Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Estoque atual" android:textSize="26sp" />
             <TextView android:id="@+id/txtEstoqueTotal" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="2dp" android:text="" />
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="14dp"
+                android:background="@drawable/input_field_cooperado_background" android:gravity="center_vertical" android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="14dp">
+                <EditText android:id="@+id/edtBuscaEstoque" android:layout_width="0dp" android:layout_height="46dp" android:layout_weight="1" android:background="@null"
+                    android:hint="Buscar material ou tipo (ex.: PET, Plástico)" android:imeOptions="actionSearch" android:inputType="text" android:maxLines="1"
+                    android:textColor="#222222" android:textColorHint="#8A8A8A" android:textSize="13sp" />
+                <ImageView android:layout_width="20dp" android:layout_height="20dp" android:src="@drawable/ic_search_dark" android:contentDescription="Buscar" />
+            </LinearLayout>
             <TextView android:id="@+id/txtVazio" style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="24dp" android:text="Nenhum material em estoque." android:visibility="gone" />
             <androidx.recyclerview.widget.RecyclerView android:id="@+id/recyclerEstoque" android:layout_width="match_parent"

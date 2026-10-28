@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -34,7 +35,7 @@ public class MotoristaPerfilFragment extends MotoristaAbaFragment {
         campo(R.id.campoEmail, "E-mail", SessionManager.getEmail(), null);
         campo(R.id.campoCargo, "Cargo", CooperadoSession.getCargo(), null);
 
-        findViewById(R.id.btnSuporte).setOnClickListener(v -> new AlertDialog.Builder(tela()).setTitle("Suporte")
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> new MaterialAlertDialogBuilder(tela()).setTitle("Suporte")
                 .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
                 .setPositiveButton("Enviar e-mail", (d, w) -> {
                     Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));

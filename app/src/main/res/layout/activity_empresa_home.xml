@@ -8,40 +8,73 @@
     <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
 
-            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Visão Geral:" android:textSize="14sp" android:textColor="#222222" />
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Visão Geral" />
 
-            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
-                android:background="@drawable/status_card_cooperado_background" android:orientation="vertical" android:padding="16dp">
-                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+            <!-- Card de pedidos: total, situação (mesmas regras da aba Pedidos) e valor aprovado -->
+            <LinearLayout android:id="@+id/cardPedidosE" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp"
+                android:background="@drawable/kpi_card_background" android:clickable="true" android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground" android:orientation="vertical" android:padding="16dp">
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="Pedidos enviados" android:textColor="@color/vinho" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Ver todos ›" android:textColor="@color/vinho" android:textSize="12sp" />
+                </LinearLayout>
+
+                <TextView android:id="@+id/txtPedidosMes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp"
+                    android:text="—" android:textColor="@color/vinho" android:textSize="34sp" android:textStyle="bold" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:orientation="horizontal">
                     <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
-                        <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Pedidos enviados" android:textSize="13sp" />
-                        <TextView android:id="@+id/txtPedidosMes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#882B4E" android:textSize="30sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/txtKpiAndamentoE" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0" android:textColor="#E0A93A" android:textSize="18sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Em andamento" android:textColor="@color/popup_texto" android:textSize="11sp" />
                     </LinearLayout>
-                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical">
-                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="end" android:orientation="horizontal" />
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
-                            <TextView android:id="@+id/txtEmNegociacao" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#882B4E" android:textSize="15sp" android:textStyle="bold" />
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:text="Aceitos" android:textColor="#6B7280" android:textSize="12sp" />
-                        </LinearLayout>
-                        <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="4dp" android:gravity="center_vertical" android:orientation="horizontal">
-                            <TextView android:id="@+id/txtFinalizados" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textColor="#519059" android:textSize="15sp" android:textStyle="bold" />
-                            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="4dp" android:text="Valor negociado" android:textColor="#6B7280" android:textSize="12sp" />
-                        </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:id="@+id/txtKpiAceitosE" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0" android:textColor="@color/verde" android:textSize="18sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Aceitos" android:textColor="@color/popup_texto" android:textSize="11sp" />
                     </LinearLayout>
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+                        <TextView android:id="@+id/txtKpiFinalizadosE" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="0" android:textColor="@color/vinho" android:textSize="18sp" android:textStyle="bold" />
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Finalizados" android:textColor="@color/popup_texto" android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:layout_marginTop="12dp" android:layout_marginBottom="10dp" android:background="#EDEDED" />
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical" android:orientation="horizontal">
+                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:text="Valor aprovado" android:textColor="@color/popup_texto" android:textSize="13sp" />
+                    <TextView android:id="@+id/txtValorAprovadoE" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="R$ 0,00" android:textColor="@color/verde" android:textSize="16sp" android:textStyle="bold" />
                 </LinearLayout>
             </LinearLayout>
 
-            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cooperativas favoritadas" android:layout_marginTop="12dp" />
-            <TextView android:id="@+id/txtTotalFavoritasE" style="@style/G.Value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" />
-            <TextView android:id="@+id/btnBuscarMateriaisE" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Buscar Materiais" android:layout_marginTop="12dp" />
+            <TextView android:id="@+id/btnBuscarMateriaisE" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Buscar Materiais" android:layout_marginTop="14dp" />
             <TextView android:id="@+id/btnMeusPedidosE" style="@style/G.BtnOutline" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Meus Pedidos" android:layout_marginTop="8dp" />
+
             <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Pedidos Recentes" />
             <LinearLayout android:id="@+id/listaPedidosRecentes" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="vertical" />
-            <TextView android:id="@+id/txtSemPedidos" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhum pedido enviado ainda." />
+            <TextView android:id="@+id/txtSemPedidos" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhum pedido enviado ainda." android:visibility="gone" />
 
-            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="Cooperativas Favoritas" />
+            <!-- Título da seção com a quantidade de favoritas ao lado -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:gravity="center_vertical" android:orientation="horizontal">
+                <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Cooperativas Favoritas" />
+                <TextView android:id="@+id/txtTotalFavoritasE" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp"
+                    android:background="@drawable/pill_light_green" android:paddingStart="10dp" android:paddingTop="1dp" android:paddingEnd="10dp" android:paddingBottom="1dp"
+                    android:text="0" android:textColor="#3F6B3F" android:textSize="12sp" android:textStyle="bold" />
+                <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1" />
+                <TextView android:id="@+id/btnVerFavoritasE" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="4dp"
+                    android:text="Ver todas ›" android:textColor="@color/vinho" android:textSize="12sp" />
+            </LinearLayout>
             <LinearLayout android:id="@+id/linhaCooperativasRecentes" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:orientation="horizontal" />
-            <TextView android:id="@+id/txtSemFavoritas" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Você ainda não tem cooperativas favoritas." />
+            <TextView android:id="@+id/txtSemFavoritas" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Você ainda não tem cooperativas favoritas." android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

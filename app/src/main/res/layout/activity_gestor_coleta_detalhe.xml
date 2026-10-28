@@ -57,6 +57,11 @@
                 <TextView style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="MÉTODO" />
                 <TextView android:id="@+id/txtMetodo" android:layout_width="wrap_content" android:layout_height="wrap_content"
                     android:layout_marginTop="4dp" android:text="—" android:textColor="#222222" android:textSize="14sp" />
+                <!-- descrição e previsão da triagem vêm do Firestore (ColetaDetalhes); somem se não houver -->
+                <TextView android:id="@+id/lblPrevisaoTriagem" style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="PREVISÃO DA TRIAGEM" android:visibility="gone" />
+                <TextView android:id="@+id/txtPrevisaoTriagem" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textColor="#111111" android:textSize="14sp" android:visibility="gone" />
+                <TextView android:id="@+id/lblDescricaoColeta" style="@style/G.Label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="14dp" android:text="DESCRIÇÃO" android:visibility="gone" />
+                <TextView android:id="@+id/txtDescricaoColeta" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#111111" android:textSize="14sp" android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

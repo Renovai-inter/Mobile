@@ -20,8 +20,8 @@
                     android:background="@drawable/card_unselected_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
                     android:text="Categorias" android:textColor="#444444" android:textSize="12sp" />
                 <TextView android:id="@+id/chipNota4" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                    android:background="@drawable/btn_green_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
-                    android:text="★ 4+" android:textColor="#FFFFFF" android:textSize="12sp" />
+                    android:background="@drawable/card_unselected_background" android:paddingStart="14dp" android:paddingEnd="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
+                    android:contentDescription="Mostrar só cooperativas com nota 4 ou mais" android:text="★ 4+" android:textColor="#444444" android:textSize="12sp" />
             </LinearLayout>
 
             <EditText android:id="@+id/edtBuscaCidadeE" style="@style/G.Input" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp" android:hint="Cidade ou localização" android:inputType="text" />

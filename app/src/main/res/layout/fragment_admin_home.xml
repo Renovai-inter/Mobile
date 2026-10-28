@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Home do Admin do site: totais do sistema e atalhos para as abas. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+
+    <include layout="@layout/include_gestor_header" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <TextView style="@style/G.Title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Painel do administrador" />
+            <TextView style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" android:text="Visão geral de todo o Renovaí" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp" android:orientation="horizontal">
+                <LinearLayout android:id="@+id/cardKpiCooperativas" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginEnd="6dp" android:background="@drawable/kpi_card_background"
+                    android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground"
+                    android:orientation="vertical" android:padding="14dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Cooperativas" android:textColor="@color/vinho" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtKpiCooperativas" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:text="—" android:textColor="@color/vinho" android:textSize="30sp" android:textStyle="bold" />
+                </LinearLayout>
+                <LinearLayout android:id="@+id/cardKpiEmpresas" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="6dp" android:background="@drawable/kpi_card_background"
+                    android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground"
+                    android:orientation="vertical" android:padding="14dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Empresas" android:textColor="@color/vinho" android:textSize="14sp" android:textStyle="bold" />
+                    <TextView android:id="@+id/txtKpiEmpresas" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:text="—" android:textColor="@color/vinho" android:textSize="30sp" android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="12dp" android:orientation="horizontal">
+                <LinearLayout android:id="@+id/cardKpiContas" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginEnd="6dp" android:background="@drawable/kpi_card_background"
+                    android:clickable="true" android:focusable="true" android:foreground="?android:attr/selectableItemBackground"
+                    android:orientation="vertical" android:padding="14dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Contas" android:textColor="@color/vinho" android:textSize="14sp" android:textStyle="bold" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+                        <TextView android:id="@+id/txtKpiContas" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="—" android:textColor="@color/vinho" android:textSize="30sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/txtKpiContasDet" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp" android:textColor="@color/vinho" android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                    android:layout_marginStart="6dp" android:background="@drawable/kpi_card_background"
+                    android:orientation="vertical" android:padding="14dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Pedidos" android:textColor="@color/vinho" android:textSize="14sp" android:textStyle="bold" />
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp" android:gravity="center_vertical" android:orientation="horizontal">
+                        <TextView android:id="@+id/txtKpiPedidos" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="—" android:textColor="@color/vinho" android:textSize="30sp" android:textStyle="bold" />
+                        <TextView android:id="@+id/txtKpiPedidosDet" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp" android:textColor="@color/vinho" android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView style="@style/G.Section" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="22dp" android:text="Pedidos recentes" android:textStyle="normal" />
+            <TextView android:id="@+id/txtSemPedidos" style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:text="Nenhum pedido no sistema ainda." android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaPedidosRecentes" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

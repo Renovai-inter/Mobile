@@ -1,11 +1,10 @@
 package com.example.renovai.view;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.graphics.drawable.ColorDrawable;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
@@ -104,10 +103,8 @@ public class CadastroActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
 
         View view = getLayoutInflater().inflate(R.layout.dialog_erro_cadastro, null);
-        AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        }
+        // cartão branco arredondado do pop-up padrão vem do tema (ThemeOverlay.Renovai.Dialogo)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(view).create();
 
         ImageView icone = view.findViewById(R.id.imgErro);
         TextView dica = view.findViewById(R.id.txtDicaErro);

@@ -126,6 +126,14 @@ public class CooperadoColetasFragment extends TelaFragment {
     }
 
     private void mostrarDetalheColeta(ColetaResponse coleta) {
+        // descrição e data prevista da triagem ficam no Firestore (o banco da API não tem esses campos)
+        com.example.renovai.ColetaDetalhes.ler(coleta.getColetaId(), extra -> {
+            if (vivo()) mostrarDetalheColeta(coleta, extra);
+        });
+    }
+
+    private void mostrarDetalheColeta(
+            ColetaResponse coleta, com.example.renovai.ColetaDetalhes.Dados extra) {
         double kg = coleta.getQuantidadeKg() != null ? coleta.getQuantidadeKg().doubleValue() : 0;
         DetalheDialogHelper.mostrar(
                 tela(),
@@ -142,6 +150,9 @@ public class CooperadoColetasFragment extends TelaFragment {
                     },
                     {"ROTA", coleta.getRotaId() != null ? coleta.getRotaId() : "-----"},
                     {"STATUS", coleta.getStatusAtual()},
+                    {"PREVISÃO DA TRIAGEM", extra == null ? null
+                            : com.example.renovai.ColetaDetalhes.dataFormatada(extra.dataPrevistaTriagem)},
+                    {"DESCRIÇÃO", extra == null ? null : extra.descricao},
                 },
                 coleta.getColetaId(),
                 coleta.getImagemUrl());

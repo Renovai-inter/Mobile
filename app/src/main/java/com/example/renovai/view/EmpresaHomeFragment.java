@@ -11,6 +11,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.renovai.EmpresaData;
+import com.example.renovai.EmpresaPedidos;
+import com.example.renovai.EmpresaStatus;
 import com.example.renovai.GestorUi;
 import com.example.renovai.R;
 import com.example.renovai.dto.response.EmpresaResponses;
@@ -35,6 +37,8 @@ public class EmpresaHomeFragment extends EmpresaAbaFragment {
         findViewById(R.id.btnMeusPedidosE)
                 .setOnClickListener(
                         v -> abrirAba(R.id.nav_pedidos));
+        findViewById(R.id.cardPedidosE).setOnClickListener(v -> abrirAba(R.id.nav_pedidos));
+        findViewById(R.id.btnVerFavoritasE).setOnClickListener(v -> abrirAba(R.id.nav_favoritas));
     }
 
     @Override
@@ -46,12 +50,11 @@ public class EmpresaHomeFragment extends EmpresaAbaFragment {
                 (p, c) -> {
                     if (vivo()) preencherHeader(p.nomeEmpresa);
                 });
-        EmpresaData.dashboard(
-                false,
-                new com.example.renovai.GestorData.Ouvinte<EmpresaResponses.Dashboard>() {
+        EmpresaPedidos.listar(
+                new com.example.renovai.GestorData.Ouvinte<List<EmpresaPedidos.Vista>>() {
                     @Override
-                    public void aoReceber(EmpresaResponses.Dashboard d, boolean c) {
-                        if (vivo()) renderDashboard(d);
+                    public void aoReceber(List<EmpresaPedidos.Vista> l, boolean c) {
+                        if (vivo()) renderResumo(l);
                     }
 
                     @Override
@@ -83,15 +86,24 @@ public class EmpresaHomeFragment extends EmpresaAbaFragment {
                 });
     }
 
-    private void renderDashboard(EmpresaResponses.Dashboard d) {
-        ((TextView) findViewById(R.id.txtPedidosMes))
-                .setText(
-                        String.valueOf(
-                                d.totalPedidosEnviados == null ? 0 : d.totalPedidosEnviados));
-        ((TextView) findViewById(R.id.txtEmNegociacao))
-                .setText(String.valueOf(d.totalPedidosAceitos == null ? 0 : d.totalPedidosAceitos));
-        ((TextView) findViewById(R.id.txtFinalizados))
-                .setText(GestorUi.dinheiro(d.valorTotalNegociado));
+    /**
+     * Card "Pedidos enviados": total e situação com as mesmas regras da aba Pedidos (Em andamento =
+     * aberto ou em negociação), e o valor aprovado (aceitos + finalizados).
+     */
+    private void renderResumo(List<EmpresaPedidos.Vista> pedidos) {
+        int andamento = 0, aceitos = 0, finalizados = 0;
+        double valor = 0;
+        for (EmpresaPedidos.Vista v : pedidos) {
+            if (v.estado == EmpresaStatus.ABERTO || v.estado == EmpresaStatus.EM_NEGOCIACAO) andamento++;
+            else if (v.estado == EmpresaStatus.ACEITO) aceitos++;
+            else if (v.estado == EmpresaStatus.FINALIZADO) finalizados++;
+            if (EmpresaStatus.aprovado(v.estado)) valor += v.valor;
+        }
+        ((TextView) findViewById(R.id.txtPedidosMes)).setText(String.valueOf(pedidos.size()));
+        ((TextView) findViewById(R.id.txtKpiAndamentoE)).setText(String.valueOf(andamento));
+        ((TextView) findViewById(R.id.txtKpiAceitosE)).setText(String.valueOf(aceitos));
+        ((TextView) findViewById(R.id.txtKpiFinalizadosE)).setText(String.valueOf(finalizados));
+        ((TextView) findViewById(R.id.txtValorAprovadoE)).setText(GestorUi.dinheiro(valor));
     }
 
     private void renderPedidos(List<PedidoResponse> lista) {
@@ -138,10 +150,33 @@ public class EmpresaHomeFragment extends EmpresaAbaFragment {
             View v = LayoutInflater.from(tela()).inflate(R.layout.item_cooperativa_card, raiz, false);
             ((TextView) v.findViewById(R.id.txtNome))
                     .setText(f.cooperativaNome == null ? "Cooperativa" : f.cooperativaNome);
+            android.widget.ImageView foto = v.findViewById(R.id.imgCooperativa);
+            EmpresaCooperativaCard.foto(foto, f.cooperativaImagem);
+            if (f.cooperativaImagem == null) fotoDoPerfil(foto, f.cooperativaId);
             v.findViewById(R.id.txtAvaliacao).setVisibility(View.GONE);
             v.setOnClickListener(
                     x -> EmpresaCooperativaCard.abrirPerfilPublico(tela(), f.cooperativaId));
             raiz.addView(v);
         }
+    }
+
+    /** Favorito sem foto: usa a foto do perfil público da cooperativa (Cloudinary). */
+    private void fotoDoPerfil(android.widget.ImageView foto, String cooperativaId) {
+        EmpresaData.api()
+                .perfilPublico(cooperativaId)
+                .enqueue(
+                        new retrofit2.Callback<EmpresaResponses.CooperativaPerfilPublico>() {
+                            @Override
+                            public void onResponse(
+                                    retrofit2.Call<EmpresaResponses.CooperativaPerfilPublico> c,
+                                    retrofit2.Response<EmpresaResponses.CooperativaPerfilPublico> r) {
+                                if (vivo() && r.isSuccessful() && r.body() != null && r.body().imagemUrl != null)
+                                    EmpresaCooperativaCard.foto(foto, r.body().imagemUrl);
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    retrofit2.Call<EmpresaResponses.CooperativaPerfilPublico> c, Throwable t) {}
+                        });
     }
 }

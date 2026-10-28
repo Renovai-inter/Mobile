@@ -4,6 +4,9 @@ package com.example.renovai.view;
 import android.app.DatePickerDialog;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -20,10 +23,12 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.renovai.ApiClient;
 import com.example.renovai.CooperadoSession;
+import com.example.renovai.GestorUi;
 import com.example.renovai.MaterialApiService;
 import com.example.renovai.R;
 import com.example.renovai.RotaApiService;
 import com.example.renovai.controller.ColetaController;
+import com.example.renovai.dto.request.ColetaRequest;
 import com.example.renovai.dto.response.ColetaResponse;
 import com.example.renovai.dto.response.MaterialResponse;
 import com.example.renovai.dto.response.RotaResponse;
@@ -34,28 +39,37 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * Tela 2.2 — Registrar Coleta.
  *
- * <p>ATENÇÃO — o backend (Requests.ColetaRequest) só aceita cooperadoId, statusId, quantidadeKg,
- * imagemUrl, tipoColeta e rotaId. Os campos "Materiais coletados", "Necessita de triagem?" e "Data
- * prevista da triagem" existem na tela (fiéis ao wireframe) mas NÃO são enviados para a API — não
- * há onde persisti-los ainda. Isso está documentado em IMPLEMENTACAO.md.
- *
- * <p>FOTO: a API não tem endpoint de upload, então a foto vai para o Cloudinary
- * (CloudinaryUpload, upload unsigned direto na API do Cloudinary) e a URL devolvida é enviada no campo imagemUrl do POST /coletas — que a API
- * já aceita.
+ * <p>POST /coletas leva peso, tipo (e rota, se externa), foto (Cloudinary), se precisa de triagem
+ * e os materiais com o peso de cada um. Com materiais, a API exige a equipe do cooperado e que a
+ * soma dos pesos seja o peso da coleta; sem triagem, os materiais entram direto no estoque.
+ * Descrição e data prevista da triagem não existem no banco da API: depois que a coleta é criada,
+ * vão para o Firestore (ColetaDetalhes).
  */
 public class AdicionarColetaActivity extends AppCompatActivity {
 
-    private EditText edtPesoColeta, edtDescricaoColeta, edtDataPrevistaTriagem;
+    /** Um material escolhido para a coleta e o peso dele. */
+    private static final class Item {
+        final MaterialResponse material;
+        BigDecimal kg;
+
+        Item(MaterialResponse material, BigDecimal kg) {
+            this.material = material;
+            this.kg = kg;
+        }
+    }
+
+    private EditText edtPesoColeta, edtDescricaoColeta, edtDataPrevistaTriagem, edtPesoMaterial;
     private TextView btnTipoInterno, btnTipoExterno, txtSemFotoColeta, btnAdicionarOutroMaterial;
+    private TextView txtDicaTriagem, txtSomaMateriais;
     private android.widget.ImageView imgPreviewFotoColeta;
     private LinearLayout containerDataPrevista,
             containerRotaOrigem,
@@ -71,7 +85,10 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     private Uri fotoSelecionada;
     // URL do Cloudinary da foto já enviada: se a API falhar, o "Registrar" de novo não sobe a foto outra vez.
     private String fotoUrlEnviada;
-    private final List<String> materiaisColetados = new ArrayList<>();
+    private LocalDate dataPrevista;
+    private String equipeId;
+    private final List<MaterialResponse> materiaisDaCooperativa = new ArrayList<>();
+    private final List<Item> itens = new ArrayList<>();
     private final List<RotaResponse> rotasCarregadas = new ArrayList<>();
 
     private final ActivityResultLauncher<String> seletorImagem =
@@ -106,21 +123,16 @@ public class AdicionarColetaActivity extends AppCompatActivity {
 
         bindViews();
         configurarTipoColeta();
-        configurarSwitchTriagem();
+        configurarTriagem();
         configurarDataPrevista();
         configurarFoto();
         configurarMateriais();
-        configurarRegistrar();
+        btnRegistrarColeta.setOnClickListener(v -> registrarColeta());
 
-        carregarCategorias();
-        edtDescricaoColeta.setEnabled(false);
-        edtDescricaoColeta.setHint("Descrição disponível em breve");
-        edtDataPrevistaTriagem.setEnabled(false);
-        switchNecessitaTriagem.setEnabled(false);
-        spinnerCategoriaMaterial.setEnabled(false);
-        btnSalvarMaterial.setEnabled(false);
-        btnAdicionarOutroMaterial.setEnabled(false);
-        // Foto: enviada ao Cloudinary no momento do registro (ver registrarColeta)
+        carregarMateriais();
+        // a equipe só é exigida quando a coleta leva materiais
+        new ColetaController().equipeDoCooperado(CooperadoSession.getFuncionarioId(), id -> equipeId = id);
+
         boolean fotoDisponivel = com.example.renovai.CloudinaryUpload.estaConfigurado();
         findViewById(R.id.btnAnexarFoto).setEnabled(fotoDisponivel);
         txtSemFotoColeta.setText(
@@ -131,10 +143,13 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         edtPesoColeta = findViewById(R.id.edtPesoColeta);
         edtDescricaoColeta = findViewById(R.id.edtDescricaoColeta);
         edtDataPrevistaTriagem = findViewById(R.id.edtDataPrevistaTriagem);
+        edtPesoMaterial = findViewById(R.id.edtPesoMaterial);
         btnTipoInterno = findViewById(R.id.btnTipoInterno);
         btnTipoExterno = findViewById(R.id.btnTipoExterno);
         imgPreviewFotoColeta = findViewById(R.id.imgPreviewFotoColeta);
         txtSemFotoColeta = findViewById(R.id.txtSemFotoColeta);
+        txtDicaTriagem = findViewById(R.id.txtDicaTriagem);
+        txtSomaMateriais = findViewById(R.id.txtSomaMateriais);
         containerDataPrevista = findViewById(R.id.containerDataPrevista);
         containerRotaOrigem = findViewById(R.id.containerRotaOrigem);
         spinnerRotaOrigem = findViewById(R.id.spinnerRotaOrigem);
@@ -174,30 +189,50 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         containerRotaOrigem.setVisibility(tipoExterno ? View.VISIBLE : View.GONE);
     }
 
-    private void configurarSwitchTriagem() {
-        switchNecessitaTriagem.setOnCheckedChangeListener(
-                (buttonView, isChecked) ->
-                        containerDataPrevista.setVisibility(isChecked ? View.VISIBLE : View.GONE));
+    private void configurarTriagem() {
+        switchNecessitaTriagem.setOnCheckedChangeListener((b, marcado) -> atualizarTriagemUi());
+        atualizarTriagemUi();
+    }
+
+    /**
+     * Com 2 ou mais materiais a triagem é obrigatória (o switch fica travado ligado). A data prevista
+     * só aparece com triagem, e a dica explica o que acontece em cada caso.
+     */
+    private void atualizarTriagemUi() {
+        boolean obrigatoria = itens.size() >= 2;
+        if (obrigatoria && !switchNecessitaTriagem.isChecked()) switchNecessitaTriagem.setChecked(true);
+        switchNecessitaTriagem.setEnabled(!obrigatoria);
+        boolean triagem = switchNecessitaTriagem.isChecked();
+        containerDataPrevista.setVisibility(triagem ? View.VISIBLE : View.GONE);
+        txtDicaTriagem.setText(
+                obrigatoria
+                        ? "Obrigatório para 2+ materiais"
+                        : triagem
+                                ? "Os materiais passam pela triagem antes do estoque"
+                                : itens.isEmpty()
+                                        ? "Sem triagem, informe abaixo o material e o peso"
+                                        : "O material vai direto para o estoque");
     }
 
     private void configurarDataPrevista() {
         edtDataPrevistaTriagem.setOnClickListener(
                 v -> {
                     Calendar agora = Calendar.getInstance();
-                    new DatePickerDialog(
+                    DatePickerDialog dialogo =
+                            new DatePickerDialog(
                                     this,
-                                    (view, ano, mes, dia) ->
-                                            edtDataPrevistaTriagem.setText(
-                                                    String.format(
-                                                            Locale.ROOT,
-                                                            "%02d/%02d/%04d",
-                                                            dia,
-                                                            mes + 1,
-                                                            ano)),
+                                    (view, ano, mes, dia) -> {
+                                        dataPrevista = LocalDate.of(ano, mes + 1, dia);
+                                        edtDataPrevistaTriagem.setText(
+                                                String.format(
+                                                        Locale.ROOT, "%02d/%02d/%04d", dia, mes + 1, ano));
+                                    },
                                     agora.get(Calendar.YEAR),
                                     agora.get(Calendar.MONTH),
-                                    agora.get(Calendar.DAY_OF_MONTH))
-                            .show();
+                                    agora.get(Calendar.DAY_OF_MONTH));
+                    // a triagem não pode ficar prevista para antes de hoje
+                    dialogo.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+                    dialogo.show();
                 });
     }
 
@@ -206,49 +241,106 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     }
 
     private void configurarMateriais() {
-        btnSalvarMaterial.setOnClickListener(
-                v -> {
-                    Object selecionado = spinnerCategoriaMaterial.getSelectedItem();
-                    if (selecionado == null) {
-                        Toast.makeText(
-                                        this,
-                                        "Selecione uma categoria de material.",
-                                        Toast.LENGTH_SHORT)
-                                .show();
-                        return;
-                    }
-                    String categoria = selecionado.toString();
-                    materiaisColetados.add(categoria);
-                    adicionarLinhaMaterial(categoria);
-                    containerMateriaisColeta.setVisibility(View.VISIBLE);
-                    containerNovoMaterial.setVisibility(View.GONE);
-                    btnAdicionarOutroMaterial.setVisibility(View.VISIBLE);
-                });
-
+        btnSalvarMaterial.setOnClickListener(v -> salvarMaterial());
         btnAdicionarOutroMaterial.setOnClickListener(
                 v -> {
                     containerNovoMaterial.setVisibility(View.VISIBLE);
                     btnAdicionarOutroMaterial.setVisibility(View.GONE);
                 });
+        edtPesoColeta.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int c, int d) {}
+            @Override public void onTextChanged(CharSequence s, int a, int c, int d) {}
+            @Override public void afterTextChanged(Editable s) { atualizarSoma(); }
+        });
     }
 
-    private void adicionarLinhaMaterial(String categoria) {
-        TextView linha = new TextView(this);
-        linha.setText("•  " + categoria);
-        linha.setTextColor(0xFF222222);
-        linha.setTextSize(14f);
-        linha.setPadding(0, 4, 0, 4);
-        listaMateriaisColeta.addView(linha);
+    private void salvarMaterial() {
+        int posicao = spinnerCategoriaMaterial.getSelectedItemPosition();
+        if (posicao < 0 || posicao >= materiaisDaCooperativa.size()) {
+            toast("Selecione um material.");
+            return;
+        }
+        BigDecimal kg = peso(edtPesoMaterial);
+        if (kg == null) {
+            toast("Informe o peso deste material.");
+            return;
+        }
+        MaterialResponse escolhido = materiaisDaCooperativa.get(posicao);
+        // a API não aceita o mesmo material duas vezes: soma no que já está na lista
+        Item existente = null;
+        for (Item it : itens)
+            if (it.material.getMaterialId().equals(escolhido.getMaterialId())) existente = it;
+        if (existente != null) existente.kg = existente.kg.add(kg);
+        else itens.add(new Item(escolhido, kg));
+
+        edtPesoMaterial.setText("");
+        containerNovoMaterial.setVisibility(View.GONE);
+        btnAdicionarOutroMaterial.setVisibility(View.VISIBLE);
+        renderMateriais();
     }
 
-    private void configurarRegistrar() {
-        btnRegistrarColeta.setOnClickListener(v -> registrarColeta());
+    private void renderMateriais() {
+        listaMateriaisColeta.removeAllViews();
+        for (Item it : itens) {
+            LinearLayout linha = new LinearLayout(this);
+            linha.setOrientation(LinearLayout.HORIZONTAL);
+            linha.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView nome = new TextView(this);
+            nome.setText("•  " + nomeMaterial(it.material) + " — " + GestorUi.kg(it.kg.doubleValue()));
+            nome.setTextColor(0xFF222222);
+            nome.setTextSize(14f);
+            nome.setLayoutParams(new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+
+            TextView remover = new TextView(this);
+            remover.setText("Remover");
+            remover.setTextColor(getColor(R.color.vinho));
+            remover.setTextSize(12f);
+            int p = GestorUi.dp(this, 8);
+            remover.setPadding(p, p, p, p);
+            remover.setOnClickListener(v -> {
+                itens.remove(it);
+                renderMateriais();
+            });
+
+            linha.addView(nome);
+            linha.addView(remover);
+            listaMateriaisColeta.addView(linha);
+        }
+        boolean vazio = itens.isEmpty();
+        containerMateriaisColeta.setVisibility(vazio ? View.GONE : View.VISIBLE);
+        if (vazio) {
+            containerNovoMaterial.setVisibility(View.VISIBLE);
+            btnAdicionarOutroMaterial.setVisibility(View.GONE);
+        }
+        atualizarSoma();
+        atualizarTriagemUi();
     }
 
-    /**
-     * Categorias reais dos materiais já cadastrados na cooperativa do cooperado (GET /materiais).
-     */
-    private void carregarCategorias() {
+    /** "Soma dos materiais: 8 kg de 10 kg" — verde quando bate com o peso da coleta. */
+    private void atualizarSoma() {
+        if (itens.isEmpty()) return;
+        BigDecimal soma = somaMateriais();
+        BigDecimal total = peso(edtPesoColeta);
+        boolean bate = total != null && soma.compareTo(total) == 0;
+        txtSomaMateriais.setText(
+                "Soma dos materiais: " + GestorUi.kg(soma.doubleValue())
+                        + (total == null ? "" : " de " + GestorUi.kg(total.doubleValue()) + " da coleta"));
+        txtSomaMateriais.setTextColor(bate ? getColor(R.color.verde) : getColor(R.color.vinho));
+    }
+
+    private BigDecimal somaMateriais() {
+        BigDecimal soma = BigDecimal.ZERO;
+        for (Item it : itens) soma = soma.add(it.kg);
+        return soma;
+    }
+
+    private static String nomeMaterial(MaterialResponse m) {
+        return m.getCategoriaNome() != null ? m.getCategoriaNome() : "Material";
+    }
+
+    /** Materiais cadastrados da cooperativa do cooperado (GET /materiais), com o id de cada um. */
+    private void carregarMateriais() {
         MaterialApiService service = ApiClient.createService(MaterialApiService.class);
         service.listar()
                 .enqueue(
@@ -257,9 +349,9 @@ public class AdicionarColetaActivity extends AppCompatActivity {
                             public void onResponse(
                                     Call<List<MaterialResponse>> call,
                                     Response<List<MaterialResponse>> response) {
-                                List<String> categorias = new ArrayList<>();
+                                if (isFinishing() || isDestroyed()) return;
+                                materiaisDaCooperativa.clear();
                                 if (response.isSuccessful() && response.body() != null) {
-                                    LinkedHashSet<String> distintas = new LinkedHashSet<>();
                                     String cooperativaId = CooperadoSession.getCooperativaId();
                                     for (MaterialResponse m : response.body()) {
                                         boolean daCooperativa =
@@ -267,44 +359,37 @@ public class AdicionarColetaActivity extends AppCompatActivity {
                                                         || (cooperativaId != null
                                                                 && cooperativaId.equalsIgnoreCase(
                                                                         m.getCooperativaId()));
-                                        if (daCooperativa && m.getCategoriaNome() != null) {
-                                            distintas.add(m.getCategoriaNome());
-                                        }
+                                        if (daCooperativa && m.getMaterialId() != null)
+                                            materiaisDaCooperativa.add(m);
                                     }
-                                    categorias.addAll(distintas);
                                 }
-                                if (categorias.isEmpty()) {
-                                    // Fallback documentado — mesmas 4 categorias já citadas no
-                                    // mapeamento
-                                    // de telas (tela 5.6, Empresa), usado só se a cooperativa ainda
-                                    // não
-                                    // tiver nenhum material cadastrado.
-                                    categorias.add("Plástico");
-                                    categorias.add("Papel");
-                                    categorias.add("Metal");
-                                    categorias.add("Vidro");
-                                }
-                                spinnerCategoriaMaterial.setAdapter(
-                                        new ArrayAdapter<>(
-                                                AdicionarColetaActivity.this,
-                                                android.R.layout.simple_spinner_dropdown_item,
-                                                categorias));
+                                mostrarMateriais();
                             }
 
                             @Override
                             public void onFailure(Call<List<MaterialResponse>> call, Throwable t) {
-                                List<String> fallback = new ArrayList<>();
-                                fallback.add("Plástico");
-                                fallback.add("Papel");
-                                fallback.add("Metal");
-                                fallback.add("Vidro");
-                                spinnerCategoriaMaterial.setAdapter(
-                                        new ArrayAdapter<>(
-                                                AdicionarColetaActivity.this,
-                                                android.R.layout.simple_spinner_dropdown_item,
-                                                fallback));
+                                if (isFinishing() || isDestroyed()) return;
+                                materiaisDaCooperativa.clear();
+                                mostrarMateriais();
                             }
                         });
+    }
+
+    private void mostrarMateriais() {
+        List<String> nomes = new ArrayList<>();
+        for (MaterialResponse m : materiaisDaCooperativa) {
+            String nome = nomeMaterial(m);
+            if (m.getPrecoSugerido() != null)
+                nome += " · " + GestorUi.dinheiro(m.getPrecoSugerido().doubleValue()) + "/kg";
+            nomes.add(nome);
+        }
+        boolean tem = !nomes.isEmpty();
+        if (!tem) nomes.add("Nenhum material cadastrado na cooperativa");
+        spinnerCategoriaMaterial.setAdapter(
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, nomes));
+        spinnerCategoriaMaterial.setEnabled(tem);
+        btnSalvarMaterial.setEnabled(tem);
+        edtPesoMaterial.setEnabled(tem);
     }
 
     private void carregarRotasSeNecessario() {
@@ -348,12 +433,9 @@ public class AdicionarColetaActivity extends AppCompatActivity {
 
     private void registrarColeta() {
         if (registrando) return;
-        String pesoTexto = edtPesoColeta.getText().toString().trim().replace(",", ".");
-        BigDecimal peso;
-        try {
-            peso = new BigDecimal(pesoTexto);
-        } catch (NumberFormatException e) {
-            Toast.makeText(this, "Informe um peso válido.", Toast.LENGTH_SHORT).show();
+        BigDecimal peso = peso(edtPesoColeta);
+        if (peso == null) {
+            toast("Informe um peso válido.");
             return;
         }
 
@@ -361,23 +443,59 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         if (tipoExterno) {
             int posicao = spinnerRotaOrigem.getSelectedItemPosition();
             if (posicao <= 0 || posicao > rotasCarregadas.size()) {
-                Toast.makeText(this, "Selecione a rota de origem.", Toast.LENGTH_SHORT).show();
+                toast("Selecione a rota de origem.");
                 return;
             }
             rotaId = rotasCarregadas.get(posicao - 1).getRotaId();
         }
 
+        boolean triagem = switchNecessitaTriagem.isChecked();
+        if (!triagem && itens.isEmpty()) {
+            toast("Sem triagem, informe o material e o peso em \"Materiais coletados\".");
+            return;
+        }
+        if (!itens.isEmpty()) {
+            BigDecimal soma = somaMateriais();
+            if (soma.compareTo(peso) != 0) {
+                toast("A soma dos materiais (" + GestorUi.kg(soma.doubleValue())
+                        + ") precisa ser igual ao peso da coleta (" + GestorUi.kg(peso.doubleValue()) + ").");
+                return;
+            }
+            if (equipeId == null) {
+                toast("Você ainda não está em uma equipe. Peça ao gestor para incluir você em uma"
+                        + " equipe para registrar os materiais da coleta.");
+                return;
+            }
+        }
+
+        List<ColetaRequest.Material> materiais = new ArrayList<>();
+        for (Item it : itens) materiais.add(new ColetaRequest.Material(it.material.getMaterialId(), it.kg));
+        String descricao = edtDescricaoColeta.getText().toString();
+        LocalDate data = triagem ? dataPrevista : null;
+
         registrando = true;
         progressRegistrarColeta.setVisibility(View.VISIBLE);
         btnRegistrarColeta.setEnabled(false);
 
+        final String rotaFinal = rotaId;
+        Runnable enviar = () -> enviarColeta(
+                ColetaController.montarRequest(
+                                CooperadoSession.getFuncionarioId(),
+                                peso,
+                                tipoExterno ? "EXTERNA" : "ENTREGA",
+                                rotaFinal,
+                                fotoUrlEnviada)
+                        .comTriagem(triagem)
+                        .comMateriais(equipeId, materiais),
+                descricao,
+                data);
+
         if (fotoSelecionada == null || fotoUrlEnviada != null) {
-            enviarColeta(peso, rotaId, fotoUrlEnviada);
+            enviar.run();
             return;
         }
 
         // 1º a foto vai para o Cloudinary; 2º a URL vai junto com a coleta para a API.
-        final String rotaFinal = rotaId;
         com.example.renovai.CloudinaryUpload.enviar(
                 this,
                 fotoSelecionada,
@@ -387,54 +505,59 @@ public class AdicionarColetaActivity extends AppCompatActivity {
                     public void sucesso(String url) {
                         fotoUrlEnviada = url;
                         if (isFinishing() || isDestroyed()) return;
-                        enviarColeta(peso, rotaFinal, url);
+                        enviar.run();
                     }
 
                     @Override
                     public void erro(String mensagem) {
-                        registrando = false;
-                        if (isFinishing() || isDestroyed()) return;
-                        progressRegistrarColeta.setVisibility(View.GONE);
-                        btnRegistrarColeta.setEnabled(true);
-                        Toast.makeText(AdicionarColetaActivity.this, mensagem, Toast.LENGTH_LONG)
-                                .show();
+                        falhou(mensagem);
                     }
                 });
     }
 
-    private void enviarColeta(BigDecimal peso, String rotaId, String imagemUrl) {
+    private void enviarColeta(ColetaRequest request, String descricao, LocalDate dataPrevistaTriagem) {
         new ColetaController()
                 .criar(
-                        CooperadoSession.getFuncionarioId(),
-                        peso,
-                        tipoExterno ? "EXTERNA" : "ENTREGA",
-                        rotaId,
-                        imagemUrl,
+                        request,
                         new ColetaController.CriarCallback() {
                             @Override
                             public void onSuccess(ColetaResponse coleta) {
+                                com.example.renovai.ColetaDetalhes.salvar(
+                                        coleta.getColetaId(), descricao, dataPrevistaTriagem);
                                 if (isFinishing() || isDestroyed()) return;
                                 progressRegistrarColeta.setVisibility(View.GONE);
-                                Toast.makeText(
-                                                AdicionarColetaActivity.this,
-                                                "Coleta registrada com sucesso.",
-                                                Toast.LENGTH_SHORT)
-                                        .show();
+                                toast("Coleta registrada com sucesso.");
                                 finish();
                             }
 
                             @Override
                             public void onErro(String mensagem) {
-                                registrando = false;
-                                if (isFinishing() || isDestroyed()) return;
-                                progressRegistrarColeta.setVisibility(View.GONE);
-                                btnRegistrarColeta.setEnabled(true);
-                                Toast.makeText(
-                                                AdicionarColetaActivity.this,
-                                                mensagem,
-                                                Toast.LENGTH_LONG)
-                                        .show();
+                                falhou(mensagem);
                             }
                         });
+    }
+
+    private void falhou(String mensagem) {
+        registrando = false;
+        if (isFinishing() || isDestroyed()) return;
+        progressRegistrarColeta.setVisibility(View.GONE);
+        btnRegistrarColeta.setEnabled(true);
+        Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
+    }
+
+    /** Peso digitado (aceita vírgula), ou null se vazio, inválido ou zero. */
+    private static BigDecimal peso(EditText campo) {
+        String texto = campo.getText().toString().trim().replace(",", ".");
+        if (texto.isEmpty()) return null;
+        try {
+            BigDecimal valor = new BigDecimal(texto);
+            return valor.compareTo(new BigDecimal("0.001")) < 0 ? null : valor.stripTrailingZeros();
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private void toast(String mensagem) {
+        Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
     }
 }

@@ -1,0 +1,10 @@
+<!-- Estrela preenchida: cooperativa favoritada. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="23dp"
+    android:height="22dp"
+    android:viewportWidth="23"
+    android:viewportHeight="22">
+  <path
+      android:pathData="M11.5,17.999L4.393,22L5.98,13.965L0,8.403L8.088,7.439L11.5,0L14.912,7.439L23,8.403L17.02,13.965L18.607,22L11.5,17.999Z"
+      android:fillColor="#ffffff"/>
+</vector>

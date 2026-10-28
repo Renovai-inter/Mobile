@@ -8,6 +8,7 @@ A API (Spring + Postgres) continua sendo a fonte da verdade. O app usa:
 | Fotos nas listas e detalhes (coletas, triagens, cooperativas) | Glide com cache em memória/disco; sem URL na listagem, busca `GET /coletas/{id}` | `Imagens`, `FotoColetaRepository`, `TipoImagem` |
 | Cópia da conta logada (role, usuarioId, empresa/cooperativa, cargo, nome; sem token nem senha) | Firestore `usuarios/{uid}/contas/{email}` | `FirebaseCache.salvarConta`, `AuthController` |
 | Cache offline das listagens (Gestor, Empresa, Cooperado) | Firestore `usuarios/{uid}/contas/{email}/cache/{chave}` | `FirebaseCache`, `GestorCache`, `CooperadoPreload` |
+| Descrição e data prevista da triagem da coleta (o banco da API não tem esses campos) | Firestore `cooperativas/{cooperativaId}/coletas/{coletaId}` | `ColetaDetalhes`, `AdicionarColetaActivity` |
 | Relatórios PDF | Storage `relatorios/{cooperativaId}/{id}.pdf` + lista no Firestore `cooperativas/{cooperativaId}/relatorios/{id}` | `GestorRelatorios`, `GestorRelatoriosActivity` |
 
 ## Configuração (uma vez)

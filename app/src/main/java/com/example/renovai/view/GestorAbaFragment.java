@@ -25,13 +25,21 @@ public abstract class GestorAbaFragment extends TelaFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         if (findViewById(R.id.gestorHeader) != null) {
-            String coop = CooperadoSession.getCooperativaNome();
-            ((TextView) findViewById(R.id.txtNomeCooperativaHeader))
-                    .setText(GestorUi.nomeCabecalho(coop));
+            ((TextView) findViewById(R.id.txtNomeCooperativaHeader)).setText(nomeNoCabecalho());
             ((TextView) findViewById(R.id.txtIniciaisHeader))
                     .setText(GestorUi.iniciais(CooperadoSession.getUsuarioNome()));
-            findViewById(R.id.btnPerfilHeader).setOnClickListener(v -> abrirAba(R.id.nav_g_perfil));
+            findViewById(R.id.btnPerfilHeader).setOnClickListener(v -> abrirAba(abaPerfil()));
         }
+    }
+
+    /** Texto do cabeçalho: o nome da cooperativa (sem o "Cooperativa" do começo). */
+    protected String nomeNoCabecalho() {
+        return GestorUi.nomeCabecalho(CooperadoSession.getCooperativaNome());
+    }
+
+    /** Aba que o avatar do cabeçalho abre. */
+    protected int abaPerfil() {
+        return R.id.nav_g_perfil;
     }
 
     protected String coopId() {

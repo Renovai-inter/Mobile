@@ -12,7 +12,6 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.renovai.MainActivity;
 import com.example.renovai.controller.AuthController;
 
 import com.example.renovai.R;
@@ -120,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void prepararEntrada(LoginResponse usuario) {
         Class<?> destino = destinoParaRole(usuario.getRole());
+        if (destino == null) return;
 
         if (destino != CooperadoHomeActivity.class) {
             abrirTela(destino);
@@ -201,6 +201,17 @@ public class LoginActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
 
                     Class<?> destino = destinoParaRole(usuario.getRole());
+
+                    // Perfil que o app não conhece: fica no login, sem abrir tela vazia
+                    if (destino == null) {
+                        com.example.renovai.SessionManager.logout();
+                        aoFalhar.run();
+                        Toast.makeText(LoginActivity.this,
+                                "Esta conta (" + usuario.getRole() + ") ainda não tem uma área no"
+                                        + " aplicativo. Fale com o suporte do Renovaí.",
+                                Toast.LENGTH_LONG).show();
+                        return;
+                    }
 
                     // ÁREA GESTOR: limpa qualquer cache de outra conta e pré-carrega as
                     // listagens (mesma ideia do CooperadoPreload) antes de abrir a Home.
@@ -335,13 +346,17 @@ public class LoginActivity extends AppCompatActivity {
      * como role) — por isso o casamento é por palavra-chave ("contém
      * COOPERADO"), não um valor fixo: os valores exatos de cargo cadastrados não
      * são conhecidos sem consultar o banco (ver IMPLEMENTACAO.md). Qualquer outro
-     * role continua indo para MainActivity, exatamente como antes desta mudança.
+     * role sem área no app devolve null (o login avisa em vez de abrir uma tela vazia).
      */
     private Class<?> destinoParaRole(String role) {
         // Gestor da cooperativa (cargo GESTOR_COOPERATIVA). "GESTOR_EMPRESA" é o login de Perfil
         // da empresa e continua indo para a área da Empresa (abaixo), não para o Gestor.
         if (role != null) {
             String r = role.toUpperCase(Locale.ROOT);
+            // Admin do site (ADMIN_SITE): painel com cooperativas, empresas e contas do sistema.
+            if (AdminHomeActivity.ehAdminDoSite(r)) {
+                return AdminHomeActivity.class;
+            }
             if (r.contains("EMPRESA")) {
                 return com.example.renovai.view.EmpresaHomeActivity.class;
             }
@@ -356,6 +371,6 @@ public class LoginActivity extends AppCompatActivity {
         if (role != null && role.toUpperCase(Locale.ROOT).contains("COOPERADO")) {
             return CooperadoHomeActivity.class;
         }
-        return MainActivity.class;
+        return null; // perfil sem área no app
     }
 }

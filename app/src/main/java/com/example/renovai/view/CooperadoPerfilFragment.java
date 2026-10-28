@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
@@ -74,7 +75,7 @@ public class CooperadoPerfilFragment extends TelaFragment {
     }
 
     private void abrirSuporte() {
-        new AlertDialog.Builder(tela())
+        new MaterialAlertDialogBuilder(tela())
                 .setTitle("Suporte")
                 .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com que a equipe responde o quanto antes.")
                 .setPositiveButton("Enviar e-mail", (dialog, which) -> {

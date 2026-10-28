@@ -1,8 +1,10 @@
 package com.example.renovai.view;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,7 +24,6 @@ import com.example.renovai.R;
 import com.example.renovai.dto.response.CategoriaMaterialResponse;
 import com.example.renovai.dto.response.CooperativaResponse;
 import com.example.renovai.dto.response.EmpresaResponses;
-import com.example.renovai.dto.response.GestorResponses;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -36,6 +37,8 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
     private final Set<String> selecionadas = new LinkedHashSet<>();
     private final Map<String, CooperativaResponse> resultados = new LinkedHashMap<>();
     private final Map<String, EmpresaResponses.CooperativaPerfilPublico> perfis = new HashMap<>();
+    /** Perfis (com a nota) pedidos e que ainda não voltaram. */
+    private final Set<String> perfisPendentes = new HashSet<>();
     private List<EmpresaResponses.Favorito> favoritos = new ArrayList<>();
     private boolean apenas4Mais, editaramFiltros;
     private int geracao;
@@ -142,7 +145,7 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
             nomes[i] = categorias.get(i).getNomeCategoria();
             marcados[i] = novos.contains(categorias.get(i).getCategoriaId());
         }
-        new AlertDialog.Builder(tela())
+        new MaterialAlertDialogBuilder(tela())
                 .setTitle("Categorias de material")
                 .setMultiChoiceItems(
                         nomes,
@@ -192,6 +195,7 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
         if (filtros.isEmpty()) filtros.add(null);
         resultados.clear();
         perfis.clear();
+        perfisPendentes.clear();
         ((TextView) findViewById(R.id.chipMelhorPreco))
                 .setText("Categorias (" + selecionadas.size() + ")");
         findViewById(R.id.progressoBuscaE).setVisibility(View.VISIBLE);
@@ -238,6 +242,7 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
     }
 
     private void carregarPerfil(String id, int versao) {
+        perfisPendentes.add(id);
         Call<EmpresaResponses.CooperativaPerfilPublico> call = EmpresaData.api().perfilPublico(id);
         chamadas.add(call);
         call.enqueue(
@@ -246,31 +251,48 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
                     public void onResponse(
                             Call<EmpresaResponses.CooperativaPerfilPublico> c,
                             Response<EmpresaResponses.CooperativaPerfilPublico> r) {
-                        if (vivo() && versao == geracao && r.isSuccessful() && r.body() != null) {
-                            perfis.put(id, r.body());
-                            render();
-                        }
+                        if (!vivo() || versao != geracao) return;
+                        perfisPendentes.remove(id);
+                        if (r.isSuccessful() && r.body() != null) perfis.put(id, r.body());
+                        render();
                     }
 
                     @Override
                     public void onFailure(
-                            Call<EmpresaResponses.CooperativaPerfilPublico> c, Throwable t) {}
+                            Call<EmpresaResponses.CooperativaPerfilPublico> c, Throwable t) {
+                        if (!vivo() || versao != geracao || c.isCanceled()) return;
+                        perfisPendentes.remove(id); // sem nota: não entra no 4+, mas não trava
+                        render();
+                    }
                 });
     }
 
     private void render() {
         if (!vivo()) return;
-        findViewById(R.id.chipNota4)
-                .setBackgroundResource(
-                        apenas4Mais
-                                ? R.drawable.btn_green_background
-                                : R.drawable.card_unselected_background);
-        LinearLayout raiz = findViewById(R.id.listaBusca);
-        raiz.removeAllViews();
+        // o botão mostra se o filtro está ligado: verde com texto branco, ou claro com texto escuro
+        TextView chip = findViewById(R.id.chipNota4);
+        chip.setBackgroundResource(
+                apenas4Mais ? R.drawable.btn_green_background : R.drawable.card_unselected_background);
+        chip.setTextColor(apenas4Mais ? Color.WHITE : Color.parseColor("#444444"));
+
+        List<CooperativaResponse> lista = new ArrayList<>();
+        int esperandoNota = 0;
         for (CooperativaResponse coop : resultados.values()) {
             EmpresaResponses.CooperativaPerfilPublico p = perfis.get(coop.getCooperativaId());
             Double nota = p == null ? null : p.mediaAvaliacoes;
-            if (apenas4Mais && (nota == null || nota < 4)) continue;
+            if (apenas4Mais && (nota == null || nota < 4)) {
+                if (p == null && perfisPendentes.contains(coop.getCooperativaId())) esperandoNota++;
+                continue;
+            }
+            lista.add(coop);
+        }
+        // com o 4+ ligado, as mais bem avaliadas primeiro
+        if (apenas4Mais) lista.sort((a, b) -> Double.compare(nota(b), nota(a)));
+
+        LinearLayout raiz = findViewById(R.id.listaBusca);
+        raiz.removeAllViews();
+        for (CooperativaResponse coop : lista) {
+            EmpresaResponses.CooperativaPerfilPublico p = perfis.get(coop.getCooperativaId());
             View v =
                     LayoutInflater.from(tela())
                             .inflate(R.layout.item_empresa_cooperativa_busca, raiz, false);
@@ -279,29 +301,36 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
                     v,
                     coop.getCooperativaId(),
                     coop.getNome(),
-                    nota,
+                    coop.getImagemUrl() != null ? coop.getImagemUrl() : p == null ? null : p.imagemUrl,
+                    p == null ? null : p.mediaAvaliacoes,
                     EmpresaCooperativaCard.estaFavoritada(favoritos, coop.getCooperativaId()),
                     this::carregarFavoritos);
-            StringBuilder estoque = new StringBuilder();
-            if (p != null && p.materiaisDisponiveis != null)
-                for (GestorResponses.Estoque e : p.materiaisDisponiveis) {
-                    if (e.quantidadeKg == null || e.quantidadeKg <= 0) continue;
-                    if (estoque.length() > 0) estoque.append("\n");
-                    estoque.append(e.materialCategoria)
-                            .append(" — ")
-                            .append(GestorUi.kg(e.quantidadeKg));
-                }
-            ((TextView) v.findViewById(R.id.txtCoopMateriaisE))
-                    .setText(
-                            p == null
-                                    ? "Carregando estoque…"
-                                    : estoque.length() == 0
-                                            ? "Sem estoque disponível"
-                                            : estoque.toString());
+            EmpresaCooperativaCard.detalhes(
+                    v,
+                    primeiro(coop.getDescricao(), p == null ? null : p.descricao),
+                    primeiro(coop.getCidade(), p == null ? null : p.cidade),
+                    primeiro(coop.getHorarioFuncionamento(), p == null ? null : p.horarioFuncionamento),
+                    primeiro(coop.getContatoPreferencial(), p == null ? null : p.contatoPreferencial),
+                    coop.getNumeroCooperados());
             raiz.addView(v);
         }
-        findViewById(R.id.txtVazioBusca)
-                .setVisibility(raiz.getChildCount() == 0 ? View.VISIBLE : View.GONE);
+        TextView vazio = findViewById(R.id.txtVazioBusca);
+        boolean carregandoNotas = lista.isEmpty() && esperandoNota > 0;
+        vazio.setText(carregandoNotas
+                ? "Carregando as avaliações das cooperativas…"
+                : apenas4Mais
+                        ? "Nenhuma cooperativa com nota 4 ou mais nesta busca."
+                        : "Nenhuma cooperativa encontrada com esses filtros.");
+        vazio.setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private double nota(CooperativaResponse coop) {
+        EmpresaResponses.CooperativaPerfilPublico p = perfis.get(coop.getCooperativaId());
+        return p == null || p.mediaAvaliacoes == null ? 0 : p.mediaAvaliacoes;
+    }
+
+    private static String primeiro(String a, String b) {
+        return a != null && !a.trim().isEmpty() ? a : b;
     }
 
     @Override

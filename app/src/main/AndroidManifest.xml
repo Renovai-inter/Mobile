@@ -54,9 +54,6 @@
         <activity
             android:name=".view.CadastroActivity"
             android:exported="false" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
 
         <!-- ===================== Área Cooperado (telas 2.1 a 2.7) ===================== -->
         <activity
@@ -66,12 +63,18 @@
             android:name=".view.AdicionarColetaActivity"
             android:exported="false" />
         <activity
+            android:name=".view.AdicionarMaterialActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.CompletarTriagemActivity"
             android:exported="false" />
         <!-- =============================================================================== -->
 
 
         <!-- ===================== Área Gestor da Cooperativa (telas 4.1 a 4.9) ===================== -->
+        <!-- ===================== Área Admin do site (role ADMIN_SITE) ===================== -->
+        <activity android:name=".view.AdminHomeActivity" android:exported="false" />
+
         <activity
             android:name=".view.GestorHomeActivity"
             android:exported="false" />

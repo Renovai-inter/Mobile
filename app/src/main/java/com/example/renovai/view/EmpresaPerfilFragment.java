@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
@@ -101,7 +102,7 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
         findViewById(R.id.btnSuporteE)
                 .setOnClickListener(
                         v ->
-                                new AlertDialog.Builder(tela())
+                                new MaterialAlertDialogBuilder(tela())
                                         .setTitle("Suporte")
                                         .setMessage(
                                                 "Precisa de ajuda? Envie um e-mail para"
@@ -299,7 +300,7 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
             marcados[i] = idsAtuais.contains(categorias.get(i).getCategoriaId());
         }
         boolean[] selecao = marcados.clone();
-        new AlertDialog.Builder(tela())
+        new MaterialAlertDialogBuilder(tela())
                 .setTitle("Materiais de interesse")
                 .setMultiChoiceItems(
                         nomes, selecao, (d, which, checked) -> selecao[which] = checked)

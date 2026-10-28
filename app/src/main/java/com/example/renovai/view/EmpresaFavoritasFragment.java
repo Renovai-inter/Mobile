@@ -67,12 +67,13 @@ public class EmpresaFavoritasFragment extends EmpresaAbaFragment {
                     v,
                     f.cooperativaId,
                     f.cooperativaNome,
+                    f.cooperativaImagem,
                     null,
                     true,
-                    () -> {
-                        EmpresaData.invalidar("empresa:favoritos");
-                        carregar();
-                    });
+                    // o cartão continua na lista com a estrela vazia, para dar para favoritar de
+                    // novo; a lista se atualiza na próxima vez que a aba abrir
+                    null);
+            ((android.widget.TextView) v.findViewById(R.id.txtCoopDetalhesE)).setText("Carregando detalhes…");
             EmpresaData.api()
                     .perfilPublico(f.cooperativaId)
                     .enqueue(
@@ -84,20 +85,21 @@ public class EmpresaFavoritasFragment extends EmpresaAbaFragment {
                                                         EmpresaResponses.CooperativaPerfilPublico>
                                                 r) {
                                     if (!vivo() || !r.isSuccessful() || r.body() == null) return;
-                                    StringBuilder materiais = new StringBuilder();
-                                    if (r.body().materiaisDisponiveis != null)
-                                        for (com.example.renovai.dto.response.GestorResponses
-                                                        .Estoque
-                                                e : r.body().materiaisDisponiveis) {
-                                            if (materiais.length() > 0) materiais.append(" · ");
-                                            materiais.append(e.materialCategoria);
-                                        }
-                                    ((android.widget.TextView)
-                                                    v.findViewById(R.id.txtCoopMateriaisE))
-                                            .setText(
-                                                    materiais.length() == 0
-                                                            ? "Sem estoque disponível"
-                                                            : materiais.toString());
+                                    if (f.cooperativaImagem == null && r.body().imagemUrl != null)
+                                        EmpresaCooperativaCard.foto(v.findViewById(R.id.imgCoopBusca), r.body().imagemUrl);
+                                    EmpresaResponses.CooperativaPerfilPublico perfil = r.body();
+                                    EmpresaCooperativaCard.detalhes(
+                                            v,
+                                            perfil.descricao,
+                                            perfil.cidade,
+                                            perfil.horarioFuncionamento,
+                                            perfil.contatoPreferencial,
+                                            null);
+                                    if (perfil.mediaAvaliacoes != null)
+                                        ((android.widget.TextView) v.findViewById(R.id.txtNotaCoop))
+                                                .setText("Nota: " + String.format(
+                                                        com.example.renovai.GestorUi.BR, "%.1f",
+                                                        perfil.mediaAvaliacoes) + "/5");
                                 }
 
                                 @Override

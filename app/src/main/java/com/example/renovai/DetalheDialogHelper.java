@@ -1,5 +1,6 @@
 package com.example.renovai;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -59,7 +60,7 @@ public final class DetalheDialogHelper {
             container.addView(criarLinha(activity, linha[0], linha[1]));
         }
 
-        AlertDialog dialog = new AlertDialog.Builder(activity)
+        AlertDialog dialog = new MaterialAlertDialogBuilder(activity)
                 .setTitle(titulo)
                 .setView((View) container.getParent())
                 .setPositiveButton("Fechar", null)

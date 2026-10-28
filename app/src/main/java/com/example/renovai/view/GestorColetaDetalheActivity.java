@@ -91,5 +91,22 @@ public class GestorColetaDetalheActivity extends GestorBaseActivity {
 
         ImageView foto = findViewById(R.id.imgFotoColeta);
         Imagens.coleta(foto, col.getColetaId(), col.getImagemUrl(), false);
+
+        // descrição e previsão da triagem: Firestore (o banco da API não tem esses campos)
+        com.example.renovai.ColetaDetalhes.ler(col.getColetaId(), extra -> {
+            if (!vivo()) return;
+            String previsao = extra == null ? null
+                    : com.example.renovai.ColetaDetalhes.dataFormatada(extra.dataPrevistaTriagem);
+            mostrarOpcional(R.id.lblPrevisaoTriagem, R.id.txtPrevisaoTriagem, previsao);
+            mostrarOpcional(R.id.lblDescricaoColeta, R.id.txtDescricaoColeta, extra == null ? null : extra.descricao);
+        });
+    }
+
+    private void mostrarOpcional(int rotulo, int valor, String texto) {
+        boolean tem = texto != null && !texto.trim().isEmpty();
+        findViewById(rotulo).setVisibility(tem ? View.VISIBLE : View.GONE);
+        TextView tv = findViewById(valor);
+        tv.setVisibility(tem ? View.VISIBLE : View.GONE);
+        if (tem) tv.setText(texto.trim());
     }
 }

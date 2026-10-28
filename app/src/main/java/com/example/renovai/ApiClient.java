@@ -13,7 +13,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public final class ApiClient {
 
-    private static final String BASE_URL =
+    /** Servidor principal (AWS). */
+    static final String BASE_URL =
+            "http://ad0d8c99545a84713891def8a28f1d46-c7cd4a13dc3dd2e8.elb.us-east-1.amazonaws.com/api/";
+    /** Reserva (Render), usado quando a AWS não responde. */
+    static final String FALLBACK_URL =
             "https://spring-api-2t71.onrender.com/api/";
 
     private static Retrofit retrofit;
@@ -28,6 +32,7 @@ public final class ApiClient {
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
             client = new OkHttpClient.Builder()
+                    .addInterceptor(new ServidorFallbackInterceptor(BASE_URL, FALLBACK_URL))
                     .addInterceptor(new AuthInterceptor())
                     .addInterceptor(logging)
                     .connectTimeout(100, TimeUnit.SECONDS)
@@ -47,9 +52,9 @@ public final class ApiClient {
     }
 
     /**
-     * "Acorda" o servidor sem esperar resposta. O Render gratuito dorme quando fica parado e leva
-     * 1 a 3 minutos para voltar; chamando isso ao abrir o app, ele já está de pé quando a pessoa
-     * terminar de digitar.
+     * "Acorda" o servidor sem esperar resposta. Se a AWS estiver fora, o ping cai no Render, que
+     * dorme quando fica parado e leva 1 a 3 minutos para voltar; chamando isso ao abrir o app, ele
+     * já está de pé quando a pessoa terminar de digitar.
      */
     public static void acordarServidor() {
         getRetrofit();

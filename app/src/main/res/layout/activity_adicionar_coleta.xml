@@ -143,7 +143,8 @@
                 android:layout_marginTop="6dp"
                 android:background="@drawable/input_field_cooperado_background"
                 android:hint="Ex: Material com muita sujeira"
-                android:inputType="textMultiLine"
+                android:inputType="textMultiLine|textCapSentences"
+                android:maxLength="500"
                 android:minLines="2"
                 android:padding="12dp"
                 android:textColor="#222222"
@@ -217,6 +218,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/txtDicaTriagem"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Obrigatório para 2+ materiais"
@@ -227,15 +229,17 @@
                 <Switch
                     android:id="@+id/switchNecessitaTriagem"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:thumbTint="@color/vinho"
+                    android:trackTint="#E3C3CF" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/containerDataPrevista"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -306,7 +310,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Categoria"
+                    android:text="Material"
                     android:textColor="#222222"
                     android:textSize="13sp"
                     android:textStyle="bold" />
@@ -318,6 +322,29 @@
                     android:layout_marginTop="6dp"
                     android:background="@drawable/input_field_cooperado_background"
                     android:padding="12dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Peso deste material"
+                    android:textColor="#222222"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/edtPesoMaterial"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:background="@drawable/input_field_cooperado_background"
+                    android:hint="Ex: 4,5 kg"
+                    android:importantForAutofill="no"
+                    android:inputType="numberDecimal"
+                    android:padding="12dp"
+                    android:textColor="#222222"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="14sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnSalvarMaterial"
@@ -375,6 +402,14 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:orientation="vertical" />
+
+                <TextView
+                    android:id="@+id/txtSomaMateriais"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#8A8A8A"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
