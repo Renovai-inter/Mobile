@@ -7,6 +7,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.example.renovai.CooperadoSession;
+import com.example.renovai.Notificacoes;
 import com.example.renovai.R;
 import com.example.renovai.TelaInsets;
 
@@ -33,6 +34,14 @@ public class CooperadoHomeActivity extends MenuActivity {
         montar(R.layout.activity_cooperado_menu, R.id.bottomNavigationCooperado, b);
         TelaInsets.conteudo(this, true);
         TelaInsets.navegacao(findViewById(R.id.bottomNavigationCooperado));
+
+        Notificacoes.iniciar(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!isFinishing()) Notificacoes.verificarAgora(this);
     }
 
     @Override

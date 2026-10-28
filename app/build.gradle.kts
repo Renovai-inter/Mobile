@@ -127,4 +127,7 @@ dependencies {
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
+
+    // WorkManager: verificação periódica da API para as notificações (ver Notificacoes)
+    implementation(libs.work.runtime)
 }
