@@ -1,0 +1,113 @@
+package com.example.renovai.view;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
+
+import com.example.renovai.EmpresaData;
+import com.example.renovai.R;
+import com.example.renovai.dto.response.EmpresaResponses;
+
+import java.util.List;
+
+/** Tela 5.5 — Cooperativas Favoritas. */
+public class EmpresaFavoritasFragment extends EmpresaAbaFragment {
+
+    public EmpresaFavoritasFragment() {
+        super(R.layout.activity_empresa_favoritas);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!vivo()) return;
+        EmpresaData.meuPerfil(
+                false,
+                (p, c) -> {
+                    if (vivo()) preencherHeader(p.nomeEmpresa);
+                });
+        carregar();
+    }
+
+    private void carregar() {
+        EmpresaData.favoritos(
+                false,
+                new com.example.renovai.GestorData.Ouvinte<List<EmpresaResponses.Favorito>>() {
+                    @Override
+                    public void aoReceber(List<EmpresaResponses.Favorito> l, boolean c) {
+                        if (vivo()) render(l);
+                    }
+
+                    @Override
+                    public void aoErro(String m) {
+                        if (vivo()) toast(m);
+                    }
+                });
+    }
+
+    private void render(List<EmpresaResponses.Favorito> lista) {
+        LinearLayout raiz = findViewById(R.id.listaFavoritas);
+        raiz.removeAllViews();
+        findViewById(R.id.txtVazioFav).setVisibility(lista.isEmpty() ? View.VISIBLE : View.GONE);
+        for (EmpresaResponses.Favorito f : lista) {
+            View v =
+                    LayoutInflater.from(tela())
+                            .inflate(R.layout.item_empresa_cooperativa_busca, raiz, false);
+            EmpresaCooperativaCard.bind(
+                    tela(),
+                    v,
+                    f.cooperativaId,
+                    f.cooperativaNome,
+                    f.cooperativaImagem,
+                    null,
+                    true,
+                    // o cartão continua na lista com a estrela vazia, para dar para favoritar de
+                    // novo; a lista se atualiza na próxima vez que a aba abrir
+                    null);
+            ((android.widget.TextView) v.findViewById(R.id.txtCoopDetalhesE)).setText("Carregando detalhes…");
+            EmpresaData.api()
+                    .perfilPublico(f.cooperativaId)
+                    .enqueue(
+                            new retrofit2.Callback<EmpresaResponses.CooperativaPerfilPublico>() {
+                                @Override
+                                public void onResponse(
+                                        retrofit2.Call<EmpresaResponses.CooperativaPerfilPublico> c,
+                                        retrofit2.Response<
+                                                        EmpresaResponses.CooperativaPerfilPublico>
+                                                r) {
+                                    if (!vivo() || !r.isSuccessful() || r.body() == null) return;
+                                    if (f.cooperativaImagem == null && r.body().imagemUrl != null)
+                                        EmpresaCooperativaCard.foto(v.findViewById(R.id.imgCoopBusca), r.body().imagemUrl);
+                                    EmpresaResponses.CooperativaPerfilPublico perfil = r.body();
+                                    EmpresaCooperativaCard.detalhes(
+                                            v,
+                                            perfil.descricao,
+                                            perfil.cidade,
+                                            perfil.horarioFuncionamento,
+                                            perfil.contatoPreferencial,
+                                            null);
+                                    if (perfil.mediaAvaliacoes != null)
+                                        ((android.widget.TextView) v.findViewById(R.id.txtNotaCoop))
+                                                .setText("Nota: " + String.format(
+                                                        com.example.renovai.GestorUi.BR, "%.1f",
+                                                        perfil.mediaAvaliacoes) + "/5");
+                                }
+
+                                @Override
+                                public void onFailure(
+                                        retrofit2.Call<EmpresaResponses.CooperativaPerfilPublico> c,
+                                        Throwable t) {}
+                            });
+            raiz.addView(v);
+        }
+    }
+}

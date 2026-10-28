@@ -1,5 +1,6 @@
 package com.example.renovai;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -50,6 +51,20 @@ public final class GestorUi {
         String n = norm(s);
         for (String c : chaves) if (n.contains(c)) return true;
         return false;
+    }
+
+    /**
+     * Nome da cooperativa para o cabeçalho: sem o "Cooperativa" do começo (o contexto já diz que é
+     * uma cooperativa) — "Cooperativa de Reciclagem Vida" vira "Reciclagem Vida".
+     */
+    public static String nomeCabecalho(String nome) {
+        if (nome == null || nome.trim().isEmpty()) return "Renovaí";
+        String curto =
+                nome.trim()
+                        .replaceFirst("(?iu)^(cooperativa|coop\\.?)\\s+((de|da|do|das|dos)\\s+)?", "")
+                        .trim();
+        if (curto.isEmpty()) return nome.trim();
+        return Character.toUpperCase(curto.charAt(0)) + curto.substring(1);
     }
 
     public static String iniciais(String nome) {
@@ -194,7 +209,7 @@ public final class GestorUi {
                 break;
             default:
                 fundo = Color.parseColor("#FBE4EA");
-                texto = Color.parseColor("#C2185B");
+                texto = Color.parseColor("#882B4E");
                 icone = R.drawable.ic_refresh_cooperado;
                 break;
         }
@@ -335,7 +350,7 @@ public final class GestorUi {
                 e,
                 new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        new AlertDialog.Builder(a)
+        new MaterialAlertDialogBuilder(a)
                 .setTitle(titulo)
                 .setView(box)
                 .setPositiveButton(
@@ -346,7 +361,7 @@ public final class GestorUi {
 
     public static void confirmar(
             Activity a, String titulo, String mensagem, String rotuloOk, Runnable aoConfirmar) {
-        new AlertDialog.Builder(a)
+        new MaterialAlertDialogBuilder(a)
                 .setTitle(titulo)
                 .setMessage(mensagem)
                 .setPositiveButton(rotuloOk, (d, w) -> aoConfirmar.run())

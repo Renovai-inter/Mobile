@@ -9,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.renovai.R;
 
 import java.util.ArrayList;
@@ -62,17 +61,14 @@ public class CooperativaCardAdapter extends RecyclerView.Adapter<CooperativaCard
             holder.txtAvaliacao.setText("Sem avaliações");
         }
 
-        if (item.imagemUrl != null && !item.imagemUrl.trim().isEmpty()) {
-            Glide.with(holder.imgCooperativa.getContext())
-                    .load(item.imagemUrl)
-                    .placeholder(R.drawable.pedido_foto_placeholder)
-                    .error(R.drawable.pedido_foto_placeholder)
-                    .centerCrop()
-                    .into(holder.imgCooperativa);
-        } else {
-            holder.imgCooperativa.setImageDrawable(null);
-            holder.imgCooperativa.setBackgroundResource(R.drawable.pedido_foto_placeholder);
-        }
+        com.example.renovai.Imagens.carregar(
+                holder.imgCooperativa, item.imagemUrl, true, com.example.renovai.TipoImagem.COOPERATIVA);
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        com.example.renovai.Imagens.limpar(holder.imgCooperativa);
+        super.onViewRecycled(holder);
     }
 
     @Override

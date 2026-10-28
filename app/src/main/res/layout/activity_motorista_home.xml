@@ -43,5 +43,4 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <include layout="@layout/include_motorista_nav" />
 </LinearLayout>

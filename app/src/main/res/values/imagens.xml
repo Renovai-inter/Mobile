@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="tag_imagem_binding" type="id" />
+    <item name="imgFotoDetalhe" type="id" />
+    <string name="foto_coleta">Foto da coleta</string>
+    <string name="foto_triagem">Foto da triagem</string>
+    <string name="triagem_sem_foto">Triagem sem foto</string>
+    <string name="foto_perfil">Foto do perfil</string>
+    <string name="imagem">Imagem</string>
+    <string name="sem_imagem">Sem imagem</string>
+    <string name="coleta_sem_foto">Coleta sem foto</string>
+    <string name="carregando_foto">Carregando foto</string>
+    <string name="foto_indisponivel">Foto indisponível. Verifique sua conexão.</string>
+</resources>

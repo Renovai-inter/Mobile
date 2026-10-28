@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
@@ -45,12 +46,14 @@ public abstract class GestorBaseActivity extends AppCompatActivity {
         if (header != null) {
             String coop = CooperadoSession.getCooperativaNome();
             ((TextView) findViewById(R.id.txtNomeCooperativaHeader))
-                    .setText(coop != null ? coop : "Nome Cooperativa");
+                    .setText(GestorUi.nomeCabecalho(coop));
             ((TextView) findViewById(R.id.txtIniciaisHeader))
                     .setText(GestorUi.iniciais(CooperadoSession.getUsuarioNome()));
             findViewById(R.id.btnPerfilHeader)
                     .setOnClickListener(
-                            v -> startActivity(new Intent(this, GestorPerfilActivity.class)));
+                            v ->
+                                    MenuActivity.abrir(
+                                            this, GestorHomeActivity.class, R.id.nav_g_perfil));
         }
         View voltar = findViewById(R.id.btnVoltar);
         if (voltar != null) voltar.setOnClickListener(v -> finish());

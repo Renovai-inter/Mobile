@@ -9,6 +9,7 @@
     <!-- Header no estilo "tela empilhada" (seta pra voltar), igual ao wireframe -->
     <LinearLayout
         android:id="@+id/headerPerfil"
+        android:tag="topo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/header_cooperado_background"
@@ -45,7 +46,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -206,6 +207,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="36dp"
                 android:background="@drawable/filled_button_cooperado_background"
+                app:backgroundTint="@null"
                 android:paddingTop="14dp"
                 android:paddingBottom="14dp"
                 android:text="Suporte"
@@ -219,23 +221,5 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationCooperado"
-        style="@style/Widget.MaterialComponents.BottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:background="@drawable/menu_background"
-        app:itemBackground="@drawable/seletor_menu_background_cooperado"
-        app:itemIconSize="20dp"
-        app:itemIconTint="@color/seletor_menu_icon_cooperado"
-        app:itemPaddingBottom="6dp"
-        app:itemPaddingTop="12dp"
-        app:itemRippleColor="@android:color/transparent"
-        app:itemTextColor="@color/seletor_menu_icon_cooperado"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_cooperado" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

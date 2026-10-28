@@ -281,8 +281,10 @@ public class TriagemController {
             boolean todosConcluidos = true;
             String dataMaisRecente = null;
             String triagemIdReferencia = materiais.get(0).getTriagemId();
+            String imagemTriagem = null;
 
             for (TriagemResponse m : materiais) {
+                if (imagemTriagem == null) imagemTriagem = com.example.renovai.ImagemUrl.normalizar(m.getImagemUrl());
                 BigDecimal kg = pesoReal(m);
                 kgTotal = kgTotal.add(kg);
 
@@ -333,7 +335,8 @@ public class TriagemController {
                                     ? kgTotal
                                     : kgConcluido,
                             progresso,
-                            dataMaisRecente));
+                            dataMaisRecente,
+                            imagemTriagem));
         }
         return resultado;
     }

@@ -8,6 +8,7 @@
 
     <LinearLayout
         android:id="@+id/headerCompletarTriagem"
+        android:tag="topo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/header_cooperado_background"
@@ -226,6 +227,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:background="@drawable/filled_button_cooperado_background"
+                app:backgroundTint="@null"
                 android:paddingTop="14dp"
                 android:paddingBottom="14dp"
                 android:text="Separar material"

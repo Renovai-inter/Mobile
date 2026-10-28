@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/telaCodigo" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="#FAFAF8" android:fillViewport="true">
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent" android:layout_height="wrap_content" android:paddingBottom="24dp">
+
+    <FrameLayout android:id="@+id/headerContainer" android:layout_width="match_parent" android:layout_height="250dp"
+        app:layout_constraintTop_toTopOf="parent">
+        <com.google.android.material.card.MaterialCardView android:layout_width="match_parent" android:layout_height="250dp"
+            app:cardBackgroundColor="#519059" app:cardCornerRadius="30dp" app:cardElevation="0dp" app:strokeWidth="0dp">
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"
+                android:layout_marginTop="12dp" android:gravity="center_horizontal" android:orientation="vertical">
+                <ImageView android:layout_width="64dp" android:layout_height="68dp" android:scaleType="fitCenter" android:src="@drawable/logo" android:contentDescription="Logo Renovaí" />
+                <ImageView android:layout_width="200dp" android:layout_height="52dp" android:layout_marginTop="2dp" android:scaleType="fitCenter" android:src="@drawable/renovai_estilizado" android:contentDescription="Renovaí" />
+                <ImageView android:layout_width="170dp" android:layout_height="20dp" android:layout_marginTop="2dp" android:scaleType="fitCenter" android:src="@drawable/transforme_texto" android:contentDescription="Transforme hoje, sustente o amanhã" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+        <View android:layout_width="35dp" android:layout_height="35dp" android:layout_gravity="top|start" android:background="#519059" />
+        <View android:layout_width="35dp" android:layout_height="35dp" android:layout_gravity="top|end" android:background="#519059" />
+        <ImageView android:id="@+id/btnVoltar" android:layout_width="24dp" android:layout_height="wrap_content" android:layout_gravity="top|start"
+            android:layout_marginStart="20dp" android:layout_marginTop="45dp" android:contentDescription="Voltar" android:src="@drawable/voltar" />
+    </FrameLayout>
+
+    <TextView android:id="@+id/tituloCodigo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="32dp"
+        android:text="Verifique seu e-mail" android:textColor="#000000" android:textSize="22sp"
+        app:layout_constraintTop_toBottomOf="@id/headerContainer" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Texto preenchido no código com o e-mail digitado na tela anterior -->
+    <TextView android:id="@+id/txtInstrucao" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+        android:layout_marginStart="30dp" android:layout_marginEnd="30dp" android:gravity="center" android:lineSpacingExtra="3dp" android:textColor="#6B7280" android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tituloCodigo" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout android:id="@+id/containerDigitos" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="32dp"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/txtInstrucao" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <EditText android:id="@+id/edtDigito1" style="@style/CodigoDigito" android:layout_marginStart="0dp" android:contentDescription="Dígito 1" />
+        <EditText android:id="@+id/edtDigito2" style="@style/CodigoDigito" android:contentDescription="Dígito 2" />
+        <EditText android:id="@+id/edtDigito3" style="@style/CodigoDigito" android:contentDescription="Dígito 3" />
+        <EditText android:id="@+id/edtDigito4" style="@style/CodigoDigito" android:contentDescription="Dígito 4" />
+        <EditText android:id="@+id/edtDigito5" style="@style/CodigoDigito" android:contentDescription="Dígito 5" />
+        <EditText android:id="@+id/edtDigito6" style="@style/CodigoDigito" android:contentDescription="Dígito 6" />
+    </LinearLayout>
+
+    <TextView android:id="@+id/txtErroCodigo" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+        android:layout_marginStart="30dp" android:layout_marginEnd="30dp" android:gravity="center" android:textColor="#B3261E" android:textSize="12sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/containerDigitos" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.card.MaterialCardView android:id="@+id/btnContinuar" android:layout_width="300dp" android:layout_height="50dp"
+        android:layout_marginTop="32dp" android:clickable="true" android:focusable="true"
+        app:cardBackgroundColor="#882B4E" app:cardCornerRadius="10dp" app:cardElevation="4dp" app:strokeWidth="0dp"
+        app:layout_constraintTop_toBottomOf="@id/txtErroCodigo" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent">
+        <TextView android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:text="Continuar" android:textColor="#FFFFFF" android:textSize="14sp" android:textStyle="bold" />
+    </com.google.android.material.card.MaterialCardView>
+
+    <TextView android:id="@+id/btnReenviar" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp"
+        android:padding="8dp" android:textColor="#519059" android:textSize="13sp" android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnContinuar" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+
+    <ProgressBar android:id="@+id/progressoCodigo" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/btnReenviar" app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

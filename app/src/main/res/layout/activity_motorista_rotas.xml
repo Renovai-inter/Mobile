@@ -20,5 +20,4 @@
             <TextView android:id="@+id/txtSemConcluidas" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Nenhuma rota inativa." />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-    <include layout="@layout/include_motorista_nav" />
 </LinearLayout>

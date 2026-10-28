@@ -240,7 +240,7 @@
             android:textColor="#FFFFFF"
             android:textSize="15sp"
             android:textStyle="bold"
-            app:backgroundTint="#882A50"
+            app:backgroundTint="@color/vinho"
             app:cornerRadius="15dp"
             app:elevation="4dp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -269,7 +269,7 @@
             android:id="@+id/txtOu"
             android:layout_width="25dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="22dp"
             android:gravity="center"
             android:text="ou"
             android:textColor="#000000"
@@ -293,6 +293,37 @@
 
 
         <!-- ================================================= -->
+        <!-- ENTRAR COM GOOGLE -->
+        <!-- ================================================= -->
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGoogle"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="54dp"
+            android:layout_marginStart="45dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="45dp"
+            android:text="Entrar com Google"
+            android:textAllCaps="false"
+            android:textColor="#1F1F1F"
+            android:textSize="15sp"
+            app:backgroundTint="#FFFFFF"
+            app:cornerRadius="15dp"
+            app:icon="@drawable/ic_google"
+            app:iconGravity="textStart"
+            app:iconPadding="12dp"
+            app:iconSize="20dp"
+            app:iconTint="@null"
+            app:rippleColor="#1A882B4E"
+            app:strokeColor="#D0D0D0"
+            app:strokeWidth="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/txtOu" />
+
+
+        <!-- ================================================= -->
         <!-- CADASTRO -->
         <!-- ================================================= -->
 
@@ -300,14 +331,14 @@
             android:id="@+id/txtNaoTemCadastro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="25dp"
+            android:layout_marginTop="22dp"
             android:text="Não tem cadastro?"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@id/txtCadastre"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/txtOu" />
+            app:layout_constraintTop_toBottomOf="@id/btnGoogle" />
 
 
         <TextView

@@ -72,36 +72,24 @@ public class ColetaController {
     }
 
     /**
-     * POST /coletas (tela 2.2).
-     *
-     * <p>Só envia os campos que a API realmente aceita (ColetaRequest). "Materiais coletados",
-     * "necessita triagem?" e "data prevista" NÃO são enviados — o backend não tem onde guardar isso
-     * hoje (ver IMPLEMENTACAO.md).
+     * POST /coletas (tela 2.2). O pedido já vem montado pela tela (montarRequest + materiais,
+     * triagem e descrição); aqui ficam as conferências básicas e o tratamento da resposta.
      */
-    public void criar(
-            String cooperadoId,
-            BigDecimal quantidadeKg,
-            String tipoColeta,
-            String rotaId,
-            String imagemUrl,
-            CriarCallback callback) {
-        if (cooperadoId == null || cooperadoId.trim().isEmpty()) {
+    public void criar(ColetaRequest request, CriarCallback callback) {
+        if (request.getCooperadoId() == null || request.getCooperadoId().trim().isEmpty()) {
             callback.onErro("Não foi possível identificar o cooperado logado.");
             return;
         }
-        if (quantidadeKg == null || quantidadeKg.compareTo(new BigDecimal("0.001")) < 0) {
+        if (request.getQuantidadeKg() == null
+                || request.getQuantidadeKg().compareTo(new BigDecimal("0.001")) < 0) {
             callback.onErro("Informe o peso da coleta.");
             return;
         }
-        boolean externa =
-                "EXTERNA".equalsIgnoreCase(tipoColeta) || "EXTERNO".equalsIgnoreCase(tipoColeta);
-        if (externa && (rotaId == null || rotaId.trim().isEmpty())) {
+        if ("EXTERNA".equals(request.getTipoColeta())
+                && (request.getRotaId() == null || request.getRotaId().trim().isEmpty())) {
             callback.onErro("Selecione a rota de origem para coletas externas.");
             return;
         }
-
-        ColetaRequest request =
-                montarRequest(cooperadoId, quantidadeKg, tipoColeta, rotaId, imagemUrl);
 
         service.criar(request)
                 .enqueue(
@@ -115,16 +103,42 @@ public class ColetaController {
                                             com.example.renovai.GestorCache.COLETAS);
                                     callback.onSuccess(response.body());
                                 } else {
+                                    // a API explica o motivo (ex.: soma dos pesos diferente do total)
                                     callback.onErro(
-                                            "Erro ao registrar coleta (código "
-                                                    + response.code()
-                                                    + ").");
+                                            com.example.renovai.EmpresaData.erro(response));
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<ColetaResponse> call, Throwable t) {
                                 callback.onErro("Não foi possível conectar ao servidor.");
+                            }
+                        });
+    }
+
+    /** Equipe do cooperado (a primeira), ou null se ele não está em nenhuma. */
+    public void equipeDoCooperado(String cooperadoId, java.util.function.Consumer<String> retorno) {
+        service.equipesDoCooperado(cooperadoId)
+                .enqueue(
+                        new Callback<List<ColetaApiService.EquipeDoCooperado>>() {
+                            @Override
+                            public void onResponse(
+                                    Call<List<ColetaApiService.EquipeDoCooperado>> call,
+                                    Response<List<ColetaApiService.EquipeDoCooperado>> r) {
+                                String id = null;
+                                if (r.isSuccessful() && r.body() != null)
+                                    for (ColetaApiService.EquipeDoCooperado e : r.body())
+                                        if (e.equipeId != null) {
+                                            id = e.equipeId;
+                                            break;
+                                        }
+                                retorno.accept(id);
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    Call<List<ColetaApiService.EquipeDoCooperado>> call, Throwable t) {
+                                retorno.accept(null);
                             }
                         });
     }

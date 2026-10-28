@@ -8,6 +8,7 @@
 
     <LinearLayout
         android:id="@+id/headerRateios"
+        android:tag="topo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@drawable/header_cooperado_background"
@@ -22,13 +23,15 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:maxLines="1"
+            android:ellipsize="end"
             android:id="@+id/txtNomeCooperativaHeader"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Nome Cooperativa"
+            android:text="Renovaí"
             android:textColor="#FFFFFF"
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <FrameLayout
@@ -110,7 +113,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="0dp"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -118,23 +121,5 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/linhaContadorRateios" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationCooperado"
-        style="@style/Widget.MaterialComponents.BottomNavigationView"
-        android:layout_width="0dp"
-        android:layout_height="72dp"
-        android:background="@drawable/menu_background"
-        app:itemBackground="@drawable/seletor_menu_background_cooperado"
-        app:itemIconSize="20dp"
-        app:itemIconTint="@color/seletor_menu_icon_cooperado"
-        app:itemPaddingBottom="6dp"
-        app:itemPaddingTop="12dp"
-        app:itemRippleColor="@android:color/transparent"
-        app:itemTextColor="@color/seletor_menu_icon_cooperado"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/menu_cooperado" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

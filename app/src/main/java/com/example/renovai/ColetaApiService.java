@@ -28,4 +28,13 @@ public interface ColetaApiService {
 
     @POST("coletas")
     Call<ColetaResponse> criar(@Body ColetaRequest request);
+
+    /** Equipes do cooperado: a coleta com materiais precisa da equipe responsável. */
+    @GET("equipes-cooperados/por-cooperado/{cooperadoId}")
+    Call<List<EquipeDoCooperado>> equipesDoCooperado(@Path("cooperadoId") String cooperadoId);
+
+    /** Espelha Responses.EquipeCooperadoResponse (só o que o app usa). */
+    class EquipeDoCooperado {
+        public String equipeId, equipeNome;
+    }
 }

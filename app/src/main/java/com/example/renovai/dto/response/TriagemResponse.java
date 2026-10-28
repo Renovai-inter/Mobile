@@ -22,6 +22,7 @@ public class TriagemResponse {
     private BigDecimal quantidadeKg;
     private BigDecimal quantidadeRejeitoKg;
     private String dataTriagem;
+    @com.google.gson.annotations.SerializedName(value = "imagemUrl", alternate = {"imagem_url"})
     private String imagemUrl;
     private List<String> cooperadosNomes;
 

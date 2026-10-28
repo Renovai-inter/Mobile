@@ -114,6 +114,8 @@ public class GestorNovaTriagemActivity extends GestorBaseActivity {
             View v =
                     LayoutInflater.from(this)
                             .inflate(R.layout.item_gestor_coleta_sel, ehSel ? sel : outras, false);
+            com.example.renovai.Imagens.coleta(v.findViewById(R.id.imgFotoColetaSelecao),
+                    c.getColetaId(), c.getImagemUrl(), true);
             ((TextView) v.findViewById(R.id.txtColetaSelNome))
                     .setText("Coleta " + GestorUi.idCurto(c.getColetaId()));
             ((TextView) v.findViewById(R.id.txtColetaSelSub))

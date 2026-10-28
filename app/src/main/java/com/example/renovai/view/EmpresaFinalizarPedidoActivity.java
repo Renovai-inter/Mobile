@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -99,11 +100,15 @@ public class EmpresaFinalizarPedidoActivity extends EmpresaBaseActivity {
                                 EmpresaCarrinho.limpar();
                                 if (!vivo()) return;
                                 toast("Pedido enviado. Aguarde a resposta da cooperativa.");
+                                // fecha o carrinho e volta ao menu, na aba Pedidos
                                 Intent i =
                                         new Intent(
                                                 EmpresaFinalizarPedidoActivity.this,
-                                                EmpresaPedidosActivity.class);
-                                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                EmpresaHomeActivity.class);
+                                i.putExtra(MenuActivity.EXTRA_ABA, R.id.nav_pedidos);
+                                i.addFlags(
+                                        Intent.FLAG_ACTIVITY_CLEAR_TOP
+                                                | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                 startActivity(i);
                                 finish();
                             }

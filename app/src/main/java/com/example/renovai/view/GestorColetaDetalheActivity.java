@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.example.renovai.Imagens;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.GestorBottomNav;
 import com.example.renovai.GestorData;
@@ -89,6 +90,23 @@ public class GestorColetaDetalheActivity extends GestorBaseActivity {
         ((TextView) findViewById(R.id.txtTriada)).setText(algumPeso ? "Sim" : (linhas > 0 ? "Em andamento" : "Não"));
 
         ImageView foto = findViewById(R.id.imgFotoColeta);
-        if (col.getImagemUrl() != null && !col.getImagemUrl().trim().isEmpty()) Glide.with(this).load(col.getImagemUrl()).into(foto);
+        Imagens.coleta(foto, col.getColetaId(), col.getImagemUrl(), false);
+
+        // descrição e previsão da triagem: Firestore (o banco da API não tem esses campos)
+        com.example.renovai.ColetaDetalhes.ler(col.getColetaId(), extra -> {
+            if (!vivo()) return;
+            String previsao = extra == null ? null
+                    : com.example.renovai.ColetaDetalhes.dataFormatada(extra.dataPrevistaTriagem);
+            mostrarOpcional(R.id.lblPrevisaoTriagem, R.id.txtPrevisaoTriagem, previsao);
+            mostrarOpcional(R.id.lblDescricaoColeta, R.id.txtDescricaoColeta, extra == null ? null : extra.descricao);
+        });
+    }
+
+    private void mostrarOpcional(int rotulo, int valor, String texto) {
+        boolean tem = texto != null && !texto.trim().isEmpty();
+        findViewById(rotulo).setVisibility(tem ? View.VISIBLE : View.GONE);
+        TextView tv = findViewById(valor);
+        tv.setVisibility(tem ? View.VISIBLE : View.GONE);
+        if (tem) tv.setText(texto.trim());
     }
 }

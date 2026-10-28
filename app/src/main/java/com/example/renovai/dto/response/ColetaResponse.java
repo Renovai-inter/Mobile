@@ -17,6 +17,7 @@ public class ColetaResponse {
     private BigDecimal quantidadeKg;
     private String dataColeta;
     private String tipoColeta; // "INTERNO" | "EXTERNO"
+    @com.google.gson.annotations.SerializedName(value = "imagemUrl", alternate = {"imagem_url"})
     private String imagemUrl;
     private String rotaId;
 

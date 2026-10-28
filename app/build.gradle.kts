@@ -14,6 +14,9 @@ if (file("google-services.json").exists()) {
 // Configuração do Cloudinary fica no local.properties (não vai para o Git):
 //   cloudinary.cloudName=SEU_CLOUD_NAME
 //   cloudinary.uploadPreset=SEU_UPLOAD_PRESET
+// e o login com Google precisa do "ID do cliente da Web" do projeto Firebase (o mesmo
+// GOOGLE_CLIENT_ID configurado na API):
+//   google.webClientId=XXXX.apps.googleusercontent.com
 val localProps = Properties().apply {
     val arquivo = rootProject.file("local.properties")
     if (arquivo.exists()) arquivo.inputStream().use { load(it) }
@@ -53,6 +56,7 @@ android {
 
         buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${localProp("cloudinary.cloudName")}\"")
         buildConfigField("String", "CLOUDINARY_UPLOAD_PRESET", "\"${localProp("cloudinary.uploadPreset")}\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProp("google.webClientId")}\"")
     }
 
     buildFeatures {
@@ -90,6 +94,7 @@ dependencies {
     implementation(libs.okhttp.logging)
 
     testImplementation(libs.junit)
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
@@ -111,12 +116,15 @@ dependencies {
     // Glide (carregar foto da empresa e das cooperativas a partir de uma URL)
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
-    // Cloudinary: upload das fotos (coletas)
-    implementation("com.cloudinary:cloudinary-android:3.1.2")
 
     // Firebase: Firestore (cache offline), Storage (relatórios PDF) e Auth (login anônimo p/ regras)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+
+    // Login com Google (Credential Manager)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
 }

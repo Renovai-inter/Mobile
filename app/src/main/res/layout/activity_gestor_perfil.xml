@@ -17,5 +17,4 @@
             <ProgressBar android:id="@+id/progresso" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-    <include layout="@layout/include_gestor_nav" />
 </LinearLayout>

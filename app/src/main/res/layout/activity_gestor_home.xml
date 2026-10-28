@@ -134,5 +134,4 @@
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <include layout="@layout/include_gestor_nav" />
 </LinearLayout>

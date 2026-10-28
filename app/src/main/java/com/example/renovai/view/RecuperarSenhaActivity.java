@@ -1,19 +1,18 @@
 package com.example.renovai.view;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
 import com.example.renovai.ApiClient;
 import com.example.renovai.AuthApiService;
+import com.example.renovai.EmpresaData;
 import com.example.renovai.R;
 import com.example.renovai.dto.request.RedefinirSenhaRequest;
 
@@ -21,40 +20,58 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/** Tela 1.7.1 — Redefinir Senha (Nova Senha): recebe o código gerado em 1.7 e define a nova senha. */
+/**
+ * Tela 1.7.2 — Redefinir Senha (Nova Senha): recebe o e-mail e o código digitados em 1.7/1.7.1 e
+ * define a nova senha. Se a API recusar o código, volta para a 1.7.1 com {@link
+ * #RESULT_CODIGO_INVALIDO}.
+ */
 public class RecuperarSenhaActivity extends AppCompatActivity {
+
+    public static final String EXTRA_EMAIL = "email";
+    public static final String EXTRA_CODIGO = "codigo";
+    /** Mensagem da API devolvida junto com {@link #RESULT_CODIGO_INVALIDO}. */
+    public static final String EXTRA_ERRO = "erro";
+    public static final int RESULT_CODIGO_INVALIDO = RESULT_FIRST_USER;
+
+    private String email;
+    private String codigo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
 
         WindowCompat.getInsetsController(
                 getWindow(),
                 getWindow().getDecorView()
         ).setAppearanceLightStatusBars(false);
 
-        getWindow().setStatusBarColor(Color.parseColor("#882B4E"));
 
         setContentView(R.layout.activity_recuperar_senha);
 
+        email = getIntent().getStringExtra(EXTRA_EMAIL);
+        codigo = getIntent().getStringExtra(EXTRA_CODIGO);
+        if (email == null || codigo == null) {
+            // Só se chega aqui pela tela do código (1.7.1)
+            startActivity(new Intent(this, EsqueciSenhaActivity.class));
+            finish();
+            return;
+        }
+
         ImageView btnVoltar = findViewById(R.id.btnVoltar);
-        btnVoltar.setOnClickListener(v -> {
-            Intent intent = new Intent(this, LoginActivity.class);
-            startActivity(intent);
-        });
+        btnVoltar.setOnClickListener(v -> finish());
 
         findViewById(R.id.btnAlterar).setOnClickListener(v -> alterar());
     }
 
     private void alterar() {
-        String token = ((EditText) findViewById(R.id.edtToken)).getText().toString().trim();
         String senha = ((EditText) findViewById(R.id.edtNovaSenha)).getText().toString();
         String confirmar = ((EditText) findViewById(R.id.edtConfirmarSenha)).getText().toString();
 
-        if (token.isEmpty()) { Toast.makeText(this, "Cole o código de redefinição recebido.", Toast.LENGTH_LONG).show(); return; }
-        if (senha.length() < 6) { Toast.makeText(this, "A senha deve ter no mínimo 6 caracteres.", Toast.LENGTH_LONG).show(); return; }
+        if (senha.length() < 6 || senha.getBytes(java.nio.charset.StandardCharsets.UTF_8).length > 72) {
+            Toast.makeText(this, "A senha deve ter ao menos 6 caracteres e até 72 bytes.", Toast.LENGTH_LONG).show();
+            return;
+        }
         if (!senha.equals(confirmar)) { Toast.makeText(this, "As senhas não coincidem.", Toast.LENGTH_LONG).show(); return; }
 
         View prog = findViewById(R.id.progressoAlterar);
@@ -63,7 +80,7 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
         btn.setEnabled(false);
 
         AuthApiService api = ApiClient.createService(AuthApiService.class);
-        api.redefinirSenha(new RedefinirSenhaRequest(token, senha)).enqueue(new Callback<Void>() {
+        api.redefinirSenha(new RedefinirSenhaRequest(email, codigo, senha)).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> c, Response<Void> r) {
                 prog.setVisibility(View.GONE);
@@ -75,7 +92,8 @@ public class RecuperarSenhaActivity extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 } else if (r.code() == 400 || r.code() == 422) {
-                    Toast.makeText(RecuperarSenhaActivity.this, "Código inválido ou expirado. Solicite um novo.", Toast.LENGTH_LONG).show();
+                    setResult(RESULT_CODIGO_INVALIDO, new Intent().putExtra(EXTRA_ERRO, EmpresaData.erro(r)));
+                    finish();
                 } else {
                     Toast.makeText(RecuperarSenhaActivity.this, "Não foi possível alterar a senha (erro " + r.code() + ").", Toast.LENGTH_LONG).show();
                 }

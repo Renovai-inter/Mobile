@@ -25,27 +25,25 @@
         <activity
             android:name=".view.EsqueciSenhaActivity"
             android:exported="false" />
+        <activity
+            android:name=".view.CodigoSenhaActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
 
         <!-- ===================== Área Motorista (telas 3.1 a 3.3) ===================== -->
         <activity android:name=".view.MotoristaHomeActivity" android:exported="false" />
-        <activity android:name=".view.MotoristaRotasActivity" android:exported="false" />
         <activity android:name=".view.MotoristaRotaDetalheActivity" android:exported="false" />
-        <activity android:name=".view.MotoristaPerfilActivity" android:exported="false" />
 
         <!-- ===================== Área Empresa (telas 5.1 a 5.6) ===================== -->
         <activity android:name=".view.EmpresaHomeActivity" android:exported="false" />
-        <activity android:name=".view.EmpresaCooperativasActivity" android:exported="false" />
-        <activity android:name=".view.EmpresaFavoritasActivity" android:exported="false" />
         <activity android:name=".view.EmpresaPerfilPublicoActivity" android:exported="false" />
         <activity android:name=".view.EmpresaEnviarPedidoActivity" android:exported="false" />
         <activity android:name=".view.EmpresaFinalizarPedidoActivity" android:exported="false" />
-        <activity android:name=".view.EmpresaPedidosActivity" android:exported="false" />
         <activity android:name=".view.EmpresaPedidoDetalheActivity" android:exported="false" />
         <activity
             android:name=".view.EmpresaChatActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".view.EmpresaPerfilActivity" android:exported="false" />
         <!-- ================================================================================ -->
         <activity
             android:name=".view.LoginActivity"
@@ -54,10 +52,7 @@
             android:name=".view.EscolheActivity"
             android:exported="false" />
         <activity
-            android:name=".view.CadastroEmpresaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivity"
+            android:name=".view.CadastroActivity"
             android:exported="false" />
 
         <!-- ===================== Área Cooperado (telas 2.1 a 2.7) ===================== -->
@@ -68,44 +63,26 @@
             android:name=".view.AdicionarColetaActivity"
             android:exported="false" />
         <activity
+            android:name=".view.AdicionarMaterialActivity"
+            android:exported="false" />
+        <activity
             android:name=".view.CompletarTriagemActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.PerfilCooperadoActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.RateiRecebidosActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.ListagemColetasActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.ListagemTriagensActivity"
             android:exported="false" />
         <!-- =============================================================================== -->
 
 
         <!-- ===================== Área Gestor da Cooperativa (telas 4.1 a 4.9) ===================== -->
+        <!-- ===================== Área Admin do site (role ADMIN_SITE) ===================== -->
+        <activity android:name=".view.AdminHomeActivity" android:exported="false" />
+
         <activity
             android:name=".view.GestorHomeActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.GestorColetasActivity"
             android:exported="false" />
         <activity
             android:name=".view.GestorColetaDetalheActivity"
             android:exported="false" />
         <activity
-            android:name=".view.GestorEstoqueActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.GestorFuncionariosActivity"
-            android:exported="false" />
-        <activity
             android:name=".view.GestorFuncionarioDetalheActivity"
-            android:exported="false" />
-        <activity
-            android:name=".view.GestorPerfilActivity"
             android:exported="false" />
         <activity
             android:name=".view.GestorPedidosActivity"

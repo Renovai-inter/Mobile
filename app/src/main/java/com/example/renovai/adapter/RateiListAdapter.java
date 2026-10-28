@@ -102,7 +102,7 @@ public class RateiListAdapter extends RecyclerView.Adapter<RateiListAdapter.View
             default:
                 corBorda = Color.parseColor("#E8A9BB");
                 corBadgeFundo = Color.parseColor("#FBE4EA");
-                corBadgeTexto = Color.parseColor("#C2185B");
+                corBadgeTexto = Color.parseColor("#882B4E");
                 texto = "Pendente";
                 break;
         }

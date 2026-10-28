@@ -3,6 +3,10 @@
     android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
         android:gravity="center_vertical" android:orientation="horizontal" android:paddingTop="9dp" android:paddingBottom="9dp">
+        <ImageView android:id="@+id/imgFotoTriagemMaterial" android:layout_width="44dp"
+            android:layout_height="44dp" android:layout_marginEnd="12dp" android:visibility="gone"
+            android:scaleType="centerCrop" android:src="@drawable/pedido_foto_placeholder"
+            android:contentDescription="@string/foto_triagem" />
         <TextView android:id="@+id/txtMaterialNome" android:layout_width="0dp" android:layout_height="wrap_content"
             android:layout_weight="1" android:text="Material" android:textColor="#222222" android:textSize="14sp" />
         <TextView android:id="@+id/txtMaterialKg" android:layout_width="wrap_content" android:layout_height="wrap_content"

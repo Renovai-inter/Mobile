@@ -1,5 +1,7 @@
 package com.example.renovai.view;
 
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -55,7 +57,6 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                     aba = i;
                     mostrarAba();
                 });
-        findViewById(R.id.imgFavPP).setOnClickListener(v -> alternarFavorito());
         findViewById(R.id.btnFazerPedidoPP).setOnClickListener(v -> abrirEnviarPedido());
         findViewById(R.id.btnComentarPP).setOnClickListener(v -> abrirComentar());
 
@@ -91,61 +92,11 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                 (l, c) -> {
                     favoritos = l;
                     favoritada = EmpresaCooperativaCard.estaFavoritada(l, cooperativaId);
-                    if (vivo()) atualizarEstrela();
+                    // estrela cheia = favoritada; cada toque põe ou tira dos favoritos
+                    if (vivo())
+                        EmpresaCooperativaCard.estrela(
+                                findViewById(R.id.imgFavPP), cooperativaId, favoritada, null);
                 });
-    }
-
-    private void atualizarEstrela() {
-        findViewById(R.id.imgFavPP).setAlpha(favoritada ? 1f : 0.4f);
-    }
-
-    private void alternarFavorito() {
-        String empresaId = EmpresaData.empresaId();
-        if (empresaId == null) return;
-        if (favoritada) {
-            EmpresaData.api()
-                    .desfavoritar(cooperativaId)
-                    .enqueue(
-                            new Callback<Void>() {
-                                @Override
-                                public void onResponse(Call<Void> c, Response<Void> r) {
-                                    if (!vivo()) return;
-                                    if (!r.isSuccessful()) {
-                                        toast(EmpresaData.erro(r));
-                                        return;
-                                    }
-                                    EmpresaData.invalidar("empresa:favoritos", "empresa:dashboard");
-                                    favoritada = false;
-                                    atualizarEstrela();
-                                }
-
-                                @Override
-                                public void onFailure(Call<Void> c, Throwable t) {}
-                            });
-        } else {
-            EmpresaData.api()
-                    .favoritar(new EmpresaRequests.Favorito(cooperativaId))
-                    .enqueue(
-                            new Callback<EmpresaResponses.Favorito>() {
-                                @Override
-                                public void onResponse(
-                                        Call<EmpresaResponses.Favorito> c,
-                                        Response<EmpresaResponses.Favorito> r) {
-                                    if (!vivo()) return;
-                                    if (!r.isSuccessful()) {
-                                        toast(EmpresaData.erro(r));
-                                        return;
-                                    }
-                                    EmpresaData.invalidar("empresa:favoritos", "empresa:dashboard");
-                                    favoritada = true;
-                                    atualizarEstrela();
-                                }
-
-                                @Override
-                                public void onFailure(
-                                        Call<EmpresaResponses.Favorito> c, Throwable t) {}
-                            });
-        }
     }
 
     private void abrirEnviarPedido() {
@@ -162,6 +113,11 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
         ((TextView) findViewById(R.id.txtNomePP))
                 .setText(perfil.nome == null ? "Cooperativa" : perfil.nome);
         ((TextView) findViewById(R.id.txtIniciaisPP)).setText(GestorUi.iniciais(perfil.nome));
+        // foto da cooperativa (Cloudinary) por cima das iniciais, quando existe
+        android.widget.ImageView foto = findViewById(R.id.imgFotoPP);
+        boolean temFoto = com.example.renovai.ImagemUrl.normalizar(perfil.imagemUrl) != null;
+        foto.setVisibility(temFoto ? View.VISIBLE : View.GONE);
+        if (temFoto) EmpresaCooperativaCard.foto(foto, perfil.imagemUrl);
         ((TextView) findViewById(R.id.txtNotaPP))
                 .setText(
                         (perfil.mediaAvaliacoes == null
@@ -212,22 +168,7 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                                 toast("Nenhum aplicativo de contato disponível.");
                             }
                         });
-        LinearLayout mats = findViewById(R.id.listaMateriaisPP);
-        mats.removeAllViews();
-        List<GestorResponses.Estoque> disp = perfil.materiaisDisponiveis;
-        findViewById(R.id.txtSemMateriaisPP)
-                .setVisibility(disp == null || disp.isEmpty() ? View.VISIBLE : View.GONE);
-        if (disp != null)
-            for (GestorResponses.Estoque e : disp) {
-                View v =
-                        LayoutInflater.from(this)
-                                .inflate(R.layout.item_empresa_estoque_linha, mats, false);
-                ((TextView) v.findViewById(R.id.txtEstoqueLinhaNome))
-                        .setText(e.materialCategoria == null ? "Material" : e.materialCategoria);
-                ((TextView) v.findViewById(R.id.txtEstoqueLinhaKg))
-                        .setText(GestorUi.kg(e.quantidadeKg));
-                mats.addView(v);
-            }
+        renderMateriais();
 
         carregarEstrelas();
         carregarComentarios();
@@ -383,7 +324,7 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                                 new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT));
-                        new androidx.appcompat.app.AlertDialog.Builder(
+                        new MaterialAlertDialogBuilder(
                                         EmpresaPerfilPublicoActivity.this)
                                 .setTitle("Avaliar cooperativa")
                                 .setView(box)
@@ -437,5 +378,102 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                                 toast("Sem conexão com o servidor.");
                             }
                         });
+    }
+
+    /**
+     * Aba Materiais: cada material em estoque com a foto e as especificações ao lado do nome
+     * (categoria, preço sugerido por kg, se está disponível e quando o estoque foi atualizado).
+     * O estoque vem no perfil público; os dados do material (GET /empresas-conta/materiais) e a
+     * categoria-pai (GET /categorias-material) chegam depois e completam cada linha.
+     */
+    private void renderMateriais() {
+        LinearLayout mats = findViewById(R.id.listaMateriaisPP);
+        mats.removeAllViews();
+        List<GestorResponses.Estoque> disp = perfil.materiaisDisponiveis;
+        findViewById(R.id.txtSemMateriaisPP)
+                .setVisibility(disp == null || disp.isEmpty() ? View.VISIBLE : View.GONE);
+        if (disp == null || disp.isEmpty()) return;
+        java.util.Map<String, View> linhas = new java.util.HashMap<>();
+        for (GestorResponses.Estoque e : disp) {
+            View v = LayoutInflater.from(this).inflate(R.layout.item_empresa_estoque_linha, mats, false);
+            ((TextView) v.findViewById(R.id.txtEstoqueLinhaNome))
+                    .setText(e.materialCategoria == null ? "Material" : e.materialCategoria);
+            ((TextView) v.findViewById(R.id.txtEstoqueLinhaKg)).setText(GestorUi.kg(e.quantidadeKg));
+            especificacoes(v, e, null, null);
+            if (e.materialId != null) linhas.put(e.materialId, v);
+            mats.addView(v);
+        }
+        EmpresaData.api()
+                .materiaisDisponiveis()
+                .enqueue(
+                        new Callback<List<com.example.renovai.dto.response.MaterialResponse>>() {
+                            @Override
+                            public void onResponse(
+                                    Call<List<com.example.renovai.dto.response.MaterialResponse>> c,
+                                    Response<List<com.example.renovai.dto.response.MaterialResponse>> r) {
+                                if (!vivo() || !r.isSuccessful() || r.body() == null) return;
+                                java.util.Map<String, com.example.renovai.dto.response.MaterialResponse> porId =
+                                        new java.util.HashMap<>();
+                                for (com.example.renovai.dto.response.MaterialResponse m : r.body())
+                                    if (m.getMaterialId() != null) porId.put(m.getMaterialId(), m);
+                                EmpresaData.categorias(
+                                        new com.example.renovai.GestorData.Ouvinte<
+                                                List<com.example.renovai.dto.response.CategoriaMaterialResponse>>() {
+                                            @Override
+                                            public void aoReceber(
+                                                    List<com.example.renovai.dto.response.CategoriaMaterialResponse> cats,
+                                                    boolean cache) {
+                                                if (vivo()) completar(disp, linhas, porId, cats);
+                                            }
+
+                                            @Override
+                                            public void aoErro(String m) {
+                                                if (vivo()) completar(disp, linhas, porId, null);
+                                            }
+                                        });
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    Call<List<com.example.renovai.dto.response.MaterialResponse>> c,
+                                    Throwable t) {}
+                        });
+    }
+
+    private void completar(
+            List<GestorResponses.Estoque> disp,
+            java.util.Map<String, View> linhas,
+            java.util.Map<String, com.example.renovai.dto.response.MaterialResponse> porId,
+            List<com.example.renovai.dto.response.CategoriaMaterialResponse> categorias) {
+        for (GestorResponses.Estoque e : disp) {
+            View v = e.materialId == null ? null : linhas.get(e.materialId);
+            if (v == null) continue;
+            com.example.renovai.dto.response.MaterialResponse m = porId.get(e.materialId);
+            String pai = null;
+            if (m != null && categorias != null)
+                for (com.example.renovai.dto.response.CategoriaMaterialResponse cat : categorias)
+                    if (m.getCategoriaId() != null && m.getCategoriaId().equalsIgnoreCase(cat.getCategoriaId()))
+                        pai = cat.getCategoriaPaiNome();
+            especificacoes(v, e, m, pai);
+        }
+    }
+
+    /** Linha de especificações ao lado do nome; sem dado nenhum, a linha some. */
+    private static void especificacoes(
+            View v,
+            GestorResponses.Estoque e,
+            com.example.renovai.dto.response.MaterialResponse m,
+            String categoriaPai) {
+        List<String> partes = new java.util.ArrayList<>();
+        if (categoriaPai != null && !categoriaPai.isBlank()) partes.add(categoriaPai);
+        if (m != null && m.getPrecoSugerido() != null)
+            partes.add(GestorUi.dinheiro(m.getPrecoSugerido().doubleValue()) + "/kg");
+        if (m != null && m.getEstaDisponivel() != null)
+            partes.add(Boolean.TRUE.equals(m.getEstaDisponivel()) ? "Disponível" : "Indisponível");
+        if (e.dataAtualizacao != null) partes.add("Atualizado em " + GestorUi.data(e.dataAtualizacao));
+        TextView detalhes = v.findViewById(R.id.txtEstoqueLinhaDetalhes);
+        detalhes.setText(android.text.TextUtils.join(" · ", partes));
+        detalhes.setVisibility(partes.isEmpty() ? View.GONE : View.VISIBLE);
+        EmpresaCooperativaCard.foto(v.findViewById(R.id.imgEstoqueLinha), m == null ? null : m.getImagemUrl());
     }
 }

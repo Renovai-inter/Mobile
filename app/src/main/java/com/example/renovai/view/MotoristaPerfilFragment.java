@@ -1,0 +1,57 @@
+package com.example.renovai.view;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import android.view.View;
+import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.appcompat.app.AlertDialog;
+
+import com.example.renovai.CooperadoPreload;
+import com.example.renovai.CooperadoSession;
+import com.example.renovai.GestorCache;
+import com.example.renovai.MotoristaData;
+import com.example.renovai.R;
+import com.example.renovai.SessionManager;
+
+/** Tela 3.3 — Perfil do motorista: nome, e-mail e cargo (a partir da sessão do login). */
+public class MotoristaPerfilFragment extends MotoristaAbaFragment {
+
+    public MotoristaPerfilFragment() {
+        super(R.layout.activity_motorista_perfil);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle b) {
+        super.onViewCreated(view, b);
+        titulo("Perfil");
+        topoPerfil("Perfil: " + (CooperadoSession.getCargo() != null ? CooperadoSession.getCargo() : "Motorista"));
+
+        campo(R.id.campoNome, "Nome", CooperadoSession.getUsuarioNome(), null);
+        campo(R.id.campoEmail, "E-mail", SessionManager.getEmail(), null);
+        campo(R.id.campoCargo, "Cargo", CooperadoSession.getCargo(), null);
+
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> new MaterialAlertDialogBuilder(tela()).setTitle("Suporte")
+                .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
+                .setPositiveButton("Enviar e-mail", (d, w) -> {
+                    Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));
+                    i.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Motorista)");
+                    try { startActivity(i); } catch (Exception e) { toast("Nenhum app de e-mail encontrado."); }
+                }).setNegativeButton("Fechar", null).show());
+        findViewById(R.id.btnSair).setOnClickListener(v -> com.example.renovai.GestorUi.confirmar(tela(), "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
+    }
+
+    private void sair() {
+        SessionManager.logout();
+        CooperadoSession.limpar();
+        GestorCache.limpar();
+        CooperadoPreload.limpar();
+        Intent i = new Intent(tela(), LoginActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+    }
+}

@@ -1,5 +1,6 @@
 package com.example.renovai.view;
 
+
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
@@ -52,7 +53,9 @@ public abstract class EmpresaBaseActivity extends AppCompatActivity {
         if (header != null) {
             findViewById(R.id.btnPerfilHeaderE)
                     .setOnClickListener(
-                            v -> startActivity(new Intent(this, EmpresaPerfilActivity.class)));
+                            v ->
+                                    MenuActivity.abrir(
+                                            this, EmpresaHomeActivity.class, R.id.nav_perfil));
         }
         View voltar = findViewById(R.id.btnVoltar);
         if (voltar != null) voltar.setOnClickListener(v -> finish());

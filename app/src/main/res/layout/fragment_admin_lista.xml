@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lista do Admin do site (Cooperativas, Empresas ou Contas): busca, filtro e cartões. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+
+    <include layout="@layout/include_gestor_header" />
+
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="vertical" android:padding="16dp">
+
+            <TextView android:id="@+id/txtTituloLista" style="@style/G.Title" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Lista" />
+            <TextView android:id="@+id/txtContador" style="@style/G.Sub" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_marginTop="2dp" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="46dp" android:layout_marginTop="14dp"
+                android:background="@drawable/input_field_cooperado_background" android:gravity="center_vertical"
+                android:orientation="horizontal" android:paddingStart="14dp" android:paddingEnd="14dp">
+                <ImageView android:layout_width="18dp" android:layout_height="18dp" android:src="@drawable/ic_search_dark"
+                    android:contentDescription="Buscar" />
+                <EditText android:id="@+id/edtBusca" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1"
+                    android:layout_marginStart="10dp" android:background="@null" android:hint="Buscar pelo nome"
+                    android:importantForAutofill="no" android:inputType="text" android:maxLines="1"
+                    android:textColor="#111111" android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/trilhaFiltro" style="@style/G.Track" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="12dp" android:visibility="gone" />
+
+            <ProgressBar android:id="@+id/progressoLista" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal" android:layout_marginTop="24dp" android:visibility="gone" />
+            <TextView android:id="@+id/txtVazio" style="@style/G.Sub" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" android:gravity="center" android:text="Nada por aqui ainda." android:visibility="gone" />
+            <LinearLayout android:id="@+id/listaItens" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="14dp" android:orientation="vertical" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

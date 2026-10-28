@@ -4,6 +4,16 @@
     <color name="white">#FFFFFFFF</color>
     <color name="menu_selecionado_empresa">#D4E699</color>
 
+    <!-- Cores da marca Renovaí -->
+    <color name="vinho">#882B4E</color>
+    <color name="vinho_claro">#F6E7ED</color>
+    <color name="verde">#519059</color>
+    <color name="verde_claro">#E3EFE4</color>
+
+    <!-- Pop-up padrão (Pop-up-padrao): título vinho, texto cinza e botão vinho rosado -->
+    <color name="popup_botao">#C04775</color>
+    <color name="popup_texto">#6B7280</color>
+
     <!-- Área Cooperado (telas 2.1 a 2.7) -->
     <color name="background_light_cooperado">#F5F5F5</color>
 </resources>
