@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Brilho verde-claro atrás do mascote na splash (radial: 70% → 25% → transparente). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <gradient
+        android:type="radial"
+        android:gradientRadius="50%"
+        android:startColor="#B379B581"
+        android:centerColor="#4079B581"
+        android:centerX="0.5"
+        android:centerY="0.5"
+        android:endColor="#0079B581" />
+</shape>
