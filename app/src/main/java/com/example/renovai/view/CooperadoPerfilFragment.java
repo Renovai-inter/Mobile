@@ -1,12 +1,10 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,20 +73,6 @@ public class CooperadoPerfilFragment extends TelaFragment {
     }
 
     private void abrirSuporte() {
-        new MaterialAlertDialogBuilder(tela())
-                .setTitle("Suporte")
-                .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com que a equipe responde o quanto antes.")
-                .setPositiveButton("Enviar e-mail", (dialog, which) -> {
-                    Intent intent = new Intent(Intent.ACTION_SENDTO);
-                    intent.setData(Uri.parse("mailto:suporte@renovai.com"));
-                    intent.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Cooperado)");
-                    try {
-                        startActivity(intent);
-                    } catch (Exception e) {
-                        Toast.makeText(tela(), "Nenhum aplicativo de e-mail encontrado.", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("Fechar", null)
-                .show();
+        SuporteChatActivity.abrir(requireContext());
     }
 }

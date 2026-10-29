@@ -138,6 +138,12 @@
         </provider>
         <!-- ======================================================================================= -->
 
+        <!-- Chat de suporte com o NIMO (botão Suporte do perfil de todas as áreas) -->
+        <activity
+            android:name=".view.SuporteChatActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".view.SplashActivity"
             android:exported="true" >
