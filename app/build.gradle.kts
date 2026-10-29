@@ -117,17 +117,17 @@ dependencies {
     implementation("com.github.bumptech.glide:glide:4.16.0")
 
 
-    // Firebase: Firestore (cache offline), Storage (relatórios PDF) e Auth (login anônimo p/ regras)
+    // Firebase: Firestore (cache offline), Storage (relatórios PDF), Auth (login anônimo p/ regras)
+    // e Messaging (notificações push enviadas pela API, ver Notificacoes)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.messaging)
 
     // Login com Google (Credential Manager)
     implementation(libs.credentials)
     implementation(libs.credentials.play.services.auth)
     implementation(libs.googleid)
 
-    // WorkManager: verificação periódica da API para as notificações (ver Notificacoes)
-    implementation(libs.work.runtime)
 }

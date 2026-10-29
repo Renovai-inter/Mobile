@@ -13,32 +13,27 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.work.Constraints;
-import androidx.work.ExistingPeriodicWorkPolicy;
-import androidx.work.ExistingWorkPolicy;
-import androidx.work.NetworkType;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
-import androidx.work.WorkManager;
 
 import com.example.renovai.view.AdminHomeActivity;
 import com.example.renovai.view.CooperadoHomeActivity;
 import com.example.renovai.view.EmpresaHomeActivity;
 import com.example.renovai.view.GestorHomeActivity;
 import com.example.renovai.view.MenuActivity;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
- * Notificações do app. A API não envia push, então o app verifica sozinho: um WorkManager roda o
- * NotificacaoVerificador a cada 15 min (o mínimo do Android) e também ao abrir/voltar para a Home
- * do perfil. Cada verificação compara a API com o retrato salvo da última vez e notifica o que
- * mudou.
+ * Notificações push. Quem decide o que avisar e para quem é a API (NotificacaoService), na hora
+ * do evento e nunca para quem fez a ação. O app só registra o aparelho para a conta logada (uma
+ * conta por aparelho), mostra o que chega (NotificacaoPushService) e descadastra no logout.
  *
- * <p>Gestor: proposta nova, proposta aceita/finalizada e mudança de estado de coletas e triagens.
- * Cooperado: material do estoque abaixo de 1.000 kg e rateio realizado em que ele entrou. Empresa:
- * contraproposta e proposta finalizada.
+ * <p>Gestor: proposta recebida, proposta aceita/finalizada, coletas e triagens. Cooperado: estoque
+ * abaixo de 1.000 kg e rateio em que entrou. Empresa: contraproposta e proposta finalizada.
  */
 public final class Notificacoes {
 
@@ -53,35 +48,7 @@ public final class Notificacoes {
             CANAL_ESTOQUE = "estoque",
             CANAL_RATEIOS = "rateios";
 
-    private static final String TRABALHO_PERIODICO = "notificacoes_periodicas",
-            TRABALHO_AGORA = "notificacoes_agora";
     private static final int PEDIDO_PERMISSAO = 7301;
-
-    /** O que mostrar e para onde o toque leva. */
-    public static final class Aviso {
-        final String canal, chave, titulo, texto;
-        final Class<? extends MenuActivity> casca;
-        final int aba;
-
-        /**
-         * @param chave identifica o evento (a mesma chave substitui a notificação anterior)
-         * @param casca Home do perfil; @param aba aba dela que o toque abre
-         */
-        public Aviso(
-                String canal,
-                String chave,
-                String titulo,
-                String texto,
-                Class<? extends MenuActivity> casca,
-                int aba) {
-            this.canal = canal;
-            this.chave = chave;
-            this.titulo = titulo;
-            this.texto = texto;
-            this.casca = casca;
-            this.aba = aba;
-        }
-    }
 
     private Notificacoes() {}
 
@@ -100,8 +67,8 @@ public final class Notificacoes {
     }
 
     /**
-     * Chamado pela Home de cada perfil: cria os canais, pede a permissão (Android 13+) e liga a
-     * verificação periódica.
+     * Chamado pela Home de cada perfil: cria os canais, pede a permissão (Android 13+) e liga o
+     * aparelho à conta logada na API.
      */
     public static void iniciar(Activity a) {
         criarCanais(a);
@@ -110,35 +77,57 @@ public final class Notificacoes {
             ActivityCompat.requestPermissions(
                     a, new String[] {Manifest.permission.POST_NOTIFICATIONS}, PEDIDO_PERMISSAO);
         }
-        PeriodicWorkRequest periodico =
-                new PeriodicWorkRequest.Builder(NotificacaoWorker.class, 15, TimeUnit.MINUTES)
-                        .setConstraints(comInternet())
-                        .build();
-        WorkManager.getInstance(a)
-                .enqueueUniquePeriodicWork(
-                        TRABALHO_PERIODICO, ExistingPeriodicWorkPolicy.KEEP, periodico);
+        FirebaseMessaging.getInstance().getToken().addOnSuccessListener(Notificacoes::registrar);
     }
 
-    /** Verifica já (ao voltar para a Home), sem esperar a próxima rodada periódica. */
-    public static void verificarAgora(Context c) {
-        OneTimeWorkRequest agora =
-                new OneTimeWorkRequest.Builder(NotificacaoWorker.class)
-                        .setConstraints(comInternet())
-                        .build();
-        WorkManager.getInstance(c)
-                .enqueueUniqueWork(TRABALHO_AGORA, ExistingWorkPolicy.KEEP, agora);
+    /** Envia o token do aparelho para a API (ela troca a conta dona do aparelho, se for outra). */
+    static void registrar(String token) {
+        if (token == null || perfil() == null) return;
+        ApiClient.createService(DispositivoApiService.class)
+                .registrar(new DispositivoApiService.Dispositivo(token))
+                .enqueue(ignorar());
     }
 
-    /** No logout: para as verificações e tira da bandeja os avisos da conta que saiu. */
+    /**
+     * No logout (antes de limpar a sessão): descadastra o aparelho na API, invalida o token no
+     * Firebase e tira da bandeja os avisos da conta que saiu.
+     */
     public static void parar(Context c) {
-        WorkManager wm = WorkManager.getInstance(c);
-        wm.cancelUniqueWork(TRABALHO_PERIODICO);
-        wm.cancelUniqueWork(TRABALHO_AGORA);
         NotificationManagerCompat.from(c).cancelAll();
+        if (perfil() == null) return;
+        String bearer = "Bearer " + SessionManager.getToken();
+        FirebaseMessaging fcm = FirebaseMessaging.getInstance();
+        fcm.getToken()
+                .addOnSuccessListener(
+                        token ->
+                                ApiClient.createService(DispositivoApiService.class)
+                                        .remover(bearer, token)
+                                        .enqueue(
+                                                new Callback<Void>() {
+                                                    @Override
+                                                    public void onResponse(Call<Void> call, Response<Void> r) {
+                                                        fcm.deleteToken();
+                                                    }
+
+                                                    @Override
+                                                    public void onFailure(Call<Void> call, Throwable t) {
+                                                        // sem rede: o token invalidado faz a API
+                                                        // descartar o aparelho no próximo envio
+                                                        fcm.deleteToken();
+                                                    }
+                                                }));
     }
 
-    private static Constraints comInternet() {
-        return new Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build();
+    private static Callback<Void> ignorar() {
+        return new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> r) {}
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                // tenta de novo na próxima abertura da Home
+            }
+        };
     }
 
     static void criarCanais(Context c) {
@@ -168,18 +157,22 @@ public final class Notificacoes {
         return ch;
     }
 
-    static void mostrar(Context c, Aviso aviso) {
+    /** Mostra um push da API; aba = "pedidos", "coletas", "estoque" ou "rateios". */
+    static void mostrar(Context c, String titulo, String texto, String aba) {
+        Perfil p = perfil();
+        if (p == null) return; // aviso chegou depois do logout
         if (ContextCompat.checkSelfPermission(c, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
-        int id = aviso.chave.hashCode();
+        criarCanais(c);
+        int id = (titulo + texto).hashCode();
         NotificationCompat.Builder b =
-                new NotificationCompat.Builder(c, aviso.canal)
+                new NotificationCompat.Builder(c, canal(aba))
                         .setSmallIcon(R.drawable.ic_notificacao)
-                        .setContentTitle(aviso.titulo)
-                        .setContentText(aviso.texto)
-                        .setStyle(new NotificationCompat.BigTextStyle().bigText(aviso.texto))
+                        .setContentTitle(titulo)
+                        .setContentText(texto)
+                        .setStyle(new NotificationCompat.BigTextStyle().bigText(texto))
                         .setAutoCancel(true)
-                        .setContentIntent(destino(c, aviso, id));
+                        .setContentIntent(destino(c, p, aba, id));
         try {
             NotificationManagerCompat.from(c).notify(id, b.build());
         } catch (SecurityException ignorado) {
@@ -187,17 +180,24 @@ public final class Notificacoes {
         }
     }
 
+    private static String canal(String aba) {
+        if ("coletas".equals(aba)) return CANAL_OPERACAO;
+        if ("estoque".equals(aba)) return CANAL_ESTOQUE;
+        if ("rateios".equals(aba)) return CANAL_RATEIOS;
+        return CANAL_PEDIDOS;
+    }
+
     /** Abre a Home do perfil na aba do aviso (reaproveita a casca se ela já estiver aberta). */
-    private static PendingIntent destino(Context c, Aviso aviso, int id) {
-        Intent i = new Intent(c, aviso.casca);
-        i.putExtra(MenuActivity.EXTRA_ABA, aviso.aba);
+    private static PendingIntent destino(Context c, Perfil p, String aba, int id) {
+        Intent i = new Intent(c, casca(p));
+        i.putExtra(MenuActivity.EXTRA_ABA, aba(p, aba));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
                 c, id, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-    static Class<? extends MenuActivity> casca(Perfil p) {
+    private static Class<? extends MenuActivity> casca(Perfil p) {
         switch (p) {
             case GESTOR:
                 return GestorHomeActivity.class;
@@ -205,6 +205,21 @@ public final class Notificacoes {
                 return CooperadoHomeActivity.class;
             default:
                 return EmpresaHomeActivity.class;
+        }
+    }
+
+    /** Item do menu da casca para a aba do aviso (0 = a aba inicial). */
+    private static int aba(Perfil p, String aba) {
+        switch (p) {
+            case GESTOR:
+                if ("coletas".equals(aba)) return R.id.nav_g_coletas;
+                if ("estoque".equals(aba)) return R.id.nav_g_estoque;
+                return R.id.nav_g_home;
+            case COOPERADO:
+                if ("rateios".equals(aba)) return R.id.nav_rateios;
+                return R.id.nav_home_cooperado;
+            default:
+                return R.id.nav_pedidos;
         }
     }
 }

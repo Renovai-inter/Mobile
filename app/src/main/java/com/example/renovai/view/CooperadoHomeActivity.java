@@ -39,12 +39,6 @@ public class CooperadoHomeActivity extends MenuActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (!isFinishing()) Notificacoes.verificarAgora(this);
-    }
-
-    @Override
     protected int abaInicial() {
         return R.id.nav_home_cooperado;
     }

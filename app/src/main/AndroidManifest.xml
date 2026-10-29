@@ -139,6 +139,15 @@
         </provider>
         <!-- ======================================================================================= -->
 
+        <!-- Notificações push enviadas pela API (Firebase Cloud Messaging) -->
+        <service
+            android:name=".NotificacaoPushService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".view.SplashActivity"
             android:exported="true" >
