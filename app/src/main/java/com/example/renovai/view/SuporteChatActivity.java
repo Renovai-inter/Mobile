@@ -23,14 +23,17 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.renovai.ApiClient;
+import com.example.renovai.CooperadoSession;
 import com.example.renovai.EmpresaData;
+import com.example.renovai.GestorData;
 import com.example.renovai.R;
+import com.example.renovai.SessionManager;
 import com.example.renovai.SuporteApiService;
 import com.example.renovai.TelaInsets;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -40,9 +43,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Atendimento ao cliente com o NIMO, aberto pelo botão Suporte do perfil de todas as áreas. O que
- * o assistente responde depende do perfil (a API decide pelo login): gestor, empresa e admin
- * recebem análises dos dados; cooperado e motorista, dúvidas gerais e FAQ.
+ * Atendimento ao cliente com o NIMO, aberto pelo botão Suporte do perfil de todas as áreas. A
+ * conversa vai direto para a API de IA com o id da empresa (perfil empresa) ou da cooperativa
+ * (gestor, cooperado e motorista) do login; a IA só responde sobre esse id.
  */
 public class SuporteChatActivity extends AppCompatActivity {
 
@@ -146,11 +149,56 @@ public class SuporteChatActivity extends AppCompatActivity {
         adicionar(new Mensagem(pergunta, true));
         adicionar(new Mensagem(DIGITANDO, false));
         aguardar(true);
-        perguntou = true;
 
-        chamada =
-                ApiClient.createService(SuporteApiService.class)
-                        .perguntar(new SuporteApiService.Pergunta(sessaoId, pergunta));
+        String role = SessionManager.getRole();
+        boolean empresa = role != null && role.toUpperCase(Locale.ROOT).contains("EMPRESA");
+        String empresaId = empresa ? SessionManager.getEmpresaId() : null;
+        String cooperativaId = empresa ? null : CooperadoSession.getCooperativaId();
+        if (empresaId == null && cooperativaId == null) { // admin do site
+            responder("Ainda não consigo atender esta conta. Eu respondo pelas contas de"
+                    + " cooperativa e de empresa.");
+            return;
+        }
+        perguntou = true;
+        resolverPerfil(
+                empresa,
+                perfilId -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    String email = SessionManager.getEmail();
+                    perguntarIa(new SuporteApiService.Pergunta(
+                            sessaoId, perfilId, cooperativaId, empresaId,
+                            email == null ? null : email.toLowerCase(Locale.ROOT), pergunta));
+                });
+    }
+
+    /**
+     * perfis.perfil_id da conta (da empresa ou da cooperativa), que a versão publicada da IA
+     * exige; sem ele segue com null, que basta para a versão nova.
+     */
+    private void resolverPerfil(boolean empresa, java.util.function.Consumer<String> pronto) {
+        boolean[] feito = {false}; // o cache pode responder antes da rede
+        GestorData.Ouvinte<String> ouvinte =
+                new GestorData.Ouvinte<String>() {
+                    @Override
+                    public void aoReceber(String perfilId, boolean doCache) {
+                        if (feito[0]) return;
+                        feito[0] = true;
+                        pronto.accept(perfilId);
+                    }
+
+                    @Override
+                    public void aoErro(String m) {
+                        if (feito[0]) return;
+                        feito[0] = true;
+                        pronto.accept(null);
+                    }
+                };
+        if (empresa) EmpresaData.meuPerfilId(ouvinte);
+        else GestorData.perfilDaCooperativa(ouvinte);
+    }
+
+    private void perguntarIa(SuporteApiService.Pergunta corpo) {
+        chamada = SuporteApiService.criar().perguntar(corpo);
         chamada.enqueue(
                 new Callback<SuporteApiService.Resposta>() {
                     @Override
@@ -161,10 +209,8 @@ public class SuporteChatActivity extends AppCompatActivity {
                         String texto =
                                 r.isSuccessful() && r.body() != null && r.body().resposta != null
                                         ? r.body().resposta
-                                        : r.code() == 401 || r.code() == 403
-                                                ? "Sua sessão expirou. Entre de novo no app para"
-                                                        + " conversar comigo."
-                                                : EmpresaData.erro(r);
+                                        : "Tive um problema para responder agora ("
+                                                + r.code() + "). Tente de novo em instantes.";
                         responder(texto);
                     }
 
@@ -209,7 +255,7 @@ public class SuporteChatActivity extends AppCompatActivity {
         if (!isFinishing()) return; // rotação: a conversa continua
         if (chamada != null) chamada.cancel();
         if (perguntou) {
-            ApiClient.createService(SuporteApiService.class)
+            SuporteApiService.criar()
                     .encerrar(sessaoId)
                     .enqueue(
                             new Callback<Void>() {
