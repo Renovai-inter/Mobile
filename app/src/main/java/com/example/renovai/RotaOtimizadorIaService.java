@@ -13,16 +13,15 @@ import retrofit2.http.Body;
 import retrofit2.http.POST;
 
 /**
- * Cálculo de rota da API de IA (POST /rotas/otimizar): o modelo de tempo de trajeto é treinado com
+ * Cálculo de rota da API de IA (POST /ia/rotas/otimizar): o modelo de tempo de trajeto é treinado com
  * as rotas que o RPA-neo4j sincroniza do Postgres para o Neo4j. Devolve o tempo na ordem da rota,
  * a ordem sugerida e quanto ela economiza. Quando a IA não responde, a tela cai no RotaEstimador.
  */
 public interface RotaOtimizadorIaService {
 
     /**
-     * Mesmo host da AWS. Atenção: hoje o gateway manda todo /rotas/** para a API-Redis; o
-     * /rotas/otimizar só chega na IA quando o gateway (Spring-API, orchestration/gateway) separar
-     * esse caminho.
+     * Mesmo host da AWS. O gateway manda todo /rotas/** para a API-Redis, por isso a IA expõe o
+     * cálculo também em /ia/rotas/** (repo IA, PR #36).
      */
     String BASE_URL = "http://ad0d8c99545a84713891def8a28f1d46-c7cd4a13dc3dd2e8.elb.us-east-1.amazonaws.com/";
 
@@ -85,7 +84,7 @@ public interface RotaOtimizadorIaService {
         public Double economiaMin;
     }
 
-    @POST("rotas/otimizar")
+    @POST("ia/rotas/otimizar")
     Call<Resultado> otimizar(@Body Pedido body);
 
     static RotaOtimizadorIaService criar() {

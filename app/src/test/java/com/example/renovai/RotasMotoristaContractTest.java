@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-/** Formato dos pedidos do app para a API-Redis (andamento da viagem) e para a IA (/rotas/otimizar). */
+/** Formato dos pedidos do app para a API-Redis (andamento da viagem) e para a IA (/ia/rotas/otimizar). */
 public class RotasMotoristaContractTest {
     private final RotaViagemApiService redis = RotaViagemApiService.criar("http://localhost/");
     private final RotaOtimizadorIaService ia = RotaOtimizadorIaService.criar("http://localhost/");
@@ -101,7 +101,8 @@ public class RotasMotoristaContractTest {
                                                         "e1", "Rua B, 2, São Paulo", null)),
                                         9))
                         .request();
-        assertEquals("/rotas/otimizar", r.url().encodedPath());
+        // /rotas/** o gateway entrega para a API-Redis; /ia/rotas/** chega na IA
+        assertEquals("/ia/rotas/otimizar", r.url().encodedPath());
         JsonObject json = body(r);
         assertFalse(json.get("salvar_no_neo4j").getAsBoolean());
         assertEquals("coop-1", json.get("cooperativa_id").getAsString());
