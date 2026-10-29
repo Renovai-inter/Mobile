@@ -89,12 +89,17 @@ public interface RotaOtimizadorIaService {
     Call<Resultado> otimizar(@Body Pedido body);
 
     static RotaOtimizadorIaService criar() {
+        return criar(BASE_URL);
+    }
+
+    /** Outro servidor (testes contra o modelo de rotas da IA rodando local). */
+    static RotaOtimizadorIaService criar(String baseUrl) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(45, TimeUnit.SECONDS)
                 .build();
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()

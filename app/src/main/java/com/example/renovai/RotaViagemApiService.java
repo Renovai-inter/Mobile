@@ -106,12 +106,17 @@ public interface RotaViagemApiService {
     Call<Sessao> finalizar(@Path("id") String rotaId);
 
     static RotaViagemApiService criar() {
+        return criar(BASE_URL);
+    }
+
+    /** Outro servidor (testes contra a API-Redis local). */
+    static RotaViagemApiService criar(String baseUrl) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
         return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
+                .baseUrl(baseUrl)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
