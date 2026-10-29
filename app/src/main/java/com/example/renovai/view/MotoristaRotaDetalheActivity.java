@@ -15,6 +15,7 @@ import com.example.renovai.MotoristaData;
 import com.example.renovai.MotoristaLocal;
 import com.example.renovai.R;
 import com.example.renovai.RotaEstimador;
+import com.example.renovai.RotaOtimizadorIaService;
 import com.example.renovai.RotaViagemApiService;
 import com.example.renovai.dto.response.GestorResponses;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -48,6 +49,10 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
     /** Índice da parada de coleta (0, 1, 2… na ordem da rota) → status na API-Redis. */
     private final Map<Integer, String> statusColetas = new HashMap<>();
     private boolean ocupado, reenviouParadas;
+
+    /** Distância e tempo já formatados (da IA ou da estimativa local) e a dica de ordem da IA. */
+    private String distancia, tempo, sugestaoIa;
+    private boolean estimou;
 
     @Override
     protected void onCreate(Bundle b) {
@@ -94,6 +99,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                 ordenarParadas();
                                 render();
                                 carregarViagem();
+                                estimar();
                             }
 
                             public void onFailure(Call<GestorResponses.Rota> c, Throwable t) {
@@ -488,6 +494,80 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
         }
         ((TextView) findViewById(R.id.txtProxRotaM)).setText(prox != null ? "Próx: " + prox : "—");
 
+        if (distancia != null)
+            ((TextView) findViewById(R.id.txtDistanciaM)).setText(distancia);
+        if (tempo != null) ((TextView) findViewById(R.id.txtTempoM)).setText(tempo);
+        if (sugestaoIa != null)
+            ((TextView) findViewById(R.id.txtResumoRotaM))
+                    .setText(ends.size() + (ends.size() == 1 ? " parada" : " paradas")
+                            + " · " + sugestaoIa);
+    }
+
+    // ───────────────────────────── distância e tempo ─────────────────────────────
+
+    /**
+     * Uma vez por tela: pede o cálculo à IA (modelo treinado com as rotas do Neo4j) e, se ela não
+     * responder, usa a estimativa local em linha reta.
+     */
+    private void estimar() {
+        if (estimou || ends.isEmpty()) return;
+        estimou = true;
+        List<GestorResponses.RotaEnd> coletas = coletas();
+        if (coletas.isEmpty()) {
+            estimarLocal();
+            return;
+        }
+        GestorResponses.RotaEnd partida = ends.get(0);
+        if (!ehExtremo(partida)) partida = coletas.get(0);
+        List<RotaOtimizadorIaService.Ponto> paradas = new ArrayList<>();
+        for (GestorResponses.RotaEnd e : coletas) if (e != partida) paradas.add(ponto(e));
+        if (paradas.isEmpty()) {
+            estimarLocal();
+            return;
+        }
+        RotaOtimizadorIaService.criar()
+                .otimizar(new RotaOtimizadorIaService.Pedido(
+                        rota.cooperativaId, rotaId, ponto(partida), paradas,
+                        java.time.LocalTime.now().getHour()))
+                .enqueue(
+                        new Callback<RotaOtimizadorIaService.Resultado>() {
+                            @Override
+                            public void onResponse(
+                                    Call<RotaOtimizadorIaService.Resultado> c,
+                                    Response<RotaOtimizadorIaService.Resultado> r) {
+                                if (!vivo()) return;
+                                RotaOtimizadorIaService.Resultado res = r.body();
+                                if (!r.isSuccessful() || res == null
+                                        || res.tempoOrdemAtualMin == null
+                                        || res.distanciaKm == null) {
+                                    estimarLocal();
+                                    return;
+                                }
+                                distancia = RotaEstimador.textoKm(res.distanciaKm) + " (IA)";
+                                tempo = RotaEstimador.textoTempo(
+                                        (int) Math.round(res.tempoOrdemAtualMin)) + " (IA)";
+                                long economia =
+                                        res.economiaMin == null ? 0 : Math.round(res.economiaMin);
+                                sugestaoIa = economia >= 5
+                                        ? "a IA sugere outra ordem (−" + economia + " min)"
+                                        : null;
+                                render();
+                            }
+
+                            @Override
+                            public void onFailure(
+                                    Call<RotaOtimizadorIaService.Resultado> c, Throwable t) {
+                                if (vivo()) estimarLocal();
+                            }
+                        });
+    }
+
+    private static RotaOtimizadorIaService.Ponto ponto(GestorResponses.RotaEnd e) {
+        return new RotaOtimizadorIaService.Ponto(
+                e.enderecoId, GestorRotaTexto.consulta(e), e.bairro);
+    }
+
+    private void estimarLocal() {
         List<String> qs = new ArrayList<>();
         for (GestorResponses.RotaEnd e : ends) qs.add(GestorRotaTexto.consulta(e));
         RotaEstimador.estimar(
@@ -497,10 +577,9 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                     @Override
                     public void resultado(double km, int min) {
                         if (!vivo()) return;
-                        ((TextView) findViewById(R.id.txtDistanciaM))
-                                .setText(RotaEstimador.textoKm(km) + " (estimado)");
-                        ((TextView) findViewById(R.id.txtTempoM))
-                                .setText(RotaEstimador.textoTempo(min) + " (estimado)");
+                        distancia = RotaEstimador.textoKm(km) + " (estimado)";
+                        tempo = RotaEstimador.textoTempo(min) + " (estimado)";
+                        render();
                     }
 
                     @Override
