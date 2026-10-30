@@ -4,6 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
@@ -30,7 +31,8 @@ public interface RotaViagemApiService {
     /** O gateway da AWS manda /rotas/** para a API-Redis (a Spring API fica em /api/rotas). */
     String BASE_URL = "http://ad0d8c99545a84713891def8a28f1d46-c7cd4a13dc3dd2e8.elb.us-east-1.amazonaws.com/";
 
-    String INICIADA = "INICIADA", FINALIZADA = "FINALIZADA";
+    /** SINCRONIZADA: a API-Redis já gravou a viagem no Postgres e só falta apagar a sessão. */
+    String INICIADA = "INICIADA", FINALIZADA = "FINALIZADA", SINCRONIZADA = "SINCRONIZADA";
     String PENDENTE = "PENDENTE", CONCLUIDA = "CONCLUIDA";
 
     class Inicio {
@@ -53,8 +55,25 @@ public interface RotaViagemApiService {
         @SerializedName("peso_estimado")
         public String pesoEstimado;
 
+        /** rotas_enderecos.endereco_id: liga a viagem ao ponto do grafo (tempo real do trecho). */
+        @SerializedName("endereco_id")
+        public String enderecoId;
+
+        /** Posição na rota da Spring API (a API-Redis devolve como texto). */
+        public String ordem;
+
+        /** Hora em que a coleta foi concluída (só nas paradas CONCLUIDA). */
+        @SerializedName("timestamp_conclusao")
+        public String conclusao;
+
         public Parada(String endereco) {
             this.endereco = endereco;
+        }
+
+        public Parada(String endereco, String enderecoId, Integer ordem) {
+            this.endereco = endereco;
+            this.enderecoId = enderecoId;
+            this.ordem = ordem == null ? null : String.valueOf(ordem);
         }
     }
 
@@ -69,8 +88,26 @@ public interface RotaViagemApiService {
     class NovoStatus {
         public final String status;
 
+        /** A API recusa (403) a alteração de quem não iniciou a viagem. */
+        @SerializedName("motorista_id")
+        public final String motoristaId;
+
         public NovoStatus(String status) {
+            this(status, null);
+        }
+
+        public NovoStatus(String status, String motoristaId) {
             this.status = status;
+            this.motoristaId = motoristaId;
+        }
+    }
+
+    class Motorista {
+        @SerializedName("motorista_id")
+        public final String motoristaId;
+
+        public Motorista(String motoristaId) {
+            this.motoristaId = motoristaId;
         }
     }
 
@@ -105,21 +142,29 @@ public interface RotaViagemApiService {
     @PUT("rotas/{id}/finalizar")
     Call<Sessao> finalizar(@Path("id") String rotaId);
 
+    @PUT("rotas/{id}/finalizar")
+    Call<Sessao> finalizar(@Path("id") String rotaId, @Body Motorista body);
+
     static RotaViagemApiService criar() {
         return criar(BASE_URL);
     }
 
     /** Outro servidor (testes contra a API-Redis local). */
     static RotaViagemApiService criar(String baseUrl) {
+        return criar(baseUrl, null);
+    }
+
+    /** {@code callbacks} != null: executa as respostas nesse executor (testes fora do Android). */
+    static RotaViagemApiService criar(String baseUrl, Executor callbacks) {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
                 .build();
-        return new Retrofit.Builder()
+        Retrofit.Builder b = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build()
-                .create(RotaViagemApiService.class);
+                .addConverterFactory(GsonConverterFactory.create());
+        if (callbacks != null) b.callbackExecutor(callbacks);
+        return b.build().create(RotaViagemApiService.class);
     }
 }

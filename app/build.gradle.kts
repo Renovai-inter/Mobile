@@ -17,6 +17,9 @@ if (file("google-services.json").exists()) {
 // e o login com Google precisa do "ID do cliente da Web" do projeto Firebase (o mesmo
 // GOOGLE_CLIENT_ID configurado na API):
 //   google.webClientId=XXXX.apps.googleusercontent.com
+// e o mapa do motorista precisa de uma chave com o "Maps SDK for Android" ativado no Google Cloud
+// (sem ela o app mostra o trajeto esquemático e continua permitindo cumprir a rota):
+//   maps.apiKey=AIza...
 val localProps = Properties().apply {
     val arquivo = rootProject.file("local.properties")
     if (arquivo.exists()) arquivo.inputStream().use { load(it) }
@@ -57,6 +60,8 @@ android {
         buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${localProp("cloudinary.cloudName")}\"")
         buildConfigField("String", "CLOUDINARY_UPLOAD_PRESET", "\"${localProp("cloudinary.uploadPreset")}\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProp("google.webClientId")}\"")
+        buildConfigField("String", "MAPS_API_KEY", "\"${localProp("maps.apiKey")}\"")
+        manifestPlaceholders["MAPS_API_KEY"] = localProp("maps.apiKey")
     }
 
     buildFeatures {
@@ -124,6 +129,10 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.messaging)
+
+    // Mapa e localização do motorista durante a rota (MotoristaNavegacaoActivity)
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
 
     // Login com Google (Credential Manager)
     implementation(libs.credentials)

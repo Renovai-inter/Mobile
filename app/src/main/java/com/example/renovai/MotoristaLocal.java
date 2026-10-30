@@ -3,9 +3,13 @@ package com.example.renovai;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.renovai.controller.ViagemRota;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -72,6 +76,41 @@ public final class MotoristaLocal {
         e.remove("finalizada_" + rotaId);
         for (int o : ordens) e.remove("parada_" + rotaId + "_" + o);
         e.apply();
+    }
+
+    /**
+     * Coletas marcadas sem conexão, aguardando envio à API-Redis (ver ViagemRota). Ficam no
+     * aparelho até a API aceitar, mesmo que o app seja fechado.
+     */
+    public static ViagemRota.Pendencias pendencias(Context c) {
+        SharedPreferences p = prefs(c);
+        return new ViagemRota.Pendencias() {
+            @Override
+            public Map<Integer, String> ler(String rotaId) {
+                String prefixo = "envio_" + rotaId + "_";
+                Map<Integer, String> out = new HashMap<>();
+                for (Map.Entry<String, ?> e : p.getAll().entrySet()) {
+                    if (!e.getKey().startsWith(prefixo) || !(e.getValue() instanceof String)) continue;
+                    try {
+                        out.put(Integer.parseInt(e.getKey().substring(prefixo.length())),
+                                (String) e.getValue());
+                    } catch (NumberFormatException ignorado) {
+                        // chave fora do formato
+                    }
+                }
+                return out;
+            }
+
+            @Override
+            public void guardar(String rotaId, int indice, String status) {
+                p.edit().putString("envio_" + rotaId + "_" + indice, status).apply();
+            }
+
+            @Override
+            public void remover(String rotaId, int indice) {
+                p.edit().remove("envio_" + rotaId + "_" + indice).apply();
+            }
+        };
     }
 
     /**

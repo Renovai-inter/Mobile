@@ -29,21 +29,24 @@ public final class RotaEstimador {
     private static final ExecutorService EXEC = Executors.newSingleThreadExecutor();
     private static final Map<String, double[]> CACHE = new HashMap<>();
     private static final Map<String, double[]> COORDS = new HashMap<>();
-    private static final Handler MAIN = new Handler(Looper.getMainLooper());
+    /** Criado só no primeiro uso (as funções de distância rodam em teste fora do Android). */
+    private static final class Main {
+        static final Handler H = new Handler(Looper.getMainLooper());
+    }
 
     private RotaEstimador() {
     }
 
     public static void estimar(Context ctx, List<String> enderecos, Callback cb) {
         if (enderecos == null || enderecos.size() < 2 || !Geocoder.isPresent()) {
-            MAIN.post(cb::indisponivel);
+            Main.H.post(cb::indisponivel);
             return;
         }
         final String chave = String.join("|", enderecos);
         synchronized (CACHE) {
             double[] c = CACHE.get(chave);
             if (c != null) {
-                MAIN.post(() -> cb.resultado(c[0], (int) c[1]));
+                Main.H.post(() -> cb.resultado(c[0], (int) c[1]));
                 return;
             }
         }
@@ -56,7 +59,7 @@ public final class RotaEstimador {
                 if (p != null) pontos.add(p);
             }
             if (pontos.size() < 2) {
-                MAIN.post(cb::indisponivel);
+                Main.H.post(cb::indisponivel);
                 return;
             }
             double km = 0;
@@ -67,8 +70,54 @@ public final class RotaEstimador {
             synchronized (CACHE) {
                 CACHE.put(chave, new double[]{kmF, min});
             }
-            MAIN.post(() -> cb.resultado(kmF, min));
+            Main.H.post(() -> cb.resultado(kmF, min));
         });
+    }
+
+    public interface CallbackCoordenadas {
+        /** Uma posição por endereço, na mesma ordem; null quando não foi possível localizar. */
+        void coordenadas(List<double[]> pontos);
+    }
+
+    /** Geocodifica os endereços (com o mesmo cache da estimativa) fora da thread da tela. */
+    public static void coordenadas(Context ctx, List<String> enderecos, CallbackCoordenadas cb) {
+        if (enderecos == null || enderecos.isEmpty() || !Geocoder.isPresent()) {
+            List<double[]> vazio = new ArrayList<>();
+            if (enderecos != null) for (int i = 0; i < enderecos.size(); i++) vazio.add(null);
+            Main.H.post(() -> cb.coordenadas(vazio));
+            return;
+        }
+        final Context app = ctx.getApplicationContext();
+        final List<String> copia = new ArrayList<>(enderecos);
+        EXEC.execute(() -> {
+            Geocoder g = new Geocoder(app, new Locale("pt", "BR"));
+            List<double[]> pontos = new ArrayList<>();
+            for (String e : copia) {
+                double[] p = e == null || e.trim().isEmpty() ? null : coord(g, e);
+                pontos.add(valida(p) ? p : null);
+            }
+            Main.H.post(() -> cb.coordenadas(pontos));
+        });
+    }
+
+    /** Descarta posições impossíveis (NaN, fora do globo) e o 0,0 que geocoders devolvem por erro. */
+    public static boolean valida(double[] p) {
+        return p != null
+                && p.length >= 2
+                && !Double.isNaN(p[0]) && !Double.isNaN(p[1])
+                && !Double.isInfinite(p[0]) && !Double.isInfinite(p[1])
+                && Math.abs(p[0]) <= 90 && Math.abs(p[1]) <= 180
+                && !(p[0] == 0 && p[1] == 0);
+    }
+
+    /** Distância em linha reta, em metros. */
+    public static double metros(double[] a, double[] b) {
+        return haversine(a, b) * 1000.0;
+    }
+
+    public static String textoDistancia(double metros) {
+        if (metros < 1000) return Math.round(metros) + " m";
+        return textoKm(metros / 1000.0);
     }
 
     @SuppressWarnings("deprecation")
