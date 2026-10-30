@@ -18,13 +18,17 @@ if (file("google-services.json").exists()) {
 // GOOGLE_CLIENT_ID configurado na API):
 //   google.webClientId=XXXX.apps.googleusercontent.com
 // e o mapa do motorista precisa de uma chave com o "Maps SDK for Android" ativado no Google Cloud
-// (sem ela o app mostra o trajeto esquemático e continua permitindo cumprir a rota):
+// (sem ela, ou se a chave não tiver o Maps SDK liberado, a tela usa o trajeto esquemático). Nunca
+// coloque a chave em arquivo versionado; no CI ela vem do secret MAPS_API_KEY:
 //   maps.apiKey=AIza...
 val localProps = Properties().apply {
     val arquivo = rootProject.file("local.properties")
     if (arquivo.exists()) arquivo.inputStream().use { load(it) }
 }
 fun localProp(nome: String): String = (localProps.getProperty(nome) ?: "").trim()
+
+// chave do Maps SDK: local.properties na máquina de quem desenvolve; no CI, o secret MAPS_API_KEY
+val mapsApiKey: String = localProp("maps.apiKey").ifEmpty { System.getenv("MAPS_API_KEY")?.trim() ?: "" }
 
 android {
     namespace = "com.example.renovai"
@@ -60,8 +64,8 @@ android {
         buildConfigField("String", "CLOUDINARY_CLOUD_NAME", "\"${localProp("cloudinary.cloudName")}\"")
         buildConfigField("String", "CLOUDINARY_UPLOAD_PRESET", "\"${localProp("cloudinary.uploadPreset")}\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"${localProp("google.webClientId")}\"")
-        buildConfigField("String", "MAPS_API_KEY", "\"${localProp("maps.apiKey")}\"")
-        manifestPlaceholders["MAPS_API_KEY"] = localProp("maps.apiKey")
+        buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildFeatures {
