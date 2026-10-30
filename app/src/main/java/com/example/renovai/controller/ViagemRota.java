@@ -203,8 +203,12 @@ public class ViagemRota {
                 motoristaDaViagem = s.motoristaId;
                 carregou = true;
                 if (emAndamento()) carregarParadas();
-                else {
-                    if (finalizada()) descartarPendencias();
+                else if (finalizada()) {
+                    // mostra o status já; as coletas feitas chegam em seguida (até a sincronização)
+                    descartarPendencias();
+                    ouvinte.mudou();
+                    carregarParadas();
+                } else {
                     ouvinte.mudou();
                 }
             }
@@ -226,12 +230,12 @@ public class ViagemRota {
                                    Response<RotaViagemApiService.Paradas> r) {
                 if (encerrada) return;
                 if (!r.isSuccessful() || r.body() == null) {
-                    semConexao = true;
+                    semConexao = emAndamento(); // finalizada: só fica sem a contagem
                     ouvinte.mudou();
                     return;
                 }
                 List<RotaViagemApiService.Parada> lista = r.body().paradas;
-                if ((lista == null || lista.isEmpty()) && !outroMotorista()
+                if ((lista == null || lista.isEmpty()) && emAndamento() && !outroMotorista()
                         && !reenviouParadas && !coletas.isEmpty()) {
                     // o envio das paradas falhou ao iniciar: manda de novo (1 vez)
                     reenviouParadas = true;
@@ -250,13 +254,13 @@ public class ViagemRota {
                     }
                 }
                 ouvinte.mudou();
-                enviarPendencias();
+                if (emAndamento()) enviarPendencias();
             }
 
             @Override
             public void onFailure(Call<RotaViagemApiService.Paradas> c, Throwable t) {
                 if (encerrada) return;
-                semConexao = true;
+                semConexao = emAndamento();
                 ouvinte.mudou();
             }
         });

@@ -461,7 +461,7 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
                 ? ("INICIO".equalsIgnoreCase(e.tipoLocal) ? "Ponto de partida" : "Retorno à cooperativa")
                 : "Coleta");
         sb.append("\nOrdem na rota: ").append(i + 1).append(" de ").append(ends.size());
-        if (k >= 0 && viagem.emAndamento()) {
+        if (k >= 0 && comColetas()) {
             sb.append("\nSituação: ").append(situacao(k));
         }
         double[] c = coord(i);
@@ -524,14 +524,14 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
             View v = LayoutInflater.from(this).inflate(R.layout.item_motorista_parada, raiz, false);
             TextView num = v.findViewById(R.id.txtParadaMNumero);
             num.setText(String.valueOf(i + 1));
-            boolean feita = k >= 0 && viagem.emAndamento() && viagem.concluida(k);
+            boolean feita = k >= 0 && comColetas() && viagem.concluida(k);
             num.setBackgroundResource(feita ? R.drawable.avatar_green_background
                     : i == prox && viagem.emAndamento() ? R.drawable.avatar_maroon_background
                     : R.drawable.stop_outline_green);
             if (!feita && !(i == prox && viagem.emAndamento())) num.setTextColor(VERDE);
             String rotulo = k < 0
                     ? ("INICIO".equalsIgnoreCase(e.tipoLocal) ? "Ponto de Partida" : "Retorno à Cooperativa")
-                    : "Coleta" + (viagem.emAndamento() ? " - " + situacao(k) : "");
+                    : "Coleta" + (comColetas() ? " - " + situacao(k) : "");
             if (k >= 0 && coords != null && coord(i) == null) rotulo += " - sem localização";
             ((TextView) v.findViewById(R.id.txtParadaMTipo)).setText(rotulo);
             ((TextView) v.findViewById(R.id.txtParadaMEndereco)).setText(GestorRotaTexto.endereco(e));
@@ -559,6 +559,11 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
         return iso != null && iso.length() >= 16 ? iso.substring(11, 16) : null;
     }
 
+    /** Com a viagem em andamento ou já finalizada, a situação de cada coleta vale para a tela. */
+    private boolean comColetas() {
+        return viagem.emAndamento() || viagem.finalizada();
+    }
+
     private void render() {
         if (viagem == null) return;
         boolean andamento = viagem.emAndamento();
@@ -567,14 +572,16 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
                 || (viagem.carregou() && viagem.status() == null
                         && MotoristaLocal.finalizadaHoje(this, rotaId));
         boolean ativa = rota == null || !Boolean.FALSE.equals(rota.estaAtiva);
-        int total = viagem.totalColetas(), feitas = andamento ? viagem.concluidas() : 0;
+        int total = viagem.totalColetas(), feitas = comColetas() ? viagem.concluidas() : 0;
 
         TextView progresso = findViewById(R.id.txtProgressoNav);
         if (rota == null) progresso.setText("Carregando a rota…");
         else if (andamento)
             progresso.setText(feitas + " de " + total + (total == 1 ? " coleta concluída" : " coletas concluídas")
                     + (viagem.outroMotorista() ? " · outro motorista" : ""));
-        else if (finalizada) progresso.setText("Rota finalizada");
+        else if (finalizada)
+            progresso.setText("Rota finalizada"
+                    + (viagem.finalizada() && total > 0 ? " · " + feitas + " de " + total + " coletas concluídas" : ""));
         else progresso.setText(total + (total == 1 ? " coleta" : " coletas") + " · viagem não iniciada");
         ProgressBar barra = findViewById(R.id.barraProgressoNav);
         barra.setProgress(total == 0 ? 0 : Math.round(100f * feitas / total));
@@ -630,6 +637,13 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
         if (ends.isEmpty()) {
             rotulo.setText("Próxima parada");
             endereco.setText(rota == null ? "—" : "Rota sem paradas cadastradas.");
+            dist.setText("");
+            return;
+        }
+        if (viagem.finalizada()
+                || (viagem.carregou() && viagem.status() == null && MotoristaLocal.finalizadaHoje(this, rotaId))) {
+            rotulo.setText("Rota finalizada");
+            endereco.setText("Os dados da viagem foram enviados à cooperativa.");
             dist.setText("");
             return;
         }
@@ -689,7 +703,7 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
         for (int i = 0; i < ends.size(); i++) {
             double[] c = coord(i);
             int k = indiceColeta(i);
-            boolean feita = k >= 0 && viagem.emAndamento() && viagem.concluida(k);
+            boolean feita = k >= 0 && comColetas() && viagem.concluida(k);
             if (k >= 0 && !feita) emSequencia = false;
             if (c == null) continue;
             LatLng p = new LatLng(c[0], c[1]);

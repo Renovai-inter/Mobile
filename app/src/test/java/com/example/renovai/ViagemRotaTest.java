@@ -259,6 +259,30 @@ public class ViagemRotaTest {
     }
 
     @Test
+    public void finalizadaMostraAsColetasFeitasSemReenviarNada() throws Exception {
+        servidor.enqueue(json(200, sessao(EU, "FINALIZADA")));
+        servidor.enqueue(json(200, paradasForaDeOrdem(10)));
+        esperar(2, viagem::carregar);
+        assertTrue(viagem.finalizada());
+        assertTrue(viagem.concluida(10));
+        assertEquals(1, viagem.concluidas());
+        assertFalse(viagem.podeMexer());
+        assertFalse(viagem.semConexao());
+        servidor.takeRequest(); // GET /rotas/{id}
+        assertEquals("GET", servidor.takeRequest().getMethod()); // GET /paradas
+        assertEquals(2, servidor.getRequestCount()); // nada de POST de paradas nem PUT de pendências
+    }
+
+    @Test
+    public void finalizadaJaSemParadasNaoReenviaAsParadas() throws Exception {
+        servidor.enqueue(json(200, sessao(EU, "FINALIZADA")));
+        servidor.enqueue(json(200, "{\"paradas\":[]}"));
+        esperar(2, viagem::carregar);
+        assertEquals(0, viagem.concluidas());
+        assertEquals(2, servidor.getRequestCount());
+    }
+
+    @Test
     public void coordenadasInvalidasSaoDescartadas() {
         assertTrue(RotaEstimador.valida(new double[] {-23.55, -46.63}));
         assertFalse(RotaEstimador.valida(null));

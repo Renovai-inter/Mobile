@@ -197,7 +197,9 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
 
         TextView status = findViewById(R.id.txtRotaMStatus);
         int totalColetas = coletas().size();
-        int feitas = andamento ? viagem.concluidas() : 0;
+        // finalizada, a API ainda guarda as coletas até a sincronização com o Postgres
+        boolean comColetas = andamento || viagem.finalizada();
+        int feitas = comColetas ? viagem.concluidas() : 0;
         if (andamento) {
             GestorUi.badge(status, GestorUi.EM_NEGOCIACAO);
             status.setText("Em andamento");
@@ -233,9 +235,13 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                         + (viagem.pendentesDeEnvio() > 0
                                                 ? " · " + viagem.pendentesDeEnvio() + " aguardando envio"
                                                 : outroMotorista ? "" : " · toque numa coleta para marcar")
-                                : "Inicie a rota para registrar as coletas");
+                                : comColetas
+                                        ? feitas + " de " + totalColetas + " coletas concluídas"
+                                        : finalizada
+                                                ? "Rota finalizada"
+                                                : "Inicie a rota para registrar as coletas");
         ((TextView) findViewById(R.id.txtParadasConcM))
-                .setText((andamento ? String.valueOf(feitas) : "—") + " / " + totalColetas);
+                .setText((comColetas ? String.valueOf(feitas) : "—") + " / " + totalColetas);
 
         View btnIniciar = findViewById(R.id.btnIniciarRotaM);
         btnIniciar.setVisibility(
@@ -258,7 +264,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
             boolean extremo = ehExtremo(e);
             int indice = extremo ? -1 : indiceColeta++;
             boolean feita =
-                    andamento
+                    comColetas
                             && !extremo
                             && viagem.concluida(indice);
             boolean ehFim = "FIM".equalsIgnoreCase(e.tipoLocal);
@@ -280,7 +286,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                     ? "Ponto de Partida"
                                     : "Retorno à Cooperativa")
                             : "Coleta";
-            String situacao = !extremo && andamento
+            String situacao = !extremo && comColetas
                     ? (feita ? " - Concluída" : " - Pendente")
                             + (viagem.aguardandoEnvio(indice) ? " (aguardando envio)" : "")
                     : "";
