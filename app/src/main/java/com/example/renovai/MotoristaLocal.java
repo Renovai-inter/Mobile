@@ -9,9 +9,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Estado legado do protótipo local. As telas atuais não usam estes registros como andamento de
- * viagem. O acompanhamento será confirmado pela futura API com Redis; este arquivo não grava no
- * SQL.
+ * Lembrança local da viagem neste aparelho. O andamento de verdade fica na API-Redis
+ * (RotaViagemApiService), que apaga a sessão depois de gravar a rota finalizada no Postgres; por
+ * isso a tela usa {@link #finalizadaHoje} para continuar mostrando "Finalizada hoje".
  */
 public final class MotoristaLocal {
 
