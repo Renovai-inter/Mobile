@@ -1,57 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<!--
+  Splash animada (prévia: artifact "Splash do Renovaí"). Os tamanhos são proporcionais à largura
+  da tela e são aplicados em SplashAnimacao.dimensionar(): mascote 31%, nome 84%, slogan 68%.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#519059"
+    android:clipChildren="false"
     tools:context=".view.SplashActivity">
 
-    <!-- Logo / símbolo -->
-    <ImageView
-        android:id="@+id/logo"
-        android:layout_width="100dp"
-        android:layout_height="107dp"
-        android:layout_marginTop="180dp"
-        android:contentDescription="Logo Renovai"
-        android:scaleType="fitCenter"
-        android:src="@drawable/logo"
-        app:layout_constraintBottom_toTopOf="@id/renovai_estilizado"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    <!-- Folhinhas que sobem no fundo (criadas no código) -->
+    <FrameLayout
+        android:id="@+id/splashFolhas"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
-    <!-- Renovai estilizado -->
     <ImageView
-        android:id="@+id/renovai_estilizado"
-        android:layout_width="273dp"
-        android:layout_height="69dp"
-        android:layout_marginTop="10dp"
-        android:contentDescription="Renovai"
-        android:scaleType="fitCenter"
-        android:src="@drawable/renovai_estilizado"
-        app:layout_constraintBottom_toTopOf="@id/transforme_texto"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo" />
+        android:id="@+id/splashHalo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:src="@drawable/splash_halo" />
 
-    <!-- Slogan -->
     <ImageView
-        android:id="@+id/transforme_texto"
-        android:layout_width="220dp"
-        android:layout_height="25dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="250dp"
-        android:contentDescription="Transforme hoje, sustente o amanhã"
-        android:scaleType="fitCenter"
-        android:src="@drawable/transforme_texto"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/renovai_estilizado" />
+        android:id="@+id/splashAnel"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:alpha="0"
+        android:importantForAccessibility="no"
+        android:src="@drawable/splash_anel" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/splashPalco"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/logo"
+            android:layout_width="100dp"
+            android:layout_height="107dp"
+            android:contentDescription="Mascote do Renovaí"
+            android:scaleType="fitCenter"
+            android:src="@drawable/avd_logo_splash" />
+
+        <ImageView
+            android:id="@+id/renovai_estilizado"
+            android:layout_width="270dp"
+            android:layout_height="108dp"
+            android:contentDescription="Renovaí"
+            android:scaleType="fitCenter"
+            android:src="@drawable/avd_nome_splash" />
+
+        <ImageView
+            android:id="@+id/transforme_texto"
+            android:layout_width="220dp"
+            android:layout_height="13dp"
+            android:alpha="0"
+            android:contentDescription="Transforme hoje, sustente o amanhã"
+            android:scaleType="fitCenter"
+            android:src="@drawable/transforme_texto" />
+    </LinearLayout>
+
+</FrameLayout>

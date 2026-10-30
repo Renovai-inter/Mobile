@@ -28,6 +28,16 @@
     <style name="Theme.Renovai" parent="Base.Theme.Renovai" />
 
     <!--
+        Só da SplashActivity: a splash do sistema (Android 12+) fica só verde, sem o ícone, e a
+        janela já abre verde. Assim a animação do Renovaí começa sem "piscar" outra tela antes.
+    -->
+    <style name="Theme.Renovai.Splash" parent="Theme.Renovai">
+        <item name="android:windowBackground">@color/verde</item>
+        <item name="android:windowSplashScreenBackground">@color/verde</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_sistema</item>
+    </style>
+
+    <!--
         Pop-up padrão do app (imagem Pop-up-padrao): cartão branco com cantos de 20dp, título em
         negrito no vinho, texto cinza e o botão principal cheio, à direita. Vale para todo
         MaterialAlertDialogBuilder do app.

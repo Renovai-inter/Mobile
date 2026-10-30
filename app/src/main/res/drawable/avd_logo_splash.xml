@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/splash_logo">
+    <!-- Linha do tempo igual à prévia (ms): cabeça 0, nariz 420, orelhas 520/580, rabo 300, gomos 300+90·i, piscadas 1450 e 2580. -->
+    <target android:name="cabeca">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="520" android:startOffset="0" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="520" android:startOffset="0" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="nariz">
+        <aapt:attr name="android:animation">
+            <set>
+            <objectAnimator android:duration="400" android:startOffset="420">
+                <propertyValuesHolder android:propertyName="scaleX" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="1"/>
+                    <keyframe android:fraction="0.35" android:value="1.45"/>
+                    <keyframe android:fraction="1" android:value="1"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+            <objectAnimator android:duration="400" android:startOffset="420">
+                <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="1"/>
+                    <keyframe android:fraction="0.35" android:value="1.45"/>
+                    <keyframe android:fraction="1" android:value="1"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="orelhaD">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="500" android:startOffset="520">
+                <propertyValuesHolder android:propertyName="rotation" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="0"/>
+                    <keyframe android:fraction="0.28" android:value="14"/>
+                    <keyframe android:fraction="0.6" android:value="-8"/>
+                    <keyframe android:fraction="1" android:value="0"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+    <target android:name="orelhaE">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:duration="500" android:startOffset="580">
+                <propertyValuesHolder android:propertyName="rotation" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="0"/>
+                    <keyframe android:fraction="0.28" android:value="-14"/>
+                    <keyframe android:fraction="0.6" android:value="8"/>
+                    <keyframe android:fraction="1" android:value="0"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+        </aapt:attr>
+    </target>
+    <target android:name="olhos">
+        <aapt:attr name="android:animation">
+            <set>
+            <objectAnimator android:duration="230" android:startOffset="1450">
+                <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="1"/>
+                    <keyframe android:fraction="0.4" android:value="0.12"/>
+                    <keyframe android:fraction="1" android:value="1"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+            <objectAnimator android:duration="210" android:startOffset="2580">
+                <propertyValuesHolder android:propertyName="scaleY" android:valueType="floatType">
+                    <keyframe android:fraction="0" android:value="1"/>
+                    <keyframe android:fraction="0.4" android:value="0.12"/>
+                    <keyframe android:fraction="1" android:value="1"/>
+                </propertyValuesHolder>
+            </objectAnimator>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="rabo">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="rotation" android:valueFrom="-90" android:valueTo="0" android:valueType="floatType" android:duration="1000" android:startOffset="300" android:interpolator="@interpolator/splash_padrao"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo0">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="300" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="300" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo0_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="300" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo1">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="390" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="390" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo1_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="390" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo2">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="480" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="480" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo2_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="480" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo3">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="570" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="570" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo3_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="570" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo4">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="660" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="660" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo4_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="320" android:startOffset="660" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo5">
+        <aapt:attr name="android:animation">
+            <set>
+                <objectAnimator android:propertyName="scaleX" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="360" android:startOffset="750" android:interpolator="@interpolator/splash_overshoot"/>
+                <objectAnimator android:propertyName="scaleY" android:valueFrom="0.3" android:valueTo="1" android:valueType="floatType" android:duration="360" android:startOffset="750" android:interpolator="@interpolator/splash_overshoot"/>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="gomo5_p">
+        <aapt:attr name="android:animation">
+            <objectAnimator android:propertyName="fillAlpha" android:valueFrom="0" android:valueTo="1" android:valueType="floatType" android:duration="360" android:startOffset="750" android:interpolator="@interpolator/splash_overshoot"/>
+        </aapt:attr>
+    </target>
+</animated-vector>
