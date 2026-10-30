@@ -29,6 +29,9 @@ service cloud.firestore {
             || request.resource.data.dataPrevistaTriagem.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'));
     }
 
+    // Aparelhos das notificações push (dispositivos_push): só a API grava e lê, pelo SDK de
+    // admin, que não passa por estas regras. Para o app a coleção fica fechada (regra abaixo).
+
     // Todo o resto fica fechado.
     match /{documento=**} {
       allow read, write: if false;
