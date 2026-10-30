@@ -11,7 +11,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.renovai.CooperadoPreload;
 import com.example.renovai.CooperadoUi;
+import com.example.renovai.GestorUi;
+import com.example.renovai.SessionManager;
 import com.example.renovai.R;
 import com.example.renovai.controller.PerfilCooperadoController;
 
@@ -48,6 +51,8 @@ public class CooperadoPerfilFragment extends TelaFragment {
                         Toast.LENGTH_LONG).show());
 
         findViewById(R.id.btnSuporte).setOnClickListener(v -> abrirSuporte());
+        findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(
+                tela(), "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
 
 
         carregarPerfil();
@@ -74,5 +79,15 @@ public class CooperadoPerfilFragment extends TelaFragment {
 
     private void abrirSuporte() {
         SuporteChatActivity.abrir(requireContext());
+    }
+
+    /** Mesmo logout das outras áreas: descadastra o push, limpa sessão e cache e volta ao login. */
+    private void sair() {
+        SessionManager.logout();
+        com.example.renovai.GestorCache.limpar();
+        CooperadoPreload.limpar();
+        Intent i = new Intent(tela(), LoginActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
     }
 }

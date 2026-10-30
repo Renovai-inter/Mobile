@@ -348,7 +348,7 @@ public class LoginActivity extends AppCompatActivity {
      * são conhecidos sem consultar o banco (ver IMPLEMENTACAO.md). Qualquer outro
      * role sem área no app devolve null (o login avisa em vez de abrir uma tela vazia).
      */
-    private Class<?> destinoParaRole(String role) {
+    static Class<?> destinoParaRole(String role) {
         // Gestor da cooperativa (cargo GESTOR_COOPERATIVA). "GESTOR_EMPRESA" é o login de Perfil
         // da empresa e continua indo para a área da Empresa (abaixo), não para o Gestor.
         if (role != null) {
