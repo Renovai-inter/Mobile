@@ -96,6 +96,8 @@ public class SuporteChatActivity extends AppCompatActivity {
         lista.setAdapter(adaptador);
 
         restaurar(b);
+        // mesmo caminho do voltar do sistema: ao fechar, a conversa é encerrada na IA (onDestroy)
+        findViewById(R.id.btnVoltarSuporte).setOnClickListener(v -> getOnBackPressedDispatcher().onBackPressed());
         btnEnviar.setOnClickListener(v -> enviar());
         edtPergunta.setOnEditorActionListener(
                 (v, acao, evento) -> {
