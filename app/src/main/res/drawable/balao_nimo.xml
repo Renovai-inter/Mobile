@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Balão do NIMO no chat de suporte (design_chat_suporte) -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/menu_selecionado_empresa" />
+    <corners android:radius="12dp" />
+</shape>

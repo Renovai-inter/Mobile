@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Campo "Faça sua pergunta" do chat de suporte -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F7F7F7" />
+    <stroke android:width="1dp" android:color="#222222" />
+    <corners android:radius="10dp" />
+</shape>

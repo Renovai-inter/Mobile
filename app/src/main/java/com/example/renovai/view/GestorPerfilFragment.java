@@ -1,12 +1,10 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -37,13 +35,7 @@ public class GestorPerfilFragment extends GestorAbaFragment {
         campo(R.id.campoCpf, "Cargo", CooperadoSession.getCargo(), null);
         campo(R.id.campoTelefone, "Cooperativa", CooperadoSession.getCooperativaNome(), null);
 
-        findViewById(R.id.btnSuporte).setOnClickListener(v -> new MaterialAlertDialogBuilder(tela()).setTitle("Suporte")
-                .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
-                .setPositiveButton("Enviar e-mail", (d, w) -> {
-                    Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));
-                    i.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Gestor)");
-                    try { startActivity(i); } catch (Exception e) { toast("Nenhum app de e-mail encontrado."); }
-                }).setNegativeButton("Fechar", null).show());
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> SuporteChatActivity.abrir(requireContext()));
         findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(tela(), "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
     }
 

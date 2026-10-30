@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chat de suporte com o NIMO (design_chat_suporte): cabeçalho verde, conversa e campo de pergunta. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/txtTituloSuporte"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/verde"
+        android:gravity="center"
+        android:paddingTop="22dp"
+        android:paddingBottom="22dp"
+        android:tag="topo"
+        android:text="Atendimento ao cliente"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/listaMensagensSuporte"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingStart="16dp"
+        android:paddingTop="28dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="16dp">
+
+        <EditText
+            android:id="@+id/edtPerguntaSuporte"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/campo_pergunta_background"
+            android:hint="Faça sua pergunta"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLength="2000"
+            android:maxLines="4"
+            android:minHeight="48dp"
+            android:paddingStart="14dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="12dp"
+            android:textColor="#222222"
+            android:textColorHint="#9E9E9E"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/btnEnviarSuporte"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="10dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Enviar pergunta"
+            android:padding="8dp"
+            android:src="@drawable/ic_enviar_contorno" />
+    </LinearLayout>
+</LinearLayout>

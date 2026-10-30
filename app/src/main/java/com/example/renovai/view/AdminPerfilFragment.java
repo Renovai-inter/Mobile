@@ -1,8 +1,6 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -41,16 +39,7 @@ public class AdminPerfilFragment extends AdminAbaFragment {
         campo(R.id.campoCpf, "Cargo", CooperadoSession.getCargo() != null ? CooperadoSession.getCargo() : "Admin do site", null);
         campo(R.id.campoTelefone, "Acesso", "Todas as cooperativas, empresas e contas", null);
 
-        findViewById(R.id.btnSuporte).setOnClickListener(v -> new MaterialAlertDialogBuilder(requireContext())
-                .setTitle("Suporte")
-                .setMessage("Precisa de ajuda? Envie um e-mail para suporte@renovai.com.")
-                .setPositiveButton("Enviar e-mail", (d, w) -> {
-                    Intent i = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:suporte@renovai.com"));
-                    i.putExtra(Intent.EXTRA_SUBJECT, "Suporte — app Renovaí (Admin)");
-                    try { startActivity(i); } catch (Exception e) { toast("Nenhum app de e-mail encontrado."); }
-                })
-                .setNegativeButton("Fechar", null)
-                .show());
+        findViewById(R.id.btnSuporte).setOnClickListener(v -> SuporteChatActivity.abrir(requireContext()));
         findViewById(R.id.btnSair).setOnClickListener(v ->
                 GestorUi.confirmar(tela(), "Sair da conta", "Deseja sair da conta?", "Sair", this::sair));
     }

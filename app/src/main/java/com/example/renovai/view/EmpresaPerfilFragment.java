@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 
@@ -100,32 +99,7 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
         campo(R.id.campoInteresseE, "Materiais de interesse", null, v -> editarInteresses());
 
         findViewById(R.id.btnSuporteE)
-                .setOnClickListener(
-                        v ->
-                                new MaterialAlertDialogBuilder(tela())
-                                        .setTitle("Suporte")
-                                        .setMessage(
-                                                "Precisa de ajuda? Envie um e-mail para"
-                                                        + " suporte@renovai.com.")
-                                        .setPositiveButton(
-                                                "Enviar e-mail",
-                                                (d, w) -> {
-                                                    Intent i =
-                                                            new Intent(
-                                                                    Intent.ACTION_SENDTO,
-                                                                    Uri.parse(
-                                                                            "mailto:suporte@renovai.com"));
-                                                    i.putExtra(
-                                                            Intent.EXTRA_SUBJECT,
-                                                            "Suporte — app Renovaí (Empresa)");
-                                                    try {
-                                                        startActivity(i);
-                                                    } catch (Exception e) {
-                                                        toast("Nenhum app de e-mail encontrado.");
-                                                    }
-                                                })
-                                        .setNegativeButton("Fechar", null)
-                                        .show());
+                .setOnClickListener(v -> SuporteChatActivity.abrir(requireContext()));
         findViewById(R.id.btnSairE)
                 .setOnClickListener(
                         v ->
