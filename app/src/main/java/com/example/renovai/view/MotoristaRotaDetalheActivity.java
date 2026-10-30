@@ -1,8 +1,6 @@
 package com.example.renovai.view;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,22 +15,21 @@ import com.example.renovai.R;
 import com.example.renovai.RotaEstimador;
 import com.example.renovai.RotaOtimizadorIaService;
 import com.example.renovai.RotaViagemApiService;
+import com.example.renovai.controller.ViagemRota;
 import com.example.renovai.dto.response.GestorResponses;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 /**
- * Tela 3.2 — Rota selecionada: mapa, trajeto com progresso por parada, GPS e Iniciar/Finalizar.
+ * Tela 3.2 — Rota selecionada: trajeto com progresso por parada, mapa e Iniciar/Finalizar.
  * A rota vem da Spring API; o andamento da viagem (iniciada, coletas concluídas, finalizada) fica na
- * API-Redis (ver RotaViagemApiService).
+ * API-Redis, pelo ViagemRota — o mesmo da tela do mapa (MotoristaNavegacaoActivity).
  */
 public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
 
@@ -42,13 +39,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
     private GestorResponses.Rota rota;
     private List<GestorResponses.RotaEnd> ends = new ArrayList<>();
 
-    /** null = viagem não iniciada; senão INICIADA ou FINALIZADA (status da API-Redis). */
-    private String viagem;
-    private String viagemInicio;
-    private boolean outroMotorista;
-    /** Índice da parada de coleta (0, 1, 2… na ordem da rota) → status na API-Redis. */
-    private final Map<Integer, String> statusColetas = new HashMap<>();
-    private boolean ocupado, reenviouParadas;
+    private ViagemRota viagem;
 
     /** Distância e tempo já formatados (da IA ou da estimativa local) e a dica de ordem da IA. */
     private String distancia, tempo, sugestaoIa;
@@ -66,11 +57,36 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
             finish();
             return;
         }
+        viagem = new ViagemRota(RotaViagemApiService.criar(), rotaId, funcId(),
+                MotoristaLocal.pendencias(this), new ViagemRota.Ouvinte() {
+                    @Override
+                    public void mudou() {
+                        if (vivo() && rota != null) render();
+                    }
+
+                    @Override
+                    public void aviso(String m) {
+                        if (vivo()) toast(m);
+                    }
+
+                    @Override
+                    public void finalizou() {
+                        MotoristaLocal.marcarFinalizada(MotoristaRotaDetalheActivity.this, rotaId);
+                        toast("Rota finalizada.");
+                    }
+                });
         findViewById(R.id.btnIniciarRotaM).setEnabled(false);
         findViewById(R.id.btnFinalizarM).setEnabled(false);
-        findViewById(R.id.btnGpsM).setOnClickListener(v -> abrirGps());
-        findViewById(R.id.btnIniciarRotaM).setOnClickListener(v -> iniciar());
+        findViewById(R.id.btnGpsM).setOnClickListener(
+                v -> MotoristaNavegacaoActivity.abrir(this, rotaId));
+        findViewById(R.id.btnIniciarRotaM).setOnClickListener(v -> viagem.iniciar());
         findViewById(R.id.btnFinalizarM).setOnClickListener(v -> confirmarFinalizar());
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (viagem != null) viagem.encerrar();
+        super.onDestroy();
     }
 
     @Override
@@ -97,8 +113,13 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                 }
                                 rota = r.body();
                                 ordenarParadas();
+                                List<ViagemRota.Coleta> lista = new ArrayList<>();
+                                for (GestorResponses.RotaEnd e : coletas())
+                                    lista.add(new ViagemRota.Coleta(
+                                            GestorRotaTexto.endereco(e), e.enderecoId, e.ordem));
+                                viagem.setColetas(lista);
                                 render();
-                                carregarViagem();
+                                viagem.carregar();
                                 estimar();
                             }
 
@@ -128,198 +149,13 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
         return l;
     }
 
-    private boolean emAndamento() {
-        return RotaViagemApiService.INICIADA.equals(viagem);
-    }
-
-    private boolean podeMexer() {
-        return emAndamento() && !outroMotorista && !ocupado;
-    }
-
-    // ───────────────────────────── andamento (API-Redis) ─────────────────────────────
-
-    private void carregarViagem() {
-        RotaViagemApiService.criar()
-                .sessao(rotaId)
-                .enqueue(
-                        new Callback<RotaViagemApiService.Sessao>() {
-                            @Override
-                            public void onResponse(
-                                    Call<RotaViagemApiService.Sessao> c,
-                                    Response<RotaViagemApiService.Sessao> r) {
-                                if (!vivo()) return;
-                                statusColetas.clear();
-                                if (r.code() == 404 || r.body() == null) {
-                                    // não iniciada, ou finalizada e já gravada no Postgres
-                                    viagem = null;
-                                    viagemInicio = null;
-                                    outroMotorista = false;
-                                    render();
-                                    return;
-                                }
-                                RotaViagemApiService.Sessao s = r.body();
-                                viagem = s.status;
-                                viagemInicio = s.inicio;
-                                outroMotorista =
-                                        funcId() != null
-                                                && s.motoristaId != null
-                                                && !funcId().equalsIgnoreCase(s.motoristaId);
-                                render();
-                                if (emAndamento()) carregarParadas();
-                            }
-
-                            @Override
-                            public void onFailure(Call<RotaViagemApiService.Sessao> c, Throwable t) {
-                                if (!vivo()) return;
-                                ((TextView) findViewById(R.id.txtRotaMIniciada))
-                                        .setText("Sem conexão com o acompanhamento da viagem.");
-                            }
-                        });
-    }
-
-    private void carregarParadas() {
-        RotaViagemApiService.criar()
-                .paradas(rotaId)
-                .enqueue(
-                        new Callback<RotaViagemApiService.Paradas>() {
-                            @Override
-                            public void onResponse(
-                                    Call<RotaViagemApiService.Paradas> c,
-                                    Response<RotaViagemApiService.Paradas> r) {
-                                if (!vivo() || !r.isSuccessful() || r.body() == null) return;
-                                List<RotaViagemApiService.Parada> lista = r.body().paradas;
-                                if ((lista == null || lista.isEmpty())
-                                        && !outroMotorista
-                                        && !reenviouParadas
-                                        && !coletas().isEmpty()) {
-                                    // o envio das paradas falhou ao iniciar: manda de novo (1 vez)
-                                    reenviouParadas = true;
-                                    enviarParadas(null);
-                                    return;
-                                }
-                                statusColetas.clear();
-                                if (lista != null) {
-                                    for (RotaViagemApiService.Parada p : lista) {
-                                        try {
-                                            statusColetas.put(Integer.parseInt(p.id), p.status);
-                                        } catch (NumberFormatException ignorado) {
-                                            // parada fora do formato da API: fica pendente
-                                        }
-                                    }
-                                }
-                                render();
-                            }
-
-                            @Override
-                            public void onFailure(Call<RotaViagemApiService.Paradas> c, Throwable t) {}
-                        });
-    }
-
-    private void iniciar() {
-        if (ocupado) return;
-        if (funcId() == null) {
-            toast("Não foi possível identificar o motorista. Faça login novamente.");
-            return;
-        }
-        ocupar(true);
-        RotaViagemApiService.criar()
-                .iniciar(new RotaViagemApiService.Inicio(rotaId, funcId()))
-                .enqueue(
-                        new Callback<Map<String, Object>>() {
-                            @Override
-                            public void onResponse(
-                                    Call<Map<String, Object>> c, Response<Map<String, Object>> r) {
-                                if (!vivo()) return;
-                                if (!r.isSuccessful()) {
-                                    ocupar(false);
-                                    toast("Não foi possível iniciar a rota (" + r.code() + ").");
-                                    return;
-                                }
-                                MotoristaLocal.marcarIniciada(
-                                        MotoristaRotaDetalheActivity.this, rotaId);
-                                enviarParadas(() -> toast("Rota iniciada. Boa viagem!"));
-                            }
-
-                            @Override
-                            public void onFailure(Call<Map<String, Object>> c, Throwable t) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                toast("Sem conexão: a rota não foi iniciada.");
-                            }
-                        });
-    }
-
-    /** Registra as paradas de coleta na API-Redis e recarrega o andamento. */
-    private void enviarParadas(Runnable depois) {
-        List<RotaViagemApiService.Parada> lista = new ArrayList<>();
-        for (GestorResponses.RotaEnd e : coletas())
-            lista.add(new RotaViagemApiService.Parada(GestorRotaTexto.endereco(e)));
-        if (lista.isEmpty()) {
-            ocupar(false);
-            if (depois != null) depois.run();
-            carregarViagem();
-            return;
-        }
-        ocupar(true);
-        RotaViagemApiService.criar()
-                .adicionarParadas(rotaId, new RotaViagemApiService.Paradas(lista))
-                .enqueue(
-                        new Callback<Map<String, Object>>() {
-                            @Override
-                            public void onResponse(
-                                    Call<Map<String, Object>> c, Response<Map<String, Object>> r) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                if (r.isSuccessful() && depois != null) depois.run();
-                                carregarViagem();
-                            }
-
-                            @Override
-                            public void onFailure(Call<Map<String, Object>> c, Throwable t) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                carregarViagem();
-                            }
-                        });
-    }
-
-    /** Toque numa coleta durante a viagem: marca como concluída ou volta para pendente. */
-    private void alternarColeta(int indice) {
-        if (!podeMexer()) return;
-        boolean feita = RotaViagemApiService.CONCLUIDA.equals(statusColetas.get(indice));
-        String novo = feita ? RotaViagemApiService.PENDENTE : RotaViagemApiService.CONCLUIDA;
-        statusColetas.put(indice, novo); // otimista; desfaz se a API recusar
-        render();
-        ocupar(true);
-        RotaViagemApiService.criar()
-                .atualizarParada(rotaId, indice, new RotaViagemApiService.NovoStatus(novo))
-                .enqueue(
-                        new Callback<RotaViagemApiService.Parada>() {
-                            @Override
-                            public void onResponse(
-                                    Call<RotaViagemApiService.Parada> c,
-                                    Response<RotaViagemApiService.Parada> r) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                if (!r.isSuccessful()) {
-                                    toast("Não foi possível atualizar a coleta.");
-                                    carregarViagem();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<RotaViagemApiService.Parada> c, Throwable t) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                toast("Sem conexão: a coleta não foi atualizada.");
-                                carregarViagem();
-                            }
-                        });
-    }
-
     private void confirmarFinalizar() {
-        if (!podeMexer()) return;
-        int pendentes = coletas().size() - concluidas();
+        if (!viagem.podeMexer()) return;
+        if (viagem.pendentesDeEnvio() > 0) {
+            viagem.finalizar(); // tenta enviar o que ficou guardado e avisa
+            return;
+        }
+        int pendentes = coletas().size() - viagem.concluidas();
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Finalizar rota")
                 .setMessage(
@@ -329,53 +165,8 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                         + ". Finalizar mesmo assim?"
                                 : "Todas as coletas foram concluídas. Finalizar a rota?")
                 .setNegativeButton("Cancelar", null)
-                .setPositiveButton("Finalizar", (d, w) -> finalizar())
+                .setPositiveButton("Finalizar", (d, w) -> viagem.finalizar())
                 .show();
-    }
-
-    private void finalizar() {
-        ocupar(true);
-        RotaViagemApiService.criar()
-                .finalizar(rotaId)
-                .enqueue(
-                        new Callback<RotaViagemApiService.Sessao>() {
-                            @Override
-                            public void onResponse(
-                                    Call<RotaViagemApiService.Sessao> c,
-                                    Response<RotaViagemApiService.Sessao> r) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                if (!r.isSuccessful()) {
-                                    toast("Não foi possível finalizar a rota (" + r.code() + ").");
-                                    carregarViagem();
-                                    return;
-                                }
-                                MotoristaLocal.marcarFinalizada(
-                                        MotoristaRotaDetalheActivity.this, rotaId);
-                                viagem = RotaViagemApiService.FINALIZADA;
-                                render();
-                                toast("Rota finalizada.");
-                            }
-
-                            @Override
-                            public void onFailure(Call<RotaViagemApiService.Sessao> c, Throwable t) {
-                                if (!vivo()) return;
-                                ocupar(false);
-                                toast("Sem conexão: a rota não foi finalizada.");
-                            }
-                        });
-    }
-
-    private void ocupar(boolean sim) {
-        ocupado = sim;
-        if (rota != null) render();
-    }
-
-    private int concluidas() {
-        int n = 0;
-        for (String s : statusColetas.values())
-            if (RotaViagemApiService.CONCLUIDA.equals(s)) n++;
-        return n;
     }
 
     // ───────────────────────────── tela ─────────────────────────────
@@ -387,10 +178,13 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
 
     private void render() {
         boolean ativa = !Boolean.FALSE.equals(rota.estaAtiva);
-        boolean andamento = emAndamento();
+        boolean andamento = viagem.emAndamento();
+        boolean outroMotorista = viagem.outroMotorista();
+        boolean ocupado = viagem.ocupado();
         boolean finalizada =
-                RotaViagemApiService.FINALIZADA.equals(viagem)
-                        || (viagem == null && MotoristaLocal.finalizadaHoje(this, rotaId));
+                viagem.finalizada()
+                        || (viagem.carregou() && viagem.status() == null
+                                && MotoristaLocal.finalizadaHoje(this, rotaId));
 
         titulo(rota.nome == null ? "Rota" : rota.nome);
         ((TextView) findViewById(R.id.txtRotaMTitulo)).setText(rota.nome);
@@ -403,7 +197,9 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
 
         TextView status = findViewById(R.id.txtRotaMStatus);
         int totalColetas = coletas().size();
-        int feitas = andamento ? concluidas() : 0;
+        // finalizada, a API ainda guarda as coletas até a sincronização com o Postgres
+        boolean comColetas = andamento || viagem.finalizada();
+        int feitas = comColetas ? viagem.concluidas() : 0;
         if (andamento) {
             GestorUi.badge(status, GestorUi.EM_NEGOCIACAO);
             status.setText("Em andamento");
@@ -416,7 +212,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
         }
         status.setCompoundDrawables(null, null, null, null);
 
-        String inicio = hora(viagemInicio);
+        String inicio = hora(viagem.inicio());
         String fim = hora(MotoristaLocal.finalizadaEm(this, rotaId));
         ((TextView) findViewById(R.id.txtRotaMIniciada))
                 .setText(
@@ -429,18 +225,28 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                                 ? "Finalizada"
                                                         + (fim != null ? " às " + fim : "")
                                                         + ". Os dados foram enviados à cooperativa."
-                                                : "Viagem não iniciada.");
+                                                : viagem.semConexao()
+                                                        ? "Sem conexão com o acompanhamento da viagem."
+                                                        : "Viagem não iniciada.");
         ((TextView) findViewById(R.id.txtRotaMProgressoTxt))
                 .setText(
                         andamento
                                 ? feitas + " de " + totalColetas + " coletas concluídas"
-                                        + (outroMotorista ? "" : " · toque numa coleta para marcar")
-                                : "Inicie a rota para registrar as coletas");
+                                        + (viagem.pendentesDeEnvio() > 0
+                                                ? " · " + viagem.pendentesDeEnvio() + " aguardando envio"
+                                                : outroMotorista ? "" : " · toque numa coleta para marcar")
+                                : comColetas
+                                        ? feitas + " de " + totalColetas + " coletas concluídas"
+                                        : finalizada
+                                                ? "Rota finalizada"
+                                                : "Inicie a rota para registrar as coletas");
         ((TextView) findViewById(R.id.txtParadasConcM))
-                .setText((andamento ? String.valueOf(feitas) : "—") + " / " + totalColetas);
+                .setText((comColetas ? String.valueOf(feitas) : "—") + " / " + totalColetas);
 
         View btnIniciar = findViewById(R.id.btnIniciarRotaM);
-        btnIniciar.setVisibility(ativa && !andamento ? View.VISIBLE : View.GONE);
+        btnIniciar.setVisibility(
+                ativa && !andamento && !finalizada && viagem.carregou() && !viagem.semConexao()
+                        ? View.VISIBLE : View.GONE);
         btnIniciar.setEnabled(!ocupado);
         btnIniciar.setAlpha(ocupado ? 0.5f : 1f);
         View btnFinalizar = findViewById(R.id.btnFinalizarM);
@@ -458,9 +264,9 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
             boolean extremo = ehExtremo(e);
             int indice = extremo ? -1 : indiceColeta++;
             boolean feita =
-                    andamento
+                    comColetas
                             && !extremo
-                            && RotaViagemApiService.CONCLUIDA.equals(statusColetas.get(indice));
+                            && viagem.concluida(indice);
             boolean ehFim = "FIM".equalsIgnoreCase(e.tipoLocal);
             if (prox == null && !extremo && !feita && andamento) prox = GestorRotaTexto.curto(e);
 
@@ -480,14 +286,17 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                                     ? "Ponto de Partida"
                                     : "Retorno à Cooperativa")
                             : "Coleta";
-            String situacao = !extremo && andamento ? (feita ? " - Concluída" : " - Pendente") : "";
+            String situacao = !extremo && comColetas
+                    ? (feita ? " - Concluída" : " - Pendente")
+                            + (viagem.aguardandoEnvio(indice) ? " (aguardando envio)" : "")
+                    : "";
             ((TextView) v.findViewById(R.id.txtParadaMTipo)).setText(rotulo + situacao);
             ((TextView) v.findViewById(R.id.txtParadaMEndereco))
                     .setText(GestorRotaTexto.endereco(e));
             v.findViewById(R.id.linhaParadaM)
                     .setVisibility(i == ends.size() - 1 ? View.INVISIBLE : View.VISIBLE);
             if (!extremo && andamento && !outroMotorista) {
-                v.setOnClickListener(x -> alternarColeta(indice));
+                v.setOnClickListener(x -> viagem.alternar(indice));
             }
 
             raiz.addView(v);
@@ -585,30 +394,5 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
                     @Override
                     public void indisponivel() {}
                 });
-    }
-
-    private void abrirGps() {
-        if (ends.isEmpty()) {
-            toast("Rota sem paradas cadastradas.");
-            return;
-        }
-        StringBuilder url = new StringBuilder("https://www.google.com/maps/dir/?api=1");
-        url.append("&origin=").append(Uri.encode(GestorRotaTexto.consulta(ends.get(0))));
-        url.append("&destination=")
-                .append(Uri.encode(GestorRotaTexto.consulta(ends.get(ends.size() - 1))));
-        if (ends.size() > 2) {
-            StringBuilder wp = new StringBuilder();
-            for (int i = 1; i < ends.size() - 1; i++) {
-                if (wp.length() > 0) wp.append("|");
-                wp.append(GestorRotaTexto.consulta(ends.get(i)));
-            }
-            url.append("&waypoints=").append(Uri.encode(wp.toString()));
-        }
-        url.append("&travelmode=driving");
-        try {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url.toString())));
-        } catch (Exception e) {
-            toast("Não foi possível abrir o app de mapas.");
-        }
     }
 }

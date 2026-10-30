@@ -90,6 +90,50 @@ public class RotasMotoristaIntegracaoTest {
         assertEquals(RotaViagemApiService.FINALIZADA, fim.body().status);
     }
 
+    /** Contrato da API-Redis com posse da viagem (fix/viagem-paradas-ordem-e-posse). */
+    @Test
+    public void outroMotoristaNaoAssumeEReenvioNaoZeraOProgresso() throws Exception {
+        String base = url("RENOVAI_API_REDIS_URL");
+        assumeTrue("RENOVAI_API_REDIS_URL não definida", base != null);
+        RotaViagemApiService api = RotaViagemApiService.criar(base);
+        String rota = UUID.randomUUID().toString();
+        String eu = UUID.randomUUID().toString(), outro = UUID.randomUUID().toString();
+
+        assertEquals(201, api.iniciar(new RotaViagemApiService.Inicio(rota, eu)).execute().code());
+        List<RotaViagemApiService.Parada> envio = new ArrayList<>();
+        for (int i = 0; i < 12; i++)
+            envio.add(new RotaViagemApiService.Parada("Rua " + i, "end-" + i, i + 1));
+        assertEquals(201, api.adicionarParadas(rota, new RotaViagemApiService.Paradas(envio)).execute().code());
+
+        Response<RotaViagemApiService.Parada> feita = api.atualizarParada(rota, 11,
+                new RotaViagemApiService.NovoStatus(RotaViagemApiService.CONCLUIDA, eu)).execute();
+        assertEquals(200, feita.code());
+        assertNotNull(feita.body().conclusao);
+        assertEquals("end-11", feita.body().enderecoId);
+        assertEquals("12", feita.body().ordem);
+
+        // a lista volta em ordem numérica
+        List<RotaViagemApiService.Parada> lidas = api.paradas(rota).execute().body().paradas;
+        for (int i = 0; i < lidas.size(); i++) assertEquals(String.valueOf(i), lidas.get(i).id);
+
+        // outro motorista: não inicia, não marca, não finaliza
+        assertEquals(409, api.iniciar(new RotaViagemApiService.Inicio(rota, outro)).execute().code());
+        assertEquals(403, api.atualizarParada(rota, 0,
+                new RotaViagemApiService.NovoStatus(RotaViagemApiService.CONCLUIDA, outro)).execute().code());
+        assertEquals(403, api.finalizar(rota, new RotaViagemApiService.Motorista(outro)).execute().code());
+        assertEquals(eu, api.sessao(rota).execute().body().motoristaId);
+
+        // o mesmo motorista retoma: reenviar não apaga a coleta concluída
+        assertEquals(200, api.iniciar(new RotaViagemApiService.Inicio(rota, eu)).execute().code());
+        assertEquals(200, api.adicionarParadas(rota, new RotaViagemApiService.Paradas(envio)).execute().code());
+        assertEquals(RotaViagemApiService.CONCLUIDA, porIndice(api.paradas(rota).execute().body().paradas).get(11));
+
+        assertEquals(400, api.atualizarParada(rota, 0, new RotaViagemApiService.NovoStatus("FEITA", eu)).execute().code());
+        assertEquals(200, api.finalizar(rota, new RotaViagemApiService.Motorista(eu)).execute().code());
+        assertEquals(409, api.atualizarParada(rota, 0,
+                new RotaViagemApiService.NovoStatus(RotaViagemApiService.CONCLUIDA, eu)).execute().code());
+    }
+
     @Test
     public void finalizarRotaNaoIniciadaDa404() throws Exception {
         String base = url("RENOVAI_API_REDIS_URL");
