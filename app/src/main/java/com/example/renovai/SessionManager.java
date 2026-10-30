@@ -76,5 +76,7 @@ public final class SessionManager {
     public static void logout() {
         if (app != null) Notificacoes.parar(app);
         prefs.edit().clear().apply();
+        // com o "manter conectado", sobras do funcionário anterior não podem abrir uma área
+        CooperadoSession.limpar();
     }
 }

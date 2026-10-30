@@ -218,6 +218,20 @@
                 app:iconGravity="textStart"
                 app:iconTint="#FFFFFF" />
 
+            <!-- Com o "manter conectado", o cooperado precisa sair pela tela (como o gestor) -->
+            <TextView
+                android:id="@+id/btnSair"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="Sair da conta"
+                android:textColor="#882B4E"
+                android:textSize="14sp" />
+
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
