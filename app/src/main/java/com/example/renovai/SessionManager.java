@@ -12,10 +12,12 @@ public final class SessionManager {
     private static final String KEY_EMPRESA_ID = "empresa_id";
 
     private static SharedPreferences prefs;
+    private static Context app;
 
     private SessionManager() {}
 
     public static void init(Context context) {
+        app = context.getApplicationContext();
         prefs =
                 context.getApplicationContext()
                         .getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -72,6 +74,7 @@ public final class SessionManager {
     }
 
     public static void logout() {
+        if (app != null) Notificacoes.parar(app);
         prefs.edit().clear().apply();
     }
 }

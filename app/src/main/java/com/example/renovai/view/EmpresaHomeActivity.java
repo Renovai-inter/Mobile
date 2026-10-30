@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.renovai.EmpresaCarrinho;
 import com.example.renovai.GestorUi;
+import com.example.renovai.Notificacoes;
 import com.example.renovai.R;
 import com.example.renovai.SessionManager;
 
@@ -42,6 +43,8 @@ public class EmpresaHomeActivity extends MenuActivity {
                 startActivity(new Intent(this, EmpresaFinalizarPedidoActivity.class));
             }
         }
+
+        Notificacoes.iniciar(this);
     }
 
     @Override
