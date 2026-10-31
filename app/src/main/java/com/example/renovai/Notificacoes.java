@@ -18,6 +18,7 @@ import com.example.renovai.view.AdminHomeActivity;
 import com.example.renovai.view.CooperadoHomeActivity;
 import com.example.renovai.view.EmpresaHomeActivity;
 import com.example.renovai.view.GestorHomeActivity;
+import com.example.renovai.view.GestorPedidosActivity;
 import com.example.renovai.view.MenuActivity;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -55,12 +56,23 @@ public final class Notificacoes {
     /** Perfil logado com notificações, pelo mesmo critério do LoginActivity.destinoParaRole. */
     public static Perfil perfil() {
         if (!SessionManager.estaLogado()) return null;
-        String r = SessionManager.getRole();
-        if (r == null) return null;
-        r = r.toUpperCase(Locale.ROOT);
+        return perfilDoRole(
+                SessionManager.getRole(),
+                CooperadoSession.temCooperadoResolvido(),
+                SessionManager.getEmpresaId() != null);
+    }
+
+    /**
+     * Perfil que recebe avisos para o role da conta, ou null para quem não recebe (admin do site,
+     * motorista, conta sem funcionário ou empresa resolvidos). O admin da cooperativa recebe como
+     * gestor, igual à área que ele usa no app.
+     */
+    static Perfil perfilDoRole(String role, boolean temFuncionario, boolean temEmpresa) {
+        if (role == null) return null;
+        String r = role.toUpperCase(Locale.ROOT);
         if (AdminHomeActivity.ehAdminDoSite(r)) return null;
-        if (r.contains("EMPRESA")) return SessionManager.getEmpresaId() != null ? Perfil.EMPRESA : null;
-        if (!CooperadoSession.temCooperadoResolvido()) return null;
+        if (r.contains("EMPRESA")) return temEmpresa ? Perfil.EMPRESA : null;
+        if (!temFuncionario) return null;
         if (r.contains("GESTOR") || r.equals("ADMIN_COOPERATIVA")) return Perfil.GESTOR;
         if (r.contains("COOPERADO")) return Perfil.COOPERADO;
         return null;
@@ -187,14 +199,26 @@ public final class Notificacoes {
         return CANAL_PEDIDOS;
     }
 
-    /** Abre a Home do perfil na aba do aviso (reaproveita a casca se ela já estiver aberta). */
+    /**
+     * Abre a Home do perfil na aba do aviso (reaproveita a casca se ela já estiver aberta). As
+     * propostas do gestor abrem a lista de pedidos por cima da Home, e o voltar retorna a ela.
+     */
     private static PendingIntent destino(Context c, Perfil p, String aba, int id) {
         Intent i = new Intent(c, casca(p));
-        i.putExtra(MenuActivity.EXTRA_ABA, aba(p, aba));
+        i.putExtra(MenuActivity.EXTRA_ABA, abaDoAviso(p, aba));
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        return PendingIntent.getActivity(
-                c, id, i, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+        if (abrePedidosDoGestor(p, aba)) {
+            return PendingIntent.getActivities(
+                    c, id, new Intent[] {i, new Intent(c, GestorPedidosActivity.class)}, flags);
+        }
+        return PendingIntent.getActivity(c, id, i, flags);
+    }
+
+    /** Proposta recebida, aceita ou finalizada: o gestor cai direto nos pedidos. */
+    static boolean abrePedidosDoGestor(Perfil p, String aba) {
+        return p == Perfil.GESTOR && (aba == null || "pedidos".equals(aba));
     }
 
     private static Class<? extends MenuActivity> casca(Perfil p) {
@@ -208,8 +232,8 @@ public final class Notificacoes {
         }
     }
 
-    /** Item do menu da casca para a aba do aviso (0 = a aba inicial). */
-    private static int aba(Perfil p, String aba) {
+    /** Item do menu da casca para a aba do aviso. */
+    static int abaDoAviso(Perfil p, String aba) {
         switch (p) {
             case GESTOR:
                 if ("coletas".equals(aba)) return R.id.nav_g_coletas;
