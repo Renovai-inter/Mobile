@@ -58,4 +58,14 @@ public class NotificacoesTest {
         assertFalse(Notificacoes.abrePedidosDoGestor(Perfil.EMPRESA, "pedidos"));
         assertFalse(Notificacoes.abrePedidosDoGestor(Perfil.COOPERADO, "estoque"));
     }
+
+    @Test
+    public void propostaRecebidaAbreOsPendentesDoGestor() {
+        assertTrue(Notificacoes.abrePedidosDoGestor(Perfil.GESTOR, "pedidos_pendentes"));
+        assertTrue(Notificacoes.abrePendentesDoGestor(Perfil.GESTOR, "pedidos_pendentes"));
+        // aceita/finalizada (e servidores antigos, que mandam só "pedidos") ficam nos pedidos
+        assertFalse(Notificacoes.abrePendentesDoGestor(Perfil.GESTOR, "pedidos"));
+        assertFalse(Notificacoes.abrePendentesDoGestor(Perfil.EMPRESA, "pedidos_pendentes"));
+        assertEquals(R.id.nav_g_home, Notificacoes.abaDoAviso(Perfil.GESTOR, "pedidos_pendentes"));
+    }
 }

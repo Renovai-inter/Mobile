@@ -19,6 +19,7 @@ import com.example.renovai.view.CooperadoHomeActivity;
 import com.example.renovai.view.EmpresaHomeActivity;
 import com.example.renovai.view.GestorHomeActivity;
 import com.example.renovai.view.GestorPedidosActivity;
+import com.example.renovai.view.GestorPedidosPendentesActivity;
 import com.example.renovai.view.MenuActivity;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -169,10 +170,16 @@ public final class Notificacoes {
         return ch;
     }
 
-    /** Mostra um push da API; aba = "pedidos", "coletas", "estoque" ou "rateios". */
+    /**
+     * Mostra um push da API; aba = "pedidos", "pedidos_pendentes" (proposta recebida), "coletas",
+     * "estoque" ou "rateios".
+     */
     static void mostrar(Context c, String titulo, String texto, String aba) {
         Perfil p = perfil();
         if (p == null) return; // aviso chegou depois do logout
+        // o aviso é de uma mudança no servidor: as listas em cache (pedidos, coletas, estoque,
+        // rateios) rebuscam na próxima abertura, senão o toque leva a uma tela sem a novidade
+        GestorCache.invalidarTudo();
         if (ContextCompat.checkSelfPermission(c, Manifest.permission.POST_NOTIFICATIONS)
                 != PackageManager.PERMISSION_GRANTED) return;
         criarCanais(c);
@@ -201,7 +208,8 @@ public final class Notificacoes {
 
     /**
      * Abre a Home do perfil na aba do aviso (reaproveita a casca se ela já estiver aberta). As
-     * propostas do gestor abrem a lista de pedidos por cima da Home, e o voltar retorna a ela.
+     * propostas do gestor abrem os pedidos por cima da Home (proposta recebida vai até os
+     * pendentes), e o voltar retorna por essas telas.
      */
     private static PendingIntent destino(Context c, Perfil p, String aba, int id) {
         Intent i = new Intent(c, casca(p));
@@ -210,15 +218,25 @@ public final class Notificacoes {
                 | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         int flags = PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
         if (abrePedidosDoGestor(p, aba)) {
-            return PendingIntent.getActivities(
-                    c, id, new Intent[] {i, new Intent(c, GestorPedidosActivity.class)}, flags);
+            Intent pedidos = new Intent(c, GestorPedidosActivity.class);
+            Intent[] pilha =
+                    abrePendentesDoGestor(p, aba)
+                            ? new Intent[] {i, pedidos, new Intent(c, GestorPedidosPendentesActivity.class)}
+                            : new Intent[] {i, pedidos};
+            return PendingIntent.getActivities(c, id, pilha, flags);
         }
         return PendingIntent.getActivity(c, id, i, flags);
     }
 
     /** Proposta recebida, aceita ou finalizada: o gestor cai direto nos pedidos. */
     static boolean abrePedidosDoGestor(Perfil p, String aba) {
-        return p == Perfil.GESTOR && (aba == null || "pedidos".equals(aba));
+        return p == Perfil.GESTOR
+                && (aba == null || "pedidos".equals(aba) || "pedidos_pendentes".equals(aba));
+    }
+
+    /** Proposta recebida: está nos pendentes, esperando Recusar/Negociar. */
+    static boolean abrePendentesDoGestor(Perfil p, String aba) {
+        return p == Perfil.GESTOR && "pedidos_pendentes".equals(aba);
     }
 
     private static Class<? extends MenuActivity> casca(Perfil p) {
