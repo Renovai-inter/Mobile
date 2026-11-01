@@ -44,6 +44,8 @@ public class SplashActivity extends AppCompatActivity {
             abrir(LoginActivity.class);
             return;
         }
+        // "manter conectado" também é uma entrada no app: conta no DAU como o login
+        com.example.renovai.Atividade.registrarLogin();
         // mesmo pré-carregamento do login (com o cache, funciona sem internet; no máx. 15 s)
         if (home == GestorHomeActivity.class) GestorData.precarregar(() -> runOnUiThread(() -> abrir(home)));
         else if (home == EmpresaHomeActivity.class) EmpresaData.precarregar(() -> runOnUiThread(() -> abrir(home)));

@@ -1,6 +1,7 @@
 package com.example.renovai.controller;
 
 import com.example.renovai.ApiClient;
+import com.example.renovai.Atividade;
 import com.example.renovai.AuthApiService;
 import com.example.renovai.CooperadoSession;
 import com.example.renovai.Documento;
@@ -151,7 +152,7 @@ public class AuthController {
                                                     salvarCopiaDaConta(
                                                             body.getUsuarioId(),
                                                             funcionario);
-                                                    callback.onSuccess(body);
+                                                    entrou(callback, body);
                                                     return;
                                                 }
                                                 // A API não achou (ou falhou):
@@ -160,11 +161,11 @@ public class AuthController {
                                                 restaurarDaCopiaDaConta(
                                                         body.getEmail(),
                                                         body.getUsuarioId(),
-                                                        () -> callback.onSuccess(body));
+                                                        () -> entrou(callback, body));
                                             });
                                 } else {
                                     salvarCopiaDaConta(body.getUsuarioId(), null);
-                                    callback.onSuccess(body);
+                                    entrou(callback, body);
                                 }
                             });
                 } else if (google) {
@@ -186,6 +187,12 @@ public class AuthController {
                             + " internet.");
             }
         };
+    }
+
+    /** Login concluído (empresa ou funcionário já resolvidos): marca o dia no DAU e libera a tela. */
+    private static void entrou(LoginCallback callback, LoginResponse body) {
+        Atividade.registrarLogin();
+        callback.onSuccess(body);
     }
 
     /** Mensagem do erro do login com Google (a API manda o motivo em "mensagem"). */
@@ -311,6 +318,7 @@ public class AuthController {
                                     SessionManager.salvarEmpresaId(body.getEmpresaId());
                                     CooperadoSession.limpar();
                                     salvarCopiaDaConta(null, null);
+                                    Atividade.registrarLogin();
                                     callback.onSuccess(body);
                                 } else {
                                     tratarErroCadastro(response, "empresa", email.trim(), callback);
