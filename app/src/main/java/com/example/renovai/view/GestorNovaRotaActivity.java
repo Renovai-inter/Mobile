@@ -1,6 +1,7 @@
 package com.example.renovai.view;
 
 import android.graphics.Color;
+import android.location.Address;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,12 +36,13 @@ import java.util.regex.Pattern;
 public class GestorNovaRotaActivity extends GestorBaseActivity {
 
     private static class Parada {
-        String texto, logradouro, numero, bairro;
+        String texto, logradouro, numero, bairro, cidade, cep;
     }
 
     private final List<Parada> paradas = new ArrayList<>();
     private int geracao = 0;
     private boolean salvando;
+    private RotaEnderecoSugestoes sugestoes;
     private String rotaCriadaId, nomeCriado;
     private int proximaParada;
     private final java.util.Map<Integer, String> enderecosCriados = new java.util.HashMap<>();
@@ -50,6 +52,8 @@ public class GestorNovaRotaActivity extends GestorBaseActivity {
         super.onCreate(b);
         if (!preparar(R.layout.activity_gestor_nova_rota, GestorBottomNav.Aba.NENHUMA)) return;
         titulo("Nova Rota");
+        sugestoes = new RotaEnderecoSugestoes(findViewById(R.id.edtNovaParada),
+                findViewById(R.id.txtSugestoesEndereco));
         ((EditText) findViewById(R.id.edtNomeRota))
                 .setText("Rota - " + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM")));
         findViewById(R.id.btnAdicionarParada).setOnClickListener(v -> adicionar());
@@ -63,7 +67,7 @@ public class GestorNovaRotaActivity extends GestorBaseActivity {
             return;
         }
         EditText e = findViewById(R.id.edtNovaParada);
-        String t = e.getText().toString().trim();
+        String t = RotaEnderecoSugestoes.normalizar(e.getText().toString());
         if (t.isEmpty()) {
             toast("Digite o endereço da parada.");
             return;
@@ -80,6 +84,16 @@ public class GestorNovaRotaActivity extends GestorBaseActivity {
         p.logradouro = partes[0].trim();
         if (partes.length > 1) p.bairro = partes[1].trim();
         if (p.logradouro.isEmpty()) p.logradouro = p.texto;
+        Address escolhido = sugestoes.selecionado();
+        if (escolhido != null) {
+            p.logradouro = escolhido.getThoroughfare() == null
+                    ? p.texto : escolhido.getThoroughfare();
+            p.numero = escolhido.getSubThoroughfare();
+            p.bairro = escolhido.getSubLocality();
+            p.cidade = escolhido.getLocality() == null
+                    ? escolhido.getSubAdminArea() : escolhido.getLocality();
+            p.cep = escolhido.getPostalCode();
+        }
         paradas.add(p);
         e.setText("");
         render();
@@ -231,6 +245,8 @@ public class GestorNovaRotaActivity extends GestorBaseActivity {
         e.logradouro = p.logradouro;
         e.numero = p.numero;
         e.bairro = p.bairro;
+        e.cidade = p.cidade;
+        e.cep = p.cep;
         GestorData.api()
                 .criarEndereco(e)
                 .enqueue(
@@ -331,5 +347,11 @@ public class GestorNovaRotaActivity extends GestorBaseActivity {
         findViewById(R.id.btnCriarRota).setEnabled(true);
         GestorData.invalidar(GestorCache.ROTAS);
         toast(msg);
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (sugestoes != null) sugestoes.fechar();
+        super.onDestroy();
     }
 }

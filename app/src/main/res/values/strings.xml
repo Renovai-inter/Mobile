@@ -7,4 +7,11 @@
     <string name="cooperativa_abrir_site">Abrir site</string>
     <string name="cooperativa_ir_login">Ir para o login</string>
     <string name="cooperativa_sem_navegador">Nenhum navegador disponível. Acesse https://renovai-piwe.onrender.com/login em outro dispositivo.</string>
+    <string name="rota_endereco_hint">Rua, número e cidade</string>
+    <string name="rota_endereco_dica">Digite ao menos 4 caracteres para buscar sugestões. Inclua o número e a cidade.</string>
+    <string name="rota_endereco_buscando">Buscando endereços…</string>
+    <string name="rota_endereco_selecione">Selecione um endereço da lista para preencher.</string>
+    <string name="rota_endereco_selecionado">Endereço preenchido. Confira o número antes de adicionar.</string>
+    <string name="rota_endereco_sem_resultados">Nenhuma sugestão encontrada. Confira a rua, o número e a cidade.</string>
+    <string name="rota_endereco_indisponivel">Sugestões indisponíveis. Você pode digitar o endereço completo.</string>
 </resources>
