@@ -17,9 +17,14 @@
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:gravity="center_vertical" android:orientation="horizontal">
                 <EditText android:id="@+id/edtNovaParada" style="@style/G.Input" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
-                    android:hint="Adicionar Rota (ex.: Rua da Lenda - Bairro, 101)" android:inputType="textCapSentences" android:textSize="13sp" />
+                    android:hint="@string/rota_endereco_hint" android:inputType="textPostalAddress|textCapWords" android:textSize="13sp" />
                 <TextView android:id="@+id/btnAdicionarParada" style="@style/G.BtnGreen" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:paddingTop="13dp" android:paddingBottom="13dp" android:text="+  Adicionar" />
             </LinearLayout>
+
+            <TextView android:id="@+id/txtSugestoesEndereco" style="@style/G.Sub"
+                android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="6dp" android:accessibilityLiveRegion="polite"
+                android:text="@string/rota_endereco_dica" />
 
             <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="34dp" android:background="@drawable/summary_green_background" android:orientation="vertical" android:padding="14dp">
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">

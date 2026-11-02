@@ -29,6 +29,35 @@ import java.io.FileOutputStream;
 /** Exercita layouts reais sem abrir contas, fazer login ou gravar dados na API. */
 @RunWith(AndroidJUnit4.class)
 public class LayoutsAreasTest {
+    @Test
+    public void cardRotaComEnderecosLongosMantemAlturaCompacta() {
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
+            for (float fonte : new float[]{1f, 1.3f}) {
+                Context c = contexto(fonte);
+                for (int largura : new int[]{320, 360, 412}) {
+                    View card = LayoutInflater.from(c)
+                            .inflate(R.layout.item_gestor_rota, new FrameLayout(c), false);
+                    android.widget.TextView origem = card.findViewById(R.id.txtRotaOrigem);
+                    android.widget.TextView destino = card.findViewById(R.id.txtRotaDestino);
+                    String endereco = "Av. dos Autonomistas, 1400 - Vila Yara, Osasco - SP, 06020-010";
+                    origem.setText(endereco);
+                    destino.setText(endereco + " - Retorno à cooperativa");
+                    card.measure(
+                            View.MeasureSpec.makeMeasureSpec(px(c, largura), View.MeasureSpec.EXACTLY),
+                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+                    card.layout(0, 0, card.getMeasuredWidth(), card.getMeasuredHeight());
+                    assertTrue("Card não deve ocupar uma tela inteira", card.getHeight() < px(c, 250));
+                    assertTrue(origem.getWidth() > 0);
+                    assertTrue(destino.getWidth() > 0);
+                    assertTrue(origem.getLineCount() <= 2);
+                    assertTrue(destino.getLineCount() <= 2);
+                    assertTrue("Destino deve permanecer dentro da linha",
+                            destino.getRight() <= ((View) destino.getParent()).getWidth());
+                }
+            }
+        });
+    }
+
     private Context contexto(float fonte) {
         Context target = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Configuration config = new Configuration(target.getResources().getConfiguration());
