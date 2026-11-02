@@ -40,6 +40,13 @@ public class CadastroActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // Intents antigos também não devem abrir o cadastro de cooperativa no app.
+        if (TIPO_COOPERATIVA.equals(getIntent().getStringExtra(EXTRA_TIPO))) {
+            startActivity(new Intent(this, EscolheActivity.class));
+            finish();
+            return;
+        }
+
 
         WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView())
                 .setAppearanceLightStatusBars(false);

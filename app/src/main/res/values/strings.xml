@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Renovai</string>
+    <string name="cooperativa_cadastro_resumo">Cadastre sua cooperativa pelo site. No app, faça login.</string>
+    <string name="cooperativa_cadastro_titulo">Cadastro de cooperativa pelo site</string>
+    <string name="cooperativa_cadastro_mensagem">Crie sua cooperativa no site do Renovaí:\nhttps://renovai-piwe.onrender.com/login\n\nDepois do cadastro, volte ao app e entre com seu e-mail e senha. No app, a cooperativa só faz login.</string>
+    <string name="cooperativa_cadastro_url" translatable="false">https://renovai-piwe.onrender.com/login</string>
+    <string name="cooperativa_abrir_site">Abrir site</string>
+    <string name="cooperativa_ir_login">Ir para o login</string>
+    <string name="cooperativa_sem_navegador">Nenhum navegador disponível. Acesse https://renovai-piwe.onrender.com/login em outro dispositivo.</string>
 </resources>
