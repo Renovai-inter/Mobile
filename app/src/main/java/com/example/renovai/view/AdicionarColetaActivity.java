@@ -2,6 +2,9 @@ package com.example.renovai.view;
 
 
 import android.app.DatePickerDialog;
+import android.Manifest;
+import android.content.ActivityNotFoundException;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -20,6 +23,9 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.example.renovai.ApiClient;
 import com.example.renovai.CooperadoSession;
@@ -39,6 +45,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.math.BigDecimal;
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,6 +91,7 @@ public class AdicionarColetaActivity extends AppCompatActivity {
 
     private boolean tipoExterno = false, registrando;
     private Uri fotoSelecionada;
+    private Uri fotoCameraPendente;
     // URL do Cloudinary da foto já enviada: se a API falhar, o "Registrar" de novo não sobe a foto outra vez.
     private String fotoUrlEnviada;
     private LocalDate dataPrevista;
@@ -94,14 +103,19 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     private final ActivityResultLauncher<String> seletorImagem =
             registerForActivityResult(
                     new ActivityResultContracts.GetContent(),
-                    uri -> {
-                        if (uri == null) return;
-                        fotoSelecionada = uri;
-                        fotoUrlEnviada = null;
-                        imgPreviewFotoColeta.setImageURI(uri);
-                        imgPreviewFotoColeta.setVisibility(View.VISIBLE);
-                        txtSemFotoColeta.setVisibility(View.GONE);
-                    });
+                    this::selecionarFoto);
+
+    private final ActivityResultLauncher<Uri> camera =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), sucesso -> {
+                if (sucesso) selecionarFoto(fotoCameraPendente);
+                fotoCameraPendente = null;
+            });
+
+    private final ActivityResultLauncher<String> permissaoCamera =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), concedida -> {
+                if (concedida) abrirCamera();
+                else toast("Permita o acesso à câmera para tirar uma foto. Você também pode usar a galeria.");
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,6 +136,13 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         findViewById(R.id.btnVoltarAdicionarColeta).setOnClickListener(v -> finish());
 
         bindViews();
+        if (savedInstanceState != null) {
+            String pendente = savedInstanceState.getString("fotoCameraPendente");
+            fotoCameraPendente = pendente == null ? null : Uri.parse(pendente);
+            String selecionada = savedInstanceState.getString("fotoSelecionada");
+            if (selecionada != null) selecionarFoto(Uri.parse(selecionada));
+            fotoUrlEnviada = savedInstanceState.getString("fotoUrlEnviada");
+        }
         configurarTipoColeta();
         configurarTriagem();
         configurarDataPrevista();
@@ -237,7 +258,51 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     }
 
     private void configurarFoto() {
-        findViewById(R.id.btnAnexarFoto).setOnClickListener(v -> seletorImagem.launch("image/*"));
+        findViewById(R.id.btnAnexarFoto).setOnClickListener(v ->
+                new AlertDialog.Builder(this)
+                        .setTitle("Foto da coleta")
+                        .setItems(new String[]{"Tirar foto", "Escolher da galeria"}, (dialog, opcao) -> {
+                            if (opcao == 1) seletorImagem.launch("image/*");
+                            else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                                    == PackageManager.PERMISSION_GRANTED) abrirCamera();
+                            else permissaoCamera.launch(Manifest.permission.CAMERA);
+                        })
+                        .setNegativeButton("Cancelar", null)
+                        .show());
+    }
+
+    private void abrirCamera() {
+        try {
+            File foto = File.createTempFile("coleta_", ".jpg", getCacheDir());
+            fotoCameraPendente = FileProvider.getUriForFile(
+                    this, getPackageName() + ".fileprovider", foto);
+            camera.launch(fotoCameraPendente);
+        } catch (ActivityNotFoundException e) {
+            fotoCameraPendente = null;
+            toast("Nenhum aplicativo de câmera disponível. Escolha uma foto da galeria.");
+        } catch (IOException | SecurityException | IllegalArgumentException e) {
+            fotoCameraPendente = null;
+            toast("Não foi possível abrir a câmera. Tente novamente.");
+        }
+    }
+
+    private void selecionarFoto(Uri uri) {
+        if (uri == null) return;
+        fotoSelecionada = uri;
+        fotoUrlEnviada = null;
+        imgPreviewFotoColeta.setImageURI(uri);
+        imgPreviewFotoColeta.setVisibility(View.VISIBLE);
+        txtSemFotoColeta.setVisibility(View.GONE);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (fotoCameraPendente != null)
+            outState.putString("fotoCameraPendente", fotoCameraPendente.toString());
+        if (fotoSelecionada != null)
+            outState.putString("fotoSelecionada", fotoSelecionada.toString());
+        outState.putString("fotoUrlEnviada", fotoUrlEnviada);
     }
 
     private void configurarMateriais() {
