@@ -449,6 +449,9 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
             View v = e.materialId == null ? null : linhas.get(e.materialId);
             if (v == null) continue;
             com.example.renovai.dto.response.MaterialResponse m = porId.get(e.materialId);
+            if (m != null && categorias != null)
+                ((TextView) v.findViewById(R.id.txtEstoqueLinhaNome))
+                        .setText(m.nomeExibicao(categorias));
             String pai = null;
             if (m != null && categorias != null)
                 for (com.example.renovai.dto.response.CategoriaMaterialResponse cat : categorias)
