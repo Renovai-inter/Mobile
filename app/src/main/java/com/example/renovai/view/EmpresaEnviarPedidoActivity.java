@@ -21,6 +21,7 @@ import com.example.renovai.GestorUi;
 import com.example.renovai.R;
 import com.example.renovai.dto.response.EmpresaResponses;
 import com.example.renovai.dto.response.MaterialResponse;
+import com.example.renovai.dto.response.CategoriaMaterialResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -37,6 +38,9 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
 
     private List<MaterialResponse> materiais = new ArrayList<>();
     private MaterialResponse selecionado;
+    private List<CategoriaMaterialResponse> categorias = new ArrayList<>();
+    private boolean carregandoMateriais = true, carregandoEstoque = true, carregandoCategorias = true;
+    private boolean erroMateriais, erroEstoque;
     private final java.util.Map<String, Double> estoques = new java.util.HashMap<>();
 
     @Override
@@ -75,6 +79,8 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
                             public void onResponse(
                                     Call<EmpresaResponses.CooperativaPerfilPublico> c,
                                     Response<EmpresaResponses.CooperativaPerfilPublico> r) {
+                                carregandoEstoque = false;
+                                erroEstoque = !r.isSuccessful() || r.body() == null;
                                 if (r.isSuccessful() && r.body() != null && vivo()) {
                                     ((TextView) findViewById(R.id.txtContatoCoopPedido))
                                             .setText(r.body().contato());
@@ -90,7 +96,10 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
                             @Override
                             public void onFailure(
                                     Call<EmpresaResponses.CooperativaPerfilPublico> c,
-                                    Throwable t) {}
+                                    Throwable t) {
+                                carregandoEstoque = false;
+                                erroEstoque = true;
+                            }
                         });
 
         EmpresaData.api()
@@ -101,10 +110,14 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
                             public void onResponse(
                                     Call<List<MaterialResponse>> c,
                                     Response<List<MaterialResponse>> r) {
+                                carregandoMateriais = false;
+                                erroMateriais = !r.isSuccessful() || r.body() == null;
                                 if (!r.isSuccessful() || r.body() == null || !vivo()) return;
                                 materiais = new ArrayList<>();
+                                java.util.Set<String> ids = new java.util.HashSet<>();
                                 for (MaterialResponse m : r.body())
-                                    if (Boolean.TRUE.equals(m.getEstaDisponivel()))
+                                    if (Boolean.TRUE.equals(m.getEstaDisponivel())
+                                            && m.getMaterialId() != null && ids.add(m.getMaterialId()))
                                         materiais.add(m);
                                 if (materiais.isEmpty())
                                     toast(
@@ -114,9 +127,24 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
 
                             @Override
                             public void onFailure(Call<List<MaterialResponse>> c, Throwable t) {
+                                carregandoMateriais = false;
+                                erroMateriais = true;
                                 if (vivo()) toast("Sem conexão com o servidor.");
                             }
                         });
+
+        EmpresaData.categorias(new com.example.renovai.GestorData.Ouvinte<List<CategoriaMaterialResponse>>() {
+            @Override
+            public void aoReceber(List<CategoriaMaterialResponse> dados, boolean cache) {
+                categorias = dados == null ? new ArrayList<>() : dados;
+                carregandoCategorias = false;
+            }
+
+            @Override
+            public void aoErro(String mensagem) {
+                carregandoCategorias = false;
+            }
+        });
 
         findViewById(R.id.campoMaterial).setOnClickListener(v -> escolherMaterial());
 
@@ -172,6 +200,14 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
     }
 
     private void escolherMaterial() {
+        if (carregandoMateriais || carregandoEstoque || carregandoCategorias) {
+            toast("Carregando materiais da cooperativa. Aguarde um instante.");
+            return;
+        }
+        if (erroMateriais || erroEstoque) {
+            toast("Não foi possível carregar os materiais. Reabra a tela para tentar novamente.");
+            return;
+        }
         if (materiais.isEmpty()) {
             toast("Nenhum material disponível para esta cooperativa.");
             return;
@@ -186,10 +222,11 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
             return;
         }
         String[] nomes = new String[disponiveis.size()];
+        disponiveis.sort((a, b) -> nomeMaterial(a).compareToIgnoreCase(nomeMaterial(b)));
         for (int i = 0; i < nomes.length; i++)
             nomes[i] =
-                    disponiveis.get(i).getCategoriaNome()
-                            + " — "
+                    nomeMaterial(disponiveis.get(i))
+                            + "\nDisponível: "
                             + GestorUi.kg(estoques.get(disponiveis.get(i).getMaterialId()));
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Tipo de Material")
@@ -205,12 +242,22 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
                                                             .getPrecoSugerido()
                                                             .toPlainString());
                             ((TextView) findViewById(R.id.txtMaterialSel))
-                                    .setText(selecionado.getCategoriaNome());
+                                    .setText(nomeMaterial(selecionado));
                             ((TextView) findViewById(R.id.txtMaterialSel)).setTextColor(0xFF222222);
                             atualizarTotal();
                         })
                 .setNegativeButton("Cancelar", null)
                 .show();
+    }
+
+    private String nomeMaterial(MaterialResponse material) {
+        String nome = material.nomeExibicao(categorias);
+        // Materiais distintos da mesma categoria continuam sendo opções distintas.
+        boolean repetido = materiais.stream().anyMatch(outro ->
+                !material.getMaterialId().equals(outro.getMaterialId())
+                        && estoques.getOrDefault(outro.getMaterialId(), 0d) > 0
+                        && nome.equalsIgnoreCase(outro.nomeExibicao(categorias)));
+        return repetido ? nome + " · Ref. " + GestorUi.idCurto(material.getMaterialId()) : nome;
     }
 
     private double pesoAtual() {
@@ -272,7 +319,7 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
         }
         EmpresaCarrinho.itens.add(
                 new EmpresaCarrinho.Item(
-                        selecionado.getMaterialId(), selecionado.getCategoriaNome(), peso, preco));
+                        selecionado.getMaterialId(), nomeMaterial(selecionado), peso, preco));
         selecionado = null;
         ((TextView) findViewById(R.id.txtMaterialSel)).setText("Selecionar material");
         ((TextView) findViewById(R.id.txtMaterialSel)).setTextColor(0xFF8A8A8A);

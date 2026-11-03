@@ -34,6 +34,14 @@ public class GestorResponses {
                 mensagem,
                 tipoMensagem,
                 dataEnvio;
+
+        /** A API grava somente a observação, que pode estar vazia, na contraproposta. */
+        public String textoExibicao() {
+            if (!"CONTRAPROPOSTA".equalsIgnoreCase(tipoMensagem)) return mensagem;
+            String observacao = mensagem == null ? "" : mensagem.trim();
+            return "Contraproposta enviada"
+                    + (observacao.isEmpty() ? "" : "\nObservação: " + observacao);
+        }
     }
 
     public static class Status {

@@ -181,7 +181,7 @@ public class GestorChatActivity extends GestorBaseActivity {
             col.setLayoutParams(lp);
 
             TextView bolha = new TextView(this);
-            bolha.setText(m.mensagem);
+            bolha.setText(m.textoExibicao());
             bolha.setTextColor(0xFFFFFFFF);
             bolha.setTextSize(12f);
             bolha.setMaxWidth(larg);
