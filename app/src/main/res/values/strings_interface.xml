@@ -1,0 +1,11 @@
+<resources>
+    <string name="popup_fechar">Fechar pop-up</string>
+    <string name="foto_abrir">Ampliar foto</string>
+    <string name="foto_fechar">Fechar foto</string>
+    <string name="foto_trocar">Substituir foto</string>
+    <string name="perfil_dados_empresa">Dados da empresa</string>
+    <string name="perfil_contato">Contato e localização</string>
+    <string name="perfil_preferencias">Preferências</string>
+    <string name="perfil_somente_leitura">Dados da conta e do vínculo. Alterações cadastrais devem ser solicitadas ao responsável pela cooperativa.</string>
+    <string name="perfil_carregando">Carregando dados do perfil…</string>
+</resources>

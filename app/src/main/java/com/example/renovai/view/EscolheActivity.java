@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.WindowCompat;
 
 import com.example.renovai.R;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 
 public class EscolheActivity extends AppCompatActivity {
 
@@ -42,7 +42,7 @@ public class EscolheActivity extends AppCompatActivity {
     }
 
     static void orientarCooperativa(AppCompatActivity activity) {
-        new MaterialAlertDialogBuilder(activity)
+        new RenovaiDialogBuilder(activity)
                 .setTitle(R.string.cooperativa_cadastro_titulo)
                 .setMessage(R.string.cooperativa_cadastro_mensagem)
                 .setPositiveButton(R.string.cooperativa_abrir_site, (dialog, which) -> {

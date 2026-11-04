@@ -100,9 +100,9 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     private final List<Item> itens = new ArrayList<>();
     private final List<RotaResponse> rotasCarregadas = new ArrayList<>();
 
-    private final ActivityResultLauncher<String> seletorImagem =
+    private final ActivityResultLauncher<String[]> seletorImagem =
             registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
+                    new ActivityResultContracts.OpenDocument(),
                     this::selecionarFoto);
 
     private final ActivityResultLauncher<Uri> camera =
@@ -158,6 +158,8 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         findViewById(R.id.btnAnexarFoto).setEnabled(fotoDisponivel);
         txtSemFotoColeta.setText(
                 fotoDisponivel ? "Nenhuma foto anexada" : "Envio de foto não configurado");
+        if (fotoSelecionada != null)
+            ((MaterialButton) findViewById(R.id.btnAnexarFoto)).setText(R.string.foto_trocar);
     }
 
     private void bindViews() {
@@ -259,10 +261,14 @@ public class AdicionarColetaActivity extends AppCompatActivity {
 
     private void configurarFoto() {
         findViewById(R.id.btnAnexarFoto).setOnClickListener(v ->
-                new AlertDialog.Builder(this)
+                new com.example.renovai.RenovaiDialogBuilder(this)
                         .setTitle("Foto da coleta")
                         .setItems(new String[]{"Tirar foto", "Escolher da galeria"}, (dialog, opcao) -> {
-                            if (opcao == 1) seletorImagem.launch("image/*");
+                            if (registrando) return;
+                            if (opcao == 1) {
+                                try { seletorImagem.launch(new String[] {"image/*"}); }
+                                catch (ActivityNotFoundException e) { toast("Nenhum seletor de imagens disponível."); }
+                            }
                             else if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                                     == PackageManager.PERMISSION_GRANTED) abrirCamera();
                             else permissaoCamera.launch(Manifest.permission.CAMERA);
@@ -287,12 +293,17 @@ public class AdicionarColetaActivity extends AppCompatActivity {
     }
 
     private void selecionarFoto(Uri uri) {
-        if (uri == null) return;
+        if (uri == null || registrando) return;
         fotoSelecionada = uri;
         fotoUrlEnviada = null;
-        imgPreviewFotoColeta.setImageURI(uri);
+        try {
+            getContentResolver().takePersistableUriPermission(uri,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } catch (SecurityException ignored) { }
+        com.example.renovai.Imagens.local(imgPreviewFotoColeta, uri);
         imgPreviewFotoColeta.setVisibility(View.VISIBLE);
         txtSemFotoColeta.setVisibility(View.GONE);
+        ((MaterialButton) findViewById(R.id.btnAnexarFoto)).setText(R.string.foto_trocar);
     }
 
     @Override
@@ -539,6 +550,7 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         LocalDate data = triagem ? dataPrevista : null;
 
         registrando = true;
+        findViewById(R.id.btnAnexarFoto).setEnabled(false);
         progressRegistrarColeta.setVisibility(View.VISIBLE);
         btnRegistrarColeta.setEnabled(false);
 
@@ -607,6 +619,7 @@ public class AdicionarColetaActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
         progressRegistrarColeta.setVisibility(View.GONE);
         btnRegistrarColeta.setEnabled(true);
+        findViewById(R.id.btnAnexarFoto).setEnabled(com.example.renovai.CloudinaryUpload.estaConfigurado());
         Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
     }
 

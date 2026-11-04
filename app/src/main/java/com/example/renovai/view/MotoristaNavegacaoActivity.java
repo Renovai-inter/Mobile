@@ -49,7 +49,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
@@ -514,7 +514,7 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
             return;
         }
         int pendentes = viagem.totalColetas() - viagem.concluidas();
-        new MaterialAlertDialogBuilder(this)
+        new RenovaiDialogBuilder(this)
                 .setTitle("Finalizar rota")
                 .setMessage(pendentes > 0
                         ? "Ainda há " + pendentes
@@ -547,7 +547,7 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
         else if (c != null && posicao != null)
             sb.append("\nDistância: ").append(RotaEstimador.textoDistancia(RotaEstimador.metros(posicao, c)));
 
-        MaterialAlertDialogBuilder d = new MaterialAlertDialogBuilder(this)
+        RenovaiDialogBuilder d = new RenovaiDialogBuilder(this)
                 .setTitle("Parada " + (i + 1))
                 .setMessage(sb.toString())
                 .setNeutralButton("Fechar", null)
@@ -624,7 +624,7 @@ public class MotoristaNavegacaoActivity extends MotoristaBaseActivity {
         }
         ScrollView sv = new ScrollView(this);
         sv.addView(raiz);
-        dialogo[0] = new MaterialAlertDialogBuilder(this)
+        dialogo[0] = new RenovaiDialogBuilder(this)
                 .setTitle(rota != null && rota.nome != null ? rota.nome : "Paradas")
                 .setView(sv)
                 .setPositiveButton("Fechar", null)

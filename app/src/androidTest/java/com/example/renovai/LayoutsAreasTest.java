@@ -86,7 +86,7 @@ public class LayoutsAreasTest {
                             View raiz =
                                     LayoutInflater.from(c)
                                             .inflate(
-                                                    R.layout.activity_cooperado_home,
+                                                    R.layout.activity_cooperado_menu,
                                                     new FrameLayout(c),
                                                     false);
                             BottomNavigationView nav =

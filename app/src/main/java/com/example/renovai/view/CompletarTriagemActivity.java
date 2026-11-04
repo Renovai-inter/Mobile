@@ -1,7 +1,7 @@
 package com.example.renovai.view;
 
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -264,7 +264,7 @@ public class CompletarTriagemActivity extends AppCompatActivity {
         }
 
         AlertDialog dialogo =
-                new MaterialAlertDialogBuilder(this)
+                new RenovaiDialogBuilder(this)
                         .setTitle("Separar material")
                         .setView(view)
                         .setPositiveButton("Concluir este material", null)

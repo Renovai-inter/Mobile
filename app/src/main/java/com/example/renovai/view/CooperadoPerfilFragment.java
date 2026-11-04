@@ -46,9 +46,10 @@ public class CooperadoPerfilFragment extends TelaFragment {
         // fazer isso com segurança nesta tela sem pedir a senha de novo, então o
         // ícone só avisa em vez de simular uma atualização que a API não suporta.
         findViewById(R.id.btnEditarNome).setOnClickListener(v ->
-                Toast.makeText(tela(),
-                        "Edição de nome requer confirmar a senha atual — indisponível nesta tela.",
-                        Toast.LENGTH_LONG).show());
+                new com.example.renovai.RenovaiDialogBuilder(tela())
+                        .setTitle("Dados cadastrais")
+                        .setMessage(R.string.perfil_somente_leitura)
+                        .setPositiveButton("Entendi", null).show());
 
         findViewById(R.id.btnSuporte).setOnClickListener(v -> abrirSuporte());
         findViewById(R.id.btnSair).setOnClickListener(v -> GestorUi.confirmar(
@@ -62,6 +63,7 @@ public class CooperadoPerfilFragment extends TelaFragment {
         new PerfilCooperadoController().carregarPerfil(new PerfilCooperadoController.Callback() {
             @Override
             public void onSuccess(PerfilCooperadoController.PerfilCooperado perfil) {
+                if (!vivo()) return;
                 txtNomeCooperativaPerfil.setText(
                         perfil.cooperativaNome != null ? perfil.cooperativaNome : "Cooperativa");
                 txtIniciaisCooperativaPerfil.setText(CooperadoUi.gerarIniciais(perfil.cooperativaNome));
@@ -72,6 +74,7 @@ public class CooperadoPerfilFragment extends TelaFragment {
 
             @Override
             public void onErro(String mensagem) {
+                if (!vivo()) return;
                 Toast.makeText(tela(), mensagem, Toast.LENGTH_LONG).show();
             }
         });

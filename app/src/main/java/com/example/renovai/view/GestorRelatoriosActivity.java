@@ -1,7 +1,7 @@
 package com.example.renovai.view;
 
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
@@ -54,7 +54,7 @@ public class GestorRelatoriosActivity extends GestorBaseActivity {
             if (bmp != null) img.setImageBitmap(bmp); else img.setImageDrawable(null);
             v.setOnClickListener(x -> GestorRelatorios.abrir(this, m));
             v.setOnLongClickListener(x -> {
-                new MaterialAlertDialogBuilder(this).setTitle(m.nome)
+                new RenovaiDialogBuilder(this).setTitle(m.nome)
                         .setItems(new String[]{"Abrir", "Compartilhar / baixar", "Excluir"}, (d, w) -> {
                             if (w == 0) GestorRelatorios.abrir(this, m);
                             else if (w == 1) GestorRelatorios.compartilhar(this, m);

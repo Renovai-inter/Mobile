@@ -32,7 +32,13 @@ public final class CloudinaryUpload {
             return;
         }
         Context app = context.getApplicationContext();
-        String mime = app.getContentResolver().getType(uri);
+        String mime;
+        try {
+            mime = app.getContentResolver().getType(uri);
+        } catch (SecurityException e) {
+            main.post(() -> retorno.erro("Selecione novamente a imagem para permitir a leitura."));
+            return;
+        }
         if (mime != null && !mime.startsWith("image/")) {
             main.post(() -> retorno.erro("Selecione um arquivo de imagem."));
             return;

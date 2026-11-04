@@ -31,6 +31,8 @@ final class RotaEnderecoSugestoes {
         this.campo = campo;
         this.aviso = aviso;
         lista = new ListPopupWindow(campo.getContext());
+        lista.setBackgroundDrawable(androidx.core.content.ContextCompat.getDrawable(
+                campo.getContext(), R.drawable.popup_calendario_background));
         lista.setAnchorView(campo);
         observador = new TextWatcher() {
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

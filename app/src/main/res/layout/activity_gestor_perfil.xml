@@ -10,6 +10,7 @@
             <include android:id="@+id/campoEmail" layout="@layout/view_gestor_campo" />
             <include android:id="@+id/campoCpf" layout="@layout/view_gestor_campo" />
             <include android:id="@+id/campoTelefone" layout="@layout/view_gestor_campo" />
+            <TextView android:id="@+id/txtPermissoesPerfil" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Este perfil permite consultar seus dados. Para alterações cadastrais, fale com o suporte." android:textColor="@color/popup_texto" android:textSize="13sp" />
 
             <TextView android:id="@+id/btnSuporte" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="60dp" android:text="Suporte" />
             <TextView android:id="@+id/btnSair" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:padding="12dp"

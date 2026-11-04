@@ -17,7 +17,7 @@ import com.example.renovai.RotaOtimizadorIaService;
 import com.example.renovai.RotaViagemApiService;
 import com.example.renovai.controller.ViagemRota;
 import com.example.renovai.dto.response.GestorResponses;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +156,7 @@ public class MotoristaRotaDetalheActivity extends MotoristaBaseActivity {
             return;
         }
         int pendentes = coletas().size() - viagem.concluidas();
-        new MaterialAlertDialogBuilder(this)
+        new RenovaiDialogBuilder(this)
                 .setTitle("Finalizar rota")
                 .setMessage(
                         pendentes > 0

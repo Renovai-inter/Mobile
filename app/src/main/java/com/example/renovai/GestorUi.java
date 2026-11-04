@@ -1,6 +1,6 @@
 package com.example.renovai;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -340,8 +340,9 @@ public final class GestorUi {
             Consumer<String> aoConfirmar) {
         EditText e = new EditText(a);
         e.setHint(dica);
-        e.setText(inicial == null ? "" : inicial);
         e.setInputType(inputType);
+        e.setText(inicial == null ? "" : inicial);
+        e.setContentDescription(titulo);
         e.setSelection(e.getText().length());
         LinearLayout box = new LinearLayout(a);
         int m = dp(a, 20);
@@ -350,7 +351,7 @@ public final class GestorUi {
                 e,
                 new LinearLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        new MaterialAlertDialogBuilder(a)
+        new RenovaiDialogBuilder(a)
                 .setTitle(titulo)
                 .setView(box)
                 .setPositiveButton(
@@ -361,7 +362,7 @@ public final class GestorUi {
 
     public static void confirmar(
             Activity a, String titulo, String mensagem, String rotuloOk, Runnable aoConfirmar) {
-        new MaterialAlertDialogBuilder(a)
+        new RenovaiDialogBuilder(a)
                 .setTitle(titulo)
                 .setMessage(mensagem)
                 .setPositiveButton(rotuloOk, (d, w) -> aoConfirmar.run())

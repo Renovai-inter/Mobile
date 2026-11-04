@@ -1,6 +1,6 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
@@ -38,6 +38,8 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
     private List<CategoriaMaterialResponse> categorias = new ArrayList<>();
     private List<EmpresaResponses.MaterialInteresse> interesses = new ArrayList<>();
     private boolean salvandoInteresses;
+    private boolean salvandoDados;
+    private AlertDialog edicao;
 
     public EmpresaPerfilFragment() {
         super(R.layout.activity_empresa_perfil);
@@ -48,54 +50,13 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
         super.onViewCreated(view, b);
         titulo("Perfil");
 
-        campo(
-                R.id.campoNomeE,
-                "Nome da empresa",
-                null,
-                v ->
-                        GestorUi.pedirTexto(
-                                tela(),
-                                "Nome da empresa",
-                                "",
-                                eu != null ? eu.nomeEmpresa : "",
-                                GestorUi.TIPO_TEXTO,
-                                t -> salvar("nomeEmpresa", t)));
-        campo(
-                R.id.campoEmailE,
-                "E-mail",
-                null,
-                v ->
-                        GestorUi.pedirTexto(
-                                tela(),
-                                "E-mail",
-                                "email@exemplo.com",
-                                eu != null ? eu.email : "",
-                                GestorUi.TIPO_EMAIL,
-                                t -> salvar("email", t)));
-        campo(
-                R.id.campoCnpjE,
-                "CNPJ",
-                null,
-                v ->
-                        GestorUi.pedirTexto(
-                                tela(),
-                                "CNPJ (00.000.000/0000-00)",
-                                "",
-                                eu != null ? eu.cnpj : "",
-                                GestorUi.TIPO_TEXTO,
-                                t -> salvar("cnpj", t)));
-        campo(
-                R.id.campoEnderecoE,
-                "Endereço",
-                null,
-                v ->
-                        GestorUi.pedirTexto(
-                                tela(),
-                                "Endereço",
-                                "",
-                                eu != null ? eu.endereco : "",
-                                GestorUi.TIPO_TEXTO,
-                                t -> salvar("endereco", t)));
+        campo(R.id.campoNomeE, "Nome da empresa *", null, v -> editarCampo("nomeEmpresa", "Nome da empresa", GestorUi.TIPO_TEXTO));
+        campo(R.id.campoEmailE, "E-mail *", null, v -> editarCampo("email", "E-mail", GestorUi.TIPO_EMAIL));
+        campo(R.id.campoCnpjE, "CNPJ *", null, v -> editarCampo("cnpj", "CNPJ", android.text.InputType.TYPE_CLASS_PHONE));
+        campo(R.id.campoEnderecoE, "Endereço *", null, v -> editarCampo("endereco", "Endereço", GestorUi.TIPO_TEXTO));
+        campo(R.id.campoTelefoneE, "Telefone *", null, v -> editarCampo("telefone", "Telefone com DDD", GestorUi.TIPO_TELEFONE));
+        campo(R.id.campoCidadeE, "Cidade", null, v -> editarCampo("cidade", "Cidade", GestorUi.TIPO_TEXTO));
+        campo(R.id.campoDescricaoE, "Descrição", null, v -> editarCampo("descricao", "Descrição da empresa", GestorUi.TIPO_TEXTO | android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE));
         campo(R.id.campoInteresseE, "Materiais de interesse", null, v -> editarInteresses());
 
         findViewById(R.id.btnSuporteE)
@@ -126,18 +87,26 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
     public void onResume() {
         super.onResume();
         if (!vivo()) return;
+        if (eu == null) findViewById(R.id.progressoPerfilE).setVisibility(View.VISIBLE);
         EmpresaData.meuPerfil(
                 false,
                 new com.example.renovai.GestorData.Ouvinte<EmpresaResponses.MeuPerfil>() {
                     @Override
                     public void aoReceber(EmpresaResponses.MeuPerfil p, boolean c) {
                         eu = p;
-                        if (vivo()) mostrar();
+                        if (vivo()) {
+                            if (!salvandoDados && !salvandoInteresses)
+                                findViewById(R.id.progressoPerfilE).setVisibility(View.GONE);
+                            mostrar();
+                        }
                     }
 
                     @Override
                     public void aoErro(String m) {
-                        if (vivo()) toast(m);
+                        if (vivo()) {
+                            findViewById(R.id.progressoPerfilE).setVisibility(View.GONE);
+                            toast(m);
+                        }
                     }
                 });
         EmpresaData.materiaisInteresse(
@@ -165,6 +134,12 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
         valorCampo2(R.id.campoEmailE, eu.email);
         valorCampo2(R.id.campoCnpjE, eu.cnpj);
         valorCampo2(R.id.campoEnderecoE, eu.endereco);
+        valorCampo2(R.id.campoTelefoneE, eu.telefone);
+        valorCampo2(R.id.campoCidadeE, eu.cidade);
+        valorCampo2(R.id.campoDescricaoE, eu.descricao);
+        android.widget.ImageView foto = findViewById(R.id.imgPerfilEmpresa);
+        foto.setVisibility(com.example.renovai.ImagemUrl.normalizar(eu.imagemUrl) == null ? View.GONE : View.VISIBLE);
+        com.example.renovai.Imagens.carregar(foto, eu.imagemUrl, true, com.example.renovai.TipoImagem.PERFIL);
     }
 
     private void mostrarInteresses() {
@@ -191,24 +166,62 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
                 .setText(valor == null || valor.isEmpty() ? "—" : valor);
         View lapis = c.findViewById(R.id.btnCampoEditar);
         lapis.setVisibility(View.VISIBLE);
-        lapis.setOnClickListener(aoEditar);
-        c.findViewById(R.id.txtCampoValor).setOnClickListener(aoEditar);
+        View.OnClickListener editar = v -> {
+            if (eu == null) { toast(getString(R.string.perfil_carregando)); return; }
+            if (!salvandoDados && !salvandoInteresses) aoEditar.onClick(v);
+        };
+        lapis.setContentDescription("Editar " + rotulo.replace(" *", ""));
+        lapis.setOnClickListener(editar);
+        c.findViewById(R.id.txtCampoValor).setOnClickListener(editar);
         return c;
     }
 
-    private void salvar(String campo, String valor) {
-        if ("cnpj".equals(campo) && !valor.replaceAll("\\D", "").matches("[0-9]{14}")) {
-            toast("CNPJ inválido (use 00.000.000/0000-00).");
-            return;
+    private void editarCampo(String campo, String titulo, int tipo) {
+        if (edicao != null && edicao.isShowing()) return;
+        String atual;
+        switch (campo) {
+            case "nomeEmpresa": atual = eu.nomeEmpresa; break;
+            case "email": atual = eu.email; break;
+            case "cnpj": atual = eu.cnpj; break;
+            case "endereco": atual = eu.endereco; break;
+            case "telefone": atual = eu.telefone; break;
+            case "cidade": atual = eu.cidade; break;
+            default: atual = eu.descricao;
         }
-        if ("nomeEmpresa".equals(campo) && valor.isEmpty()) {
-            toast("O nome não pode ficar vazio.");
-            return;
-        }
-        if (valor.isEmpty() || valor.length() > 255) {
-            toast("Preencha o campo com até 255 caracteres.");
-            return;
-        }
+        com.google.android.material.textfield.TextInputLayout input =
+                new com.google.android.material.textfield.TextInputLayout(tela());
+        input.setHint(titulo);
+        input.setPadding(GestorUi.dp(tela(), 23), GestorUi.dp(tela(), 8), GestorUi.dp(tela(), 23), 0);
+        com.google.android.material.textfield.TextInputEditText texto =
+                new com.google.android.material.textfield.TextInputEditText(input.getContext());
+        texto.setInputType(tipo);
+        texto.setText(atual);
+        texto.setSelectAllOnFocus(true);
+        input.addView(texto, new android.widget.LinearLayout.LayoutParams(-1, -2));
+        input.setHelperText("email".equals(campo) ? "Após alterar o e-mail, será necessário entrar novamente."
+                : "telefone".equals(campo) ? "Ex.: (11) 99999-9999. Campo obrigatório."
+                : "cidade".equals(campo) || "descricao".equals(campo) ? "Campo opcional." : "Campo obrigatório.");
+        edicao = new RenovaiDialogBuilder(tela()).setTitle(titulo).setView(input)
+                .setPositiveButton("Salvar", null).setNegativeButton("Cancelar", null).show();
+        edicao.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            if (salvandoDados) return;
+            String valor = texto.getText() == null ? "" : texto.getText().toString().trim();
+            String erro = com.example.renovai.PerfilEmpresaValidacao.erro(campo, valor);
+            input.setError(erro);
+            if (erro != null) return;
+            salvar(campo, valor, input);
+        });
+    }
+
+    private void salvar(String campo, String valor, com.google.android.material.textfield.TextInputLayout input) {
+        if (salvandoDados || eu == null) return;
+        salvandoDados = true;
+        String token = SessionManager.getToken();
+        boolean mudouEmail = "email".equals(campo) && !valor.equalsIgnoreCase(eu.email);
+        AlertDialog dialog = edicao;
+        RenovaiDialogBuilder.emAndamento(dialog, true);
+        input.getEditText().setEnabled(false);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Salvando…");
         EmpresaRequests.AtualizarMeuPerfil body = new EmpresaRequests.AtualizarMeuPerfil();
         switch (campo) {
             case "nomeEmpresa":
@@ -220,6 +233,9 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
             case "cnpj":
                 body.cnpj = valor;
                 break;
+            case "telefone": body.telefone = valor; break;
+            case "cidade": body.cidade = valor; break;
+            case "descricao": body.descricao = valor; break;
             default:
                 body.endereco = valor;
         }
@@ -233,28 +249,43 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
                             public void onResponse(
                                     Call<EmpresaResponses.MeuPerfil> c,
                                     Response<EmpresaResponses.MeuPerfil> r) {
-                                if (!vivo()) return;
-                                prog.setVisibility(View.GONE);
+                                salvandoDados = false;
+                                if (!java.util.Objects.equals(token, SessionManager.getToken())) return;
                                 if (r.isSuccessful() && r.body() != null) {
                                     eu = r.body();
                                     EmpresaData.invalidar("empresa:meuPerfil");
+                                    GestorCache.guardar("empresa:meuPerfil", eu);
+                                    dialog.dismiss();
+                                    if (mudouEmail) {
+                                        if (vivo()) toast("E-mail alterado. Entre novamente com o novo e-mail.");
+                                        if (isAdded()) sair();
+                                        else SessionManager.logout();
+                                        return;
+                                    }
+                                }
+                                if (!vivo()) return;
+                                prog.setVisibility(View.GONE);
+                                if (r.isSuccessful() && r.body() != null) {
                                     mostrar();
-                                    if ("email".equals(campo)) {
-                                        toast(
-                                                "E-mail alterado. Entre novamente com o novo"
-                                                        + " e-mail.");
-                                        sair();
-                                    } else toast("Dados atualizados.");
+                                    toast("Dados atualizados.");
                                 } else {
-                                    toast(EmpresaData.erro(r));
+                                    input.setError(EmpresaData.erro(r));
+                                    RenovaiDialogBuilder.emAndamento(dialog, false);
+                                    input.getEditText().setEnabled(true);
+                                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Salvar");
                                 }
                             }
 
                             @Override
                             public void onFailure(Call<EmpresaResponses.MeuPerfil> c, Throwable t) {
+                                salvandoDados = false;
+                                if (!java.util.Objects.equals(token, SessionManager.getToken())) return;
                                 if (!vivo()) return;
                                 prog.setVisibility(View.GONE);
-                                toast("Sem conexão com o servidor.");
+                                input.setError("Não foi possível confirmar o salvamento. Confira os dados antes de tentar novamente.");
+                                RenovaiDialogBuilder.emAndamento(dialog, false);
+                                input.getEditText().setEnabled(true);
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText("Salvar");
                             }
                         });
     }
@@ -274,7 +305,7 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
             marcados[i] = idsAtuais.contains(categorias.get(i).getCategoriaId());
         }
         boolean[] selecao = marcados.clone();
-        new MaterialAlertDialogBuilder(tela())
+        new RenovaiDialogBuilder(tela())
                 .setTitle("Materiais de interesse")
                 .setMultiChoiceItems(
                         nomes, selecao, (d, which, checked) -> selecao[which] = checked)
@@ -357,5 +388,10 @@ public class EmpresaPerfilFragment extends EmpresaAbaFragment {
         Intent i = new Intent(tela(), LoginActivity.class);
         i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
+    }
+
+    @Override public void onDestroyView() {
+        if (edicao != null) { edicao.dismiss(); edicao = null; }
+        super.onDestroyView();
     }
 }
