@@ -1,6 +1,6 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
@@ -190,7 +190,7 @@ public class AdminListaFragment extends AdminAbaFragment {
             if (texto.length() > 0) texto.append("\n\n");
             texto.append(linha[0]).append(":\n").append(linha[1].trim());
         }
-        MaterialAlertDialogBuilder dialogo = new MaterialAlertDialogBuilder(requireContext())
+        RenovaiDialogBuilder dialogo = new RenovaiDialogBuilder(requireContext())
                 .setTitle(it.nome)
                 .setMessage(texto.length() == 0 ? "Sem mais informações." : texto)
                 .setPositiveButton("Fechar", null)

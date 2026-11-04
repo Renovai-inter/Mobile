@@ -1,6 +1,6 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -109,64 +109,44 @@ public class CadastroActivity extends AppCompatActivity {
         btnCadastrar.setEnabled(true);
         if (isFinishing() || isDestroyed()) return;
 
-        View view = getLayoutInflater().inflate(R.layout.dialog_erro_cadastro, null);
-        // cartão branco arredondado do pop-up padrão vem do tema (ThemeOverlay.Renovai.Dialogo)
-        AlertDialog dialog = new MaterialAlertDialogBuilder(this).setView(view).create();
-
-        ImageView icone = view.findViewById(R.id.imgErro);
-        TextView dica = view.findViewById(R.id.txtDicaErro);
-        TextView primario = view.findViewById(R.id.txtPrimarioErro);
-        TextView secundario = view.findViewById(R.id.btnSecundarioErro);
-        ((TextView) view.findViewById(R.id.txtTituloErro)).setText(falha.titulo);
-        ((TextView) view.findViewById(R.id.txtMensagemErro)).setText(falha.mensagem);
-        if (falha.dica != null) {
-            dica.setText(falha.dica);
-            dica.setVisibility(View.VISIBLE);
-        }
-
-        Runnable acaoPrimaria = dialog::dismiss;
+        String primario = "Entendi";
+        String secundario = null;
+        Runnable acaoPrimaria = () -> {};
         Runnable acaoSecundaria = null;
         switch (falha.tipo) {
             case CONTA_EXISTENTE:
-                icone.setImageResource(R.drawable.ic_erro_conta);
-                primario.setText("Ir para o login");
+                primario = "Ir para o login";
                 acaoPrimaria = this::irParaLogin;
-                secundario.setText("Usar outro e-mail");
+                secundario = "Usar outro e-mail";
                 acaoSecundaria = () -> focar(R.id.edtEmail);
                 break;
             case DADOS_EM_USO:
-                icone.setImageResource(R.drawable.ic_erro_conta);
-                primario.setText("Revisar meus dados");
+                primario = "Revisar meus dados";
                 acaoPrimaria = () -> focar(R.id.edtCpf);
-                secundario.setText("Já tenho conta: entrar");
+                secundario = "Já tenho conta: entrar";
                 acaoSecundaria = this::irParaLogin;
                 break;
             case CONEXAO:
             case SERVIDOR:
-                if (falha.tipo == FalhaCadastro.Tipo.CONEXAO) icone.setImageResource(R.drawable.ic_erro_conexao);
-                primario.setText("Tentar novamente");
+                primario = "Tentar novamente";
                 acaoPrimaria = btnCadastrar::performClick;
-                secundario.setText("Fechar");
+                secundario = "Fechar";
                 acaoSecundaria = () -> {};
                 break;
             default:
-                primario.setText("Entendi");
+                break;
         }
 
         Runnable primariaFinal = acaoPrimaria;
-        view.findViewById(R.id.btnPrimarioErro).setOnClickListener(v -> {
-            dialog.dismiss();
-            primariaFinal.run();
-        });
+        RenovaiDialogBuilder builder = new RenovaiDialogBuilder(this);
+        builder.setTitle(falha.titulo)
+                .setMessage(falha.mensagem + (falha.dica == null ? "" : "\n\n" + falha.dica))
+                .setPositiveButton(primario, (d, w) -> primariaFinal.run());
         if (acaoSecundaria != null) {
             Runnable secundariaFinal = acaoSecundaria;
-            secundario.setVisibility(View.VISIBLE);
-            secundario.setOnClickListener(v -> {
-                dialog.dismiss();
-                secundariaFinal.run();
-            });
+            builder.setNegativeButton(secundario, (d, w) -> secundariaFinal.run());
         }
-        dialog.show();
+        builder.show();
     }
 
     private void focar(int id) {

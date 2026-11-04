@@ -1,6 +1,6 @@
 package com.example.renovai.view;
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 
@@ -145,7 +145,7 @@ public class EmpresaCooperativasFragment extends EmpresaAbaFragment {
             nomes[i] = categorias.get(i).getNomeCategoria();
             marcados[i] = novos.contains(categorias.get(i).getCategoriaId());
         }
-        new MaterialAlertDialogBuilder(tela())
+        new RenovaiDialogBuilder(tela())
                 .setTitle("Categorias de material")
                 .setMultiChoiceItems(
                         nomes,

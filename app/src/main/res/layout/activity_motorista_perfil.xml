@@ -9,6 +9,7 @@
             <include android:id="@+id/campoNome" layout="@layout/view_gestor_campo" />
             <include android:id="@+id/campoEmail" layout="@layout/view_gestor_campo" />
             <include android:id="@+id/campoCargo" layout="@layout/view_gestor_campo" />
+            <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="@string/perfil_somente_leitura" android:textColor="@color/popup_texto" android:textSize="13sp" />
             <TextView android:id="@+id/btnSuporte" style="@style/G.BtnFilled" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="60dp" android:text="Suporte" />
             <TextView android:id="@+id/btnSair" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:gravity="center" android:padding="12dp"
                 android:text="Sair da conta" android:textColor="#882B4E" android:textSize="14sp" android:clickable="true" android:focusable="true" />

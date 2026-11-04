@@ -22,6 +22,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Renovai"
         android:usesCleartextTraffic="true" >
+        <activity android:name=".view.FotoActivity" android:exported="false" />
         <activity
             android:name=".EmpresaActivity"
             android:exported="false" />

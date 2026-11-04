@@ -1,7 +1,7 @@
 package com.example.renovai.view;
 
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
@@ -86,7 +86,7 @@ public class GestorFuncionarioDetalheActivity extends GestorBaseActivity {
                         final List<GestorResponses.Cargo> cargos = new ArrayList<>(l);
                         String[] nomes = new String[cargos.size()];
                         for (int i = 0; i < nomes.length; i++) nomes[i] = cargos.get(i).cargo;
-                        new MaterialAlertDialogBuilder(GestorFuncionarioDetalheActivity.this)
+                        new RenovaiDialogBuilder(GestorFuncionarioDetalheActivity.this)
                                 .setTitle("Função")
                                 .setItems(
                                         nomes,

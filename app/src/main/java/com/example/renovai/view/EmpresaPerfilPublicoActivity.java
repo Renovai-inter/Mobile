@@ -1,7 +1,7 @@
 package com.example.renovai.view;
 
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -324,7 +324,7 @@ public class EmpresaPerfilPublicoActivity extends EmpresaBaseActivity {
                                 new LinearLayout.LayoutParams(
                                         LinearLayout.LayoutParams.MATCH_PARENT,
                                         LinearLayout.LayoutParams.WRAP_CONTENT));
-                        new MaterialAlertDialogBuilder(
+                        new RenovaiDialogBuilder(
                                         EmpresaPerfilPublicoActivity.this)
                                 .setTitle("Avaliar cooperativa")
                                 .setView(box)

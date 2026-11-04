@@ -58,16 +58,22 @@ public class AdicionarMaterialActivity extends AppCompatActivity {
     private String fotoUrlEnviada;
     private boolean enviando;
 
-    private final ActivityResultLauncher<String> seletorImagem =
+    private final ActivityResultLauncher<String[]> seletorImagem =
             registerForActivityResult(
-                    new ActivityResultContracts.GetContent(),
+                    new ActivityResultContracts.OpenDocument(),
                     uri -> {
                         if (uri == null) return;
+                        if (enviando) return;
+                        try {
+                            getContentResolver().takePersistableUriPermission(uri,
+                                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        } catch (SecurityException ignored) { }
                         fotoSelecionada = uri;
                         fotoUrlEnviada = null;
-                        imgPreview.setImageURI(uri);
+                        com.example.renovai.Imagens.local(imgPreview, uri);
                         imgPreview.setVisibility(View.VISIBLE);
                         txtSemFoto.setVisibility(View.GONE);
+                        ((MaterialButton) findViewById(R.id.btnAnexarFotoMaterial)).setText(R.string.foto_trocar);
                     });
 
     @Override
@@ -96,7 +102,13 @@ public class AdicionarMaterialActivity extends AppCompatActivity {
         boolean fotoDisponivel = CloudinaryUpload.estaConfigurado();
         View anexar = findViewById(R.id.btnAnexarFotoMaterial);
         anexar.setEnabled(fotoDisponivel);
-        anexar.setOnClickListener(v -> seletorImagem.launch("image/*"));
+        anexar.setOnClickListener(v -> {
+            if (enviando) return;
+            try { seletorImagem.launch(new String[] {"image/*"}); }
+            catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(this, "Nenhum seletor de imagens disponível.", Toast.LENGTH_LONG).show();
+            }
+        });
         if (!fotoDisponivel) txtSemFoto.setText("Envio de foto não configurado");
         btnCadastrar.setOnClickListener(v -> cadastrar());
         spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -110,6 +122,23 @@ public class AdicionarMaterialActivity extends AppCompatActivity {
         });
 
         carregarCategorias();
+        if (savedInstanceState != null) {
+            String uri = savedInstanceState.getString("fotoSelecionada");
+            if (uri != null) {
+                fotoSelecionada = Uri.parse(uri);
+                com.example.renovai.Imagens.local(imgPreview, fotoSelecionada);
+                imgPreview.setVisibility(View.VISIBLE);
+                txtSemFoto.setVisibility(View.GONE);
+                ((MaterialButton) anexar).setText(R.string.foto_trocar);
+            }
+            fotoUrlEnviada = savedInstanceState.getString("fotoUrlEnviada");
+        }
+    }
+
+    @Override protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        if (fotoSelecionada != null) out.putString("fotoSelecionada", fotoSelecionada.toString());
+        out.putString("fotoUrlEnviada", fotoUrlEnviada);
     }
 
     private MaterialApiService api() {
@@ -175,6 +204,7 @@ public class AdicionarMaterialActivity extends AppCompatActivity {
         BigDecimal precoFinal = preco;
 
         enviando = true;
+        findViewById(R.id.btnAnexarFotoMaterial).setEnabled(false);
         progresso.setVisibility(View.VISIBLE);
         btnCadastrar.setEnabled(false);
         if (fotoSelecionada == null || fotoUrlEnviada != null) {
@@ -224,6 +254,7 @@ public class AdicionarMaterialActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
         progresso.setVisibility(View.GONE);
         btnCadastrar.setEnabled(true);
+        findViewById(R.id.btnAnexarFotoMaterial).setEnabled(CloudinaryUpload.estaConfigurado());
         Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
     }
 }

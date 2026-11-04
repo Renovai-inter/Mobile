@@ -60,6 +60,9 @@ public final class Imagens {
         Glide.with(view).clear(view);
         view.setImageResource(R.drawable.pedido_foto_placeholder);
         String model = ImagemUrl.normalizar(url);
+        view.setOnClickListener(model == null ? null : v ->
+                com.example.renovai.view.FotoActivity.abrir(v.getContext(), android.net.Uri.parse(model)));
+        view.setFocusable(model != null);
         view.setContentDescription(view.getContext().getString(
                 model == null ? (tipo == TipoImagem.COLETA ? R.string.coleta_sem_foto
                         : tipo == TipoImagem.TRIAGEM ? R.string.triagem_sem_foto : R.string.sem_imagem)
@@ -88,9 +91,22 @@ public final class Imagens {
     }
 
     public static void limpar(ImageView view) {
+        view.setOnClickListener(null);
+        view.setClickable(false);
         view.setTag(R.id.tag_imagem_binding, null);
         if (vivo(view.getContext())) Glide.with(view).clear(view);
         view.setImageResource(R.drawable.pedido_foto_placeholder);
+    }
+
+    /** Prévia assíncrona e sem recorte de uma imagem escolhida no seletor do Android. */
+    public static void local(ImageView view, android.net.Uri uri) {
+        if (!vivo(view.getContext())) return;
+        Glide.with(view).load(uri).fitCenter()
+                .placeholder(R.drawable.pedido_foto_placeholder)
+                .error(R.drawable.pedido_foto_placeholder).into(view);
+        view.setContentDescription(view.getContext().getString(R.string.foto_abrir));
+        view.setOnClickListener(v -> com.example.renovai.view.FotoActivity.abrir(v.getContext(), uri));
+        view.setFocusable(true);
     }
 
     public static void preparar(Context context, String url, TipoImagem tipo) {

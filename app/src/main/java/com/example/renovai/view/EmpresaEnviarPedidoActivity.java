@@ -1,7 +1,7 @@
 package com.example.renovai.view;
 
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.example.renovai.RenovaiDialogBuilder;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -228,7 +228,7 @@ public class EmpresaEnviarPedidoActivity extends EmpresaBaseActivity {
                     nomeMaterial(disponiveis.get(i))
                             + "\nDisponível: "
                             + GestorUi.kg(estoques.get(disponiveis.get(i).getMaterialId()));
-        new MaterialAlertDialogBuilder(this)
+        new RenovaiDialogBuilder(this)
                 .setTitle("Tipo de Material")
                 .setItems(
                         nomes,
