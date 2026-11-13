@@ -4,6 +4,14 @@ package com.example.renovai.dto.request;
 /** Corpos de requisição da área do Gestor (espelham os records de Requests da API). */
 public class GestorRequests {
 
+    public static class ImagemCooperativa {
+        public String imagemUrl;
+
+        public ImagemCooperativa(String imagemUrl) {
+            this.imagemUrl = imagemUrl;
+        }
+    }
+
     public static class Mensagem {
         public String negociacaoId, remetenteId, mensagem, tipoMensagem;
 

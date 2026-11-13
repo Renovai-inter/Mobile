@@ -47,6 +47,8 @@ public abstract class GestorBaseActivity extends AppCompatActivity {
             String coop = CooperadoSession.getCooperativaNome();
             ((TextView) findViewById(R.id.txtNomeCooperativaHeader))
                     .setText(GestorUi.nomeCabecalho(coop));
+            findViewById(R.id.txtNomeCooperativaHeader).setOnClickListener(
+                    v -> DetalheCooperativaActivity.abrir(this));
             ((TextView) findViewById(R.id.txtIniciaisHeader))
                     .setText(GestorUi.iniciais(CooperadoSession.getUsuarioNome()));
             findViewById(R.id.btnPerfilHeader)
