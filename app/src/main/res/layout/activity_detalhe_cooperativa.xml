@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:background="@color/background_light_cooperado" android:orientation="vertical">
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="56dp"
+        android:gravity="center_vertical" android:orientation="horizontal" android:paddingHorizontal="16dp">
+        <TextView android:id="@+id/btnVoltarDetalheCooperativa" android:layout_width="40dp" android:layout_height="40dp"
+            android:clickable="true" android:contentDescription="Voltar" android:focusable="true" android:gravity="center"
+            android:text="‹" android:textColor="#882B4E" android:textSize="36sp" />
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginStart="8dp"
+            android:text="Cooperativa" android:textColor="#882B4E" android:textSize="20sp" android:textStyle="bold" />
+    </LinearLayout>
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:gravity="center_horizontal" android:orientation="vertical" android:padding="20dp">
+            <FrameLayout android:layout_width="128dp" android:layout_height="128dp">
+                <View android:layout_width="match_parent" android:layout_height="match_parent" android:background="@drawable/avatar_green_background" />
+                <com.google.android.material.imageview.ShapeableImageView android:id="@+id/imgFotoCooperativaDetalhe"
+                    android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="Foto da cooperativa"
+                    android:scaleType="centerCrop" app:shapeAppearanceOverlay="@style/Renovai.FotoRedonda" />
+            </FrameLayout>
+            <com.google.android.material.button.MaterialButton android:id="@+id/btnAlterarFotoCooperativa"
+                android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="12dp"
+                android:text="Alterar foto" android:visibility="gone" />
+            <TextView android:id="@+id/txtNomeCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="18dp" android:gravity="center" android:text="Cooperativa" android:textColor="#882B4E"
+                android:textSize="24sp" android:textStyle="bold" />
+            <ProgressBar android:id="@+id/progressoCooperativaDetalhe" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="18dp" />
+            <LinearLayout android:id="@+id/dadosCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="20dp" android:orientation="vertical" android:visibility="gone">
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SOBRE" />
+                <TextView android:id="@+id/txtDescricaoCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:background="@drawable/card_unselected_background" android:padding="16dp" android:textColor="#444444" android:textSize="15sp" />
+                <TextView style="@style/G.Green" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="20dp" android:text="INFORMAÇÕES" />
+                <TextView android:id="@+id/txtCidadeCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:background="@drawable/card_unselected_background" android:padding="16dp" android:textColor="#444444" android:textSize="15sp" />
+                <TextView android:id="@+id/txtHorarioCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:background="@drawable/card_unselected_background" android:padding="16dp" android:textColor="#444444" android:textSize="15sp" />
+                <TextView android:id="@+id/txtContatoCooperativaDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:background="@drawable/card_unselected_background" android:padding="16dp" android:textColor="#444444" android:textSize="15sp" />
+                <TextView android:id="@+id/txtNumeroCooperadosDetalhe" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" android:background="@drawable/card_unselected_background" android:padding="16dp" android:textColor="#444444" android:textSize="15sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

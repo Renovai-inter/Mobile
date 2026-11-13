@@ -3,6 +3,7 @@ package com.example.renovai;
 import com.example.renovai.dto.request.GestorRequests;
 import com.example.renovai.dto.request.TriagemRequest;
 import com.example.renovai.dto.response.ColetaResponse;
+import com.example.renovai.dto.response.CooperativaResponse;
 import com.example.renovai.dto.response.FuncionarioResponse;
 import com.example.renovai.dto.response.GestorResponses;
 import com.example.renovai.dto.response.MaterialResponse;
@@ -27,6 +28,13 @@ import java.util.List;
  * da API (context-path /api).
  */
 public interface GestorApiService {
+
+    @GET("gestor/cooperativa")
+    Call<CooperativaResponse> minhaCooperativa();
+
+    @PATCH("gestor/cooperativa/foto")
+    Call<CooperativaResponse> atualizarFotoCooperativa(
+            @Body GestorRequests.ImagemCooperativa body);
 
     // ── Coletas / Triagens / Estoque ──
     @GET("coletas/por-cooperativa/{id}")

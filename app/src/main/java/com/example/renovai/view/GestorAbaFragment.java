@@ -26,6 +26,8 @@ public abstract class GestorAbaFragment extends TelaFragment {
         super.onViewCreated(view, savedInstanceState);
         if (findViewById(R.id.gestorHeader) != null) {
             ((TextView) findViewById(R.id.txtNomeCooperativaHeader)).setText(nomeNoCabecalho());
+            findViewById(R.id.txtNomeCooperativaHeader).setOnClickListener(
+                    v -> DetalheCooperativaActivity.abrir(requireContext()));
             ((TextView) findViewById(R.id.txtIniciaisHeader))
                     .setText(GestorUi.iniciais(CooperadoSession.getUsuarioNome()));
             findViewById(R.id.btnPerfilHeader).setOnClickListener(v -> abrirAba(abaPerfil()));

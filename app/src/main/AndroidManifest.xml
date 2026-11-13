@@ -90,6 +90,7 @@
         <activity
             android:name=".view.GestorHomeActivity"
             android:exported="false" />
+        <activity android:name=".view.DetalheCooperativaActivity" android:exported="false" />
         <activity
             android:name=".view.GestorColetaDetalheActivity"
             android:exported="false" />
